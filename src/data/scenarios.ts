@@ -1,0 +1,1259 @@
+export const OUTCOMES = [
+  "near-miss",
+  "property-damage",
+  "minor-injury",
+  "serious-injury",
+  "fatality",
+] as const;
+
+export type OutcomeId = (typeof OUTCOMES)[number];
+
+export const SCENARIO_SECTORS = [
+  "construction",
+  "production",
+  "logistics",
+  "maintenance",
+  "cleaning",
+  "hospitality",
+  "office",
+  "agriculture",
+] as const;
+
+export type ScenarioSector = (typeof SCENARIO_SECTORS)[number];
+
+export interface Scenario {
+  readonly id: string;
+  readonly outcome: OutcomeId;
+  readonly sector: ScenarioSector;
+  readonly narrative: string;
+  readonly hazard: string;
+  readonly immediateCause: string;
+  readonly consequence: string;
+  readonly preventiveActions: readonly [string, string];
+  readonly sourceTags: readonly string[];
+}
+
+export const scenarios = [
+  {
+    id: "nm-construction-01",
+    outcome: "near-miss",
+    sector: "construction",
+    narrative:
+      "Iván bajaba por una escalera de mano cuando uno de los apoyos se hundió en terreno blando. Se sujetó al forjado y un compañero estabilizó la escalera antes de que cayera.",
+    hazard: "Trabajo en altura sobre una escalera apoyada en terreno inestable.",
+    immediateCause: "La escalera se colocó sin comprobar la firmeza ni nivelar los apoyos.",
+    consequence: "Caída a distinto nivel con posibles fracturas y traumatismos.",
+    preventiveActions: [
+      "Comprobar y acondicionar la superficie antes de colocar la escalera.",
+      "Asegurar la escalera y mantener tres puntos de contacto durante el uso.",
+    ],
+    sourceTags: ["trabajos en altura", "escaleras de mano"],
+  },
+  {
+    id: "nm-construction-02",
+    outcome: "near-miss",
+    sector: "construction",
+    narrative:
+      "Al mover un palé con la grúa torre, dos ladrillos sueltos resbalaron de la carga y golpearon el suelo a pocos metros de Nuria. La zona inferior estaba vacía por casualidad.",
+    hazard: "Caída de materiales durante una maniobra de elevación.",
+    immediateCause:
+      "La carga se izó sin flejar y sin revisar la colocación de los elementos sueltos.",
+    consequence: "Golpe por objeto desprendido con lesiones graves o mortales.",
+    preventiveActions: [
+      "Flejar y verificar la estabilidad de todas las cargas antes del izado.",
+      "Delimitar la vertical de la maniobra e impedir el paso de personas.",
+    ],
+    sourceTags: ["elevación de cargas", "caída de objetos"],
+  },
+  {
+    id: "nm-production-01",
+    outcome: "near-miss",
+    sector: "production",
+    narrative:
+      "La manga de Sonia rozó los rodillos de una laminadora mientras retiraba una rebaba. Pulsó la parada de emergencia antes de que el tejido quedara atrapado.",
+    hazard: "Atrapamiento con partes móviles de una máquina.",
+    immediateCause: "Se intervino cerca de los rodillos con la máquina en marcha y ropa holgada.",
+    consequence: "Arrastre de la extremidad con lesiones por aplastamiento.",
+    preventiveActions: [
+      "Parar, aislar y bloquear la máquina antes de retirar atascos o rebabas.",
+      "Usar ropa de trabajo ajustada y mantener operativos los resguardos.",
+    ],
+    sourceTags: ["equipos de trabajo", "atrapamientos"],
+  },
+  {
+    id: "nm-production-02",
+    outcome: "near-miss",
+    sector: "production",
+    narrative:
+      "Un recipiente con disolvente cayó de una mesa y se abrió junto a una zona de soldadura. Diego retiró el equipo de soldar antes de que las chispas alcanzaran el derrame.",
+    hazard: "Atmósfera inflamable próxima a una fuente de ignición.",
+    immediateCause:
+      "El disolvente se dejó en un envase abierto y fuera del armario de inflamables.",
+    consequence: "Incendio súbito con quemaduras e intoxicación por humos.",
+    preventiveActions: [
+      "Guardar los productos inflamables cerrados en armarios homologados.",
+      "Separar los trabajos en caliente y autorizarlos mediante un permiso específico.",
+    ],
+    sourceTags: ["riesgo químico", "incendios"],
+  },
+  {
+    id: "nm-logistics-01",
+    outcome: "near-miss",
+    sector: "logistics",
+    narrative:
+      "Una carretilla salió marcha atrás de un pasillo y pasó a menos de un metro de Salma, que cruzaba hacia la zona de preparación. Ambos se vieron al aparecer en el cruce.",
+    hazard: "Atropello en una zona compartida por peatones y carretillas.",
+    immediateCause:
+      "El cruce carecía de visibilidad, señal acústica y separación física de recorridos.",
+    consequence: "Atropello o atrapamiento contra una estantería.",
+    preventiveActions: [
+      "Separar y señalizar los itinerarios de peatones y vehículos.",
+      "Instalar espejos y exigir velocidad reducida y aviso acústico en cruces.",
+    ],
+    sourceTags: ["carretillas elevadoras", "tráfico interno"],
+  },
+  {
+    id: "nm-logistics-02",
+    outcome: "near-miss",
+    sector: "logistics",
+    narrative:
+      "Al abrir un remolque, varias cajas inclinadas empujaron la puerta. Marcos retrocedió a tiempo y las cajas cayeron en el muelle sin alcanzarle.",
+    hazard: "Desplome de mercancía desplazada durante el transporte.",
+    immediateCause:
+      "La carga no estaba inmovilizada y se abrió la puerta desde la trayectoria de caída.",
+    consequence: "Golpes y aplastamiento por bultos pesados.",
+    preventiveActions: [
+      "Asegurar la carga con sistemas de retención adecuados al trayecto.",
+      "Comprobar el estado desde una posición protegida antes de abrir el remolque.",
+    ],
+    sourceTags: ["estiba", "caída de cargas"],
+  },
+  {
+    id: "nm-maintenance-01",
+    outcome: "near-miss",
+    sector: "maintenance",
+    narrative:
+      "Álex comenzó a desmontar la tapa de una bomba que figuraba como parada. Una vibración le alertó de que seguía presurizada y detuvo la intervención antes de aflojar el último tornillo.",
+    hazard: "Liberación inesperada de presión y fluido caliente.",
+    immediateCause: "No se aisló ni verificó la energía residual antes del desmontaje.",
+    consequence: "Proyección de piezas y quemaduras por el fluido a presión.",
+    preventiveActions: [
+      "Aplicar el procedimiento de consignación y bloqueo de todas las energías.",
+      "Purgar el circuito y verificar presión cero antes de intervenir.",
+    ],
+    sourceTags: ["consignación", "energías peligrosas"],
+  },
+  {
+    id: "nm-maintenance-02",
+    outcome: "near-miss",
+    sector: "maintenance",
+    narrative:
+      "Durante una revisión eléctrica, Rocío detectó tensión con el comprobador en un cuadro que constaba como desconectado. No llegó a tocar los bornes descubiertos.",
+    hazard: "Contacto eléctrico directo en un cuadro energizado.",
+    immediateCause:
+      "La identificación del circuito era incorrecta y no se verificó la ausencia de tensión.",
+    consequence: "Electrocución o quemaduras por arco eléctrico.",
+    preventiveActions: [
+      "Identificar, seccionar y bloquear de forma inequívoca el circuito.",
+      "Verificar la ausencia de tensión con un equipo comprobado antes y después.",
+    ],
+    sourceTags: ["riesgo eléctrico", "mantenimiento seguro"],
+  },
+  {
+    id: "nm-cleaning-01",
+    outcome: "near-miss",
+    sector: "cleaning",
+    narrative:
+      "Marta mezcló por error un desincrustante ácido con restos de lejía en un cubo. Percibió un olor irritante, salió del aseo y avisó antes de sufrir síntomas.",
+    hazard: "Generación de gas tóxico por mezcla incompatible de productos.",
+    immediateCause: "Se reutilizó un recipiente sin aclararlo y no se consultó la etiqueta.",
+    consequence: "Irritación respiratoria grave o intoxicación aguda.",
+    preventiveActions: [
+      "No mezclar productos y seguir las instrucciones de etiqueta y ficha de seguridad.",
+      "Mantener los envases identificados y ventilar la zona durante su uso.",
+    ],
+    sourceTags: ["productos de limpieza", "incompatibilidad química"],
+  },
+  {
+    id: "nm-cleaning-02",
+    outcome: "near-miss",
+    sector: "cleaning",
+    narrative:
+      "Luis limpiaba el borde de una claraboya cuando el mango telescópico golpeó una línea eléctrica cercana. El mango aislante evitó el contacto y él se retiró de inmediato.",
+    hazard: "Proximidad a una línea eléctrica durante tareas de limpieza exterior.",
+    immediateCause:
+      "No se evaluó la distancia de seguridad antes de desplegar el útil telescópico.",
+    consequence: "Descarga eléctrica con caída posterior desde la cubierta.",
+    preventiveActions: [
+      "Planificar el trabajo respetando las distancias de seguridad a líneas eléctricas.",
+      "Desenergizar la línea o emplear un método alternativo desde una zona segura.",
+    ],
+    sourceTags: ["líneas eléctricas", "limpieza en altura"],
+  },
+  {
+    id: "nm-hospitality-01",
+    outcome: "near-miss",
+    sector: "hospitality",
+    narrative:
+      "Una sartén con aceite comenzó a arder en la cocina. Paula apagó la fuente de calor y colocó una tapa metálica; otro empleado estaba a punto de verter agua sobre las llamas.",
+    hazard: "Incendio de aceite de cocina.",
+    immediateCause: "El aceite se dejó calentando sin vigilancia junto a materiales combustibles.",
+    consequence: "Propagación del fuego y quemaduras graves por salpicadura.",
+    preventiveActions: [
+      "Vigilar permanentemente el calentamiento de aceites y mantener despejado el entorno.",
+      "Formar al personal en extinción segura y disponer de manta ignífuga accesible.",
+    ],
+    sourceTags: ["cocinas", "prevención de incendios"],
+  },
+  {
+    id: "nm-hospitality-02",
+    outcome: "near-miss",
+    sector: "hospitality",
+    narrative:
+      "Hugo transportaba una bandeja y resbaló sobre hielo derretido junto a la barra. Recuperó el equilibrio apoyándose en una columna y no llegó a caer con la vajilla.",
+    hazard: "Suelo mojado en una zona de paso con carga manual.",
+    immediateCause: "El derrame no se retiró ni se señalizó tras reponer la cubitera.",
+    consequence: "Caída al mismo nivel con cortes por vajilla rota.",
+    preventiveActions: [
+      "Limpiar los derrames de inmediato y señalizar hasta que el suelo esté seco.",
+      "Organizar la reposición para mantener libres y visibles las vías de paso.",
+    ],
+    sourceTags: ["caídas al mismo nivel", "orden y limpieza"],
+  },
+  {
+    id: "nm-office-01",
+    outcome: "near-miss",
+    sector: "office",
+    narrative:
+      "Una regleta sobrecargada comenzó a humear bajo la mesa de Celia. Desconectó la alimentación desde el cuadro y avisó antes de que prendiera el cableado.",
+    hazard: "Sobrecalentamiento eléctrico bajo mobiliario combustible.",
+    immediateCause: "Se conectaron varios calefactores y equipos a regletas encadenadas.",
+    consequence: "Incendio, inhalación de humo y daños en la oficina.",
+    preventiveActions: [
+      "Prohibir regletas encadenadas y dimensionar la instalación para la carga prevista.",
+      "Inspeccionar cables y retirar inmediatamente los equipos con calentamiento anómalo.",
+    ],
+    sourceTags: ["seguridad eléctrica", "incendios en oficinas"],
+  },
+  {
+    id: "nm-office-02",
+    outcome: "near-miss",
+    sector: "office",
+    narrative:
+      "Al abrir un archivador alto, varios cajones salieron a la vez y el mueble se inclinó hacia Bruno. Él lo sostuvo hasta que otra persona cerró los cajones.",
+    hazard: "Vuelco de mobiliario de almacenamiento.",
+    immediateCause: "El archivador no estaba anclado y tenía los cajones superiores sobrecargados.",
+    consequence: "Aplastamiento o golpes por caída del mueble y su contenido.",
+    preventiveActions: [
+      "Anclar los archivadores altos y limitar la apertura simultánea de cajones.",
+      "Distribuir el peso colocando los documentos más pesados en la parte inferior.",
+    ],
+    sourceTags: ["almacenamiento", "vuelco de mobiliario"],
+  },
+  {
+    id: "nm-agriculture-01",
+    outcome: "near-miss",
+    sector: "agriculture",
+    narrative:
+      "Durante una maniobra en pendiente, el tractor de Gael empezó a deslizar lateralmente. Bajó el apero, frenó con suavidad y recuperó la estabilidad antes del borde del bancal.",
+    hazard: "Vuelco de tractor en terreno inclinado.",
+    immediateCause: "Se atravesó la pendiente con el apero elevado y a velocidad excesiva.",
+    consequence: "Atrapamiento bajo el tractor con lesiones graves o mortales.",
+    preventiveActions: [
+      "Planificar recorridos en la línea de máxima pendiente y reducir la velocidad.",
+      "Mantener el apero bajo y utilizar estructura de protección y cinturón.",
+    ],
+    sourceTags: ["tractores", "vuelco"],
+  },
+  {
+    id: "nm-agriculture-02",
+    outcome: "near-miss",
+    sector: "agriculture",
+    narrative:
+      "Eva oyó cómo se tensaba su chaqueta al acercarse al eje de una empacadora. Se apartó antes de que una hebra enganchada arrastrara la prenda hacia la transmisión.",
+    hazard: "Atrapamiento en la toma de fuerza de maquinaria agrícola.",
+    immediateCause:
+      "El resguardo estaba deteriorado y la máquina seguía girando durante la inspección.",
+    consequence: "Arrastre y lesiones traumáticas de extrema gravedad.",
+    preventiveActions: [
+      "Detener el motor, retirar la llave y esperar la parada completa antes de acercarse.",
+      "Mantener íntegros los resguardos de la toma de fuerza y usar ropa ajustada.",
+    ],
+    sourceTags: ["maquinaria agrícola", "toma de fuerza"],
+  },
+  {
+    id: "pd-construction-01",
+    outcome: "property-damage",
+    sector: "construction",
+    narrative:
+      "La pluma de una retroexcavadora giró fuera de la zona prevista y golpeó una caseta auxiliar. No había nadie dentro, pero una pared quedó deformada.",
+    hazard: "Colisión de maquinaria móvil con instalaciones de obra.",
+    immediateCause: "La maniobra se realizó sin señalista y con el limitador de giro desactivado.",
+    consequence: "Daños estructurales en la caseta y paralización de la zona.",
+    preventiveActions: [
+      "Definir el área de giro y designar un señalista cuando haya puntos ciegos.",
+      "Comprobar los limitadores y dispositivos de seguridad antes de usar la máquina.",
+    ],
+    sourceTags: ["maquinaria de obra", "maniobras"],
+  },
+  {
+    id: "pd-construction-02",
+    outcome: "property-damage",
+    sector: "construction",
+    narrative:
+      "Una ráfaga volcó varios paneles de encofrado apilados y rompió una valla perimetral. El área estaba cerrada al paso durante la pausa.",
+    hazard: "Vuelco de elementos almacenados por acción del viento.",
+    immediateCause: "Los paneles se dejaron en vertical sin calzos ni sujeción.",
+    consequence: "Rotura de material, vallado y equipos próximos.",
+    preventiveActions: [
+      "Almacenar los paneles en soportes estables y asegurarlos frente al viento.",
+      "Revisar y reforzar los acopios cuando se prevean condiciones meteorológicas adversas.",
+    ],
+    sourceTags: ["acopios", "viento"],
+  },
+  {
+    id: "pd-production-01",
+    outcome: "property-damage",
+    sector: "production",
+    narrative:
+      "Una pieza mal centrada salió despedida del torno y atravesó el resguardo lateral, dañando un armario de herramientas. El operario se encontraba detrás de la pantalla principal.",
+    hazard: "Proyección de una pieza desde una máquina rotativa.",
+    immediateCause: "La mordaza no se apretó con el par indicado antes de iniciar el ciclo.",
+    consequence: "Daños en el torno, el resguardo y el mobiliario cercano.",
+    preventiveActions: [
+      "Verificar el amarre y retirar la llave del plato antes de cada arranque.",
+      "Mantener resguardos resistentes y excluir equipos de la trayectoria de proyección.",
+    ],
+    sourceTags: ["tornos", "proyección de partículas"],
+  },
+  {
+    id: "pd-production-02",
+    outcome: "property-damage",
+    sector: "production",
+    narrative:
+      "Un sensor averiado permitió que la cinta siguiera alimentando cajas contra un paletizador detenido. La acumulación dobló las guías y detuvo la línea durante el turno.",
+    hazard: "Acumulación y choque de producto en una línea automatizada.",
+    immediateCause: "Se anuló la alarma del sensor sin detener la producción para repararlo.",
+    consequence: "Daños en transportadores y pérdida de producto terminado.",
+    preventiveActions: [
+      "Prohibir la anulación de protecciones y sensores sin un procedimiento autorizado.",
+      "Detener la línea y corregir el fallo antes de reanudar la alimentación.",
+    ],
+    sourceTags: ["automatización", "mantenimiento preventivo"],
+  },
+  {
+    id: "pd-logistics-01",
+    outcome: "property-damage",
+    sector: "logistics",
+    narrative:
+      "Una carretilla elevó el palé por encima del larguero y golpeó el rociador contra incendios. El agua dañó varias cajas antes de cerrar la válvula.",
+    hazard: "Impacto de una carga elevada contra instalaciones del almacén.",
+    immediateCause: "El conductor maniobró mirando la carga sin controlar la altura libre.",
+    consequence: "Daños en la red contra incendios, mercancía y estantería.",
+    preventiveActions: [
+      "Señalizar las alturas máximas y proteger físicamente las instalaciones expuestas.",
+      "Formar y autorizar a los conductores en maniobras con visibilidad limitada.",
+    ],
+    sourceTags: ["carretillas elevadoras", "protección de instalaciones"],
+  },
+  {
+    id: "pd-logistics-02",
+    outcome: "property-damage",
+    sector: "logistics",
+    narrative:
+      "Un palé de botellas cedió al colocarlo en el tercer nivel y el contenido cayó dentro del pasillo cerrado. Se perdieron la mercancía y dos largueros de la estantería.",
+    hazard: "Colapso de una unidad de carga almacenada en altura.",
+    immediateCause: "Se reutilizó un palé con tablas rotas y carga descentrada.",
+    consequence: "Destrucción de mercancía y deformación de la estantería.",
+    preventiveActions: [
+      "Inspeccionar y retirar los palés deteriorados antes de cargarlos.",
+      "Distribuir y asegurar la mercancía respetando la capacidad de cada nivel.",
+    ],
+    sourceTags: ["almacenamiento en altura", "palés"],
+  },
+  {
+    id: "pd-maintenance-01",
+    outcome: "property-damage",
+    sector: "maintenance",
+    narrative:
+      "Tras sustituir una junta, una válvula quedó montada en sentido inverso. Al arrancar la instalación, la sobrepresión agrietó una tubería y anegó la sala técnica.",
+    hazard: "Sobrepresión por montaje incorrecto de un elemento del circuito.",
+    immediateCause:
+      "No se comprobó el sentido de flujo ni se hizo una prueba gradual de puesta en marcha.",
+    consequence: "Rotura de tubería, daños por agua y parada de la instalación.",
+    preventiveActions: [
+      "Verificar el montaje con planos y lista de comprobación antes del cierre.",
+      "Realizar una puesta en servicio controlada, vigilando presión y posibles fugas.",
+    ],
+    sourceTags: ["puesta en servicio", "presión"],
+  },
+  {
+    id: "pd-maintenance-02",
+    outcome: "property-damage",
+    sector: "maintenance",
+    narrative:
+      "Una herramienta olvidada dentro de un ventilador industrial golpeó las palas durante la prueba. El equipo quedó inutilizado, aunque la carcasa contuvo los fragmentos.",
+    hazard: "Objeto extraño dentro de un equipo rotativo.",
+    immediateCause: "No se hizo el recuento de herramientas ni la inspección previa al arranque.",
+    consequence: "Rotura de palas, eje y carcasa del ventilador.",
+    preventiveActions: [
+      "Controlar herramientas y materiales al entrar y salir de equipos cerrados.",
+      "Aplicar una lista de verificación y despejar la zona antes de probar el equipo.",
+    ],
+    sourceTags: ["equipos rotativos", "control de herramientas"],
+  },
+  {
+    id: "pd-cleaning-01",
+    outcome: "property-damage",
+    sector: "cleaning",
+    narrative:
+      "Al limpiar un vestíbulo, un carro sin freno rodó por la rampa y chocó contra una puerta acristalada. El cristal laminado se agrietó sin desprenderse.",
+    hazard: "Movimiento incontrolado de un carro de limpieza en pendiente.",
+    immediateCause: "El carro se dejó cargado en la rampa con el freno defectuoso.",
+    consequence: "Daños en la puerta y en el material transportado.",
+    preventiveActions: [
+      "Estacionar los carros en superficies planas y accionar siempre el freno.",
+      "Retirar de servicio cualquier carro cuyo sistema de frenado falle.",
+    ],
+    sourceTags: ["equipos de limpieza", "pendientes"],
+  },
+  {
+    id: "pd-cleaning-02",
+    outcome: "property-damage",
+    sector: "cleaning",
+    narrative:
+      "Una fregadora chocó con una estantería baja durante una maniobra marcha atrás. Varios productos cayeron y se dañó el soporte, sin que hubiera personas detrás.",
+    hazard: "Colisión de una máquina de limpieza con mobiliario.",
+    immediateCause: "Se maniobró sin comprobar el entorno y con el avisador acústico desconectado.",
+    consequence: "Rotura de envases, estantería y carcasa de la fregadora.",
+    preventiveActions: [
+      "Comprobar el recorrido y mantener operativos los avisadores de marcha atrás.",
+      "Conducir a velocidad reducida en espacios estrechos y con visibilidad limitada.",
+    ],
+    sourceTags: ["fregadoras", "golpes contra objetos"],
+  },
+  {
+    id: "pd-hospitality-01",
+    outcome: "property-damage",
+    sector: "hospitality",
+    narrative:
+      "Un lavavajillas industrial siguió llenándose por un fallo de nivel y el agua alcanzó cámaras frigoríficas próximas. El personal cortó la alimentación antes de que llegara al comedor.",
+    hazard: "Inundación por fallo de un equipo conectado a la red de agua.",
+    immediateCause: "La alarma de nivel llevaba días avisando y se había silenciado.",
+    consequence: "Daños en equipos eléctricos, pavimento y alimentos almacenados.",
+    preventiveActions: [
+      "Atender las alarmas y reparar los dispositivos de nivel antes de seguir usando el equipo.",
+      "Instalar llaves de corte accesibles y comprobarlas en el mantenimiento periódico.",
+    ],
+    sourceTags: ["lavavajillas industrial", "mantenimiento"],
+  },
+  {
+    id: "pd-hospitality-02",
+    outcome: "property-damage",
+    sector: "hospitality",
+    narrative:
+      "Una botella de gas mal sujeta cayó al reponer la terraza y rompió el regulador de una estufa apagada. La válvula permaneció cerrada y no hubo fuga.",
+    hazard: "Caída y golpe de una botella de gas comprimido.",
+    immediateCause: "La botella se transportaba suelta en un carro no diseñado para ese uso.",
+    consequence: "Daño en el regulador, la estufa y el pavimento.",
+    preventiveActions: [
+      "Transportar y almacenar las botellas en posición vertical y sujetas.",
+      "Usar carros específicos y revisar válvulas y reguladores tras cualquier golpe.",
+    ],
+    sourceTags: ["gases comprimidos", "hostelería"],
+  },
+  {
+    id: "pd-office-01",
+    outcome: "property-damage",
+    sector: "office",
+    narrative:
+      "Una cafetera quedó encendida durante la noche y deformó la encimera de la zona de descanso. El sistema de detección avisó antes de que se iniciara un incendio.",
+    hazard: "Sobrecalentamiento de un pequeño electrodoméstico sin vigilancia.",
+    immediateCause: "El equipo carecía de apagado automático y no se desconectó al cerrar.",
+    consequence: "Daños por calor en mobiliario, enchufe y cafetera.",
+    preventiveActions: [
+      "Incluir la desconexión de aparatos en la comprobación de cierre diario.",
+      "Sustituir equipos defectuosos por modelos con protección térmica y apagado automático.",
+    ],
+    sourceTags: ["equipos eléctricos", "zonas de descanso"],
+  },
+  {
+    id: "pd-office-02",
+    outcome: "property-damage",
+    sector: "office",
+    narrative:
+      "Una fuga del equipo de climatización goteó durante el fin de semana sobre varios monitores. El lunes se detectaron daños eléctricos, pero nadie había entrado aún en la sala.",
+    hazard: "Entrada de agua en equipos eléctricos y electrónicos.",
+    immediateCause: "El desagüe de condensados estaba obstruido y no había detector de fugas.",
+    consequence: "Avería de monitores, cableado y parte del falso techo.",
+    preventiveActions: [
+      "Limpiar los desagües de climatización dentro del mantenimiento preventivo.",
+      "Evitar situar equipos sensibles bajo conducciones e instalar detección de fugas.",
+    ],
+    sourceTags: ["climatización", "daños por agua"],
+  },
+  {
+    id: "pd-agriculture-01",
+    outcome: "property-damage",
+    sector: "agriculture",
+    narrative:
+      "Un remolque comenzó a desplazarse mientras se cargaban pacas y terminó contra la puerta de una nave. No había nadie entre ambos elementos.",
+    hazard: "Desplazamiento no previsto de un remolque estacionado.",
+    immediateCause: "Se dejó en una ligera pendiente sin calzos y con el freno mal ajustado.",
+    consequence: "Daños en la puerta, el remolque y varias pacas.",
+    preventiveActions: [
+      "Estacionar en terreno firme, accionar el freno y colocar calzos adecuados.",
+      "Revisar periódicamente el sistema de frenado de remolques y aperos.",
+    ],
+    sourceTags: ["remolques agrícolas", "estacionamiento seguro"],
+  },
+  {
+    id: "pd-agriculture-02",
+    outcome: "property-damage",
+    sector: "agriculture",
+    narrative:
+      "El brazo de un pulverizador se abrió al atravesar un camino estrecho y golpeó una valla de riego. El impacto rompió varias boquillas y un tramo de tubería.",
+    hazard: "Choque de un apero desplegable durante el desplazamiento.",
+    immediateCause: "El bloqueo de transporte no quedó enclavado tras la última parcela.",
+    consequence: "Daños en el pulverizador, la valla y la red de riego.",
+    preventiveActions: [
+      "Verificar el cierre y bloqueo de todos los brazos antes del transporte.",
+      "Adaptar la velocidad y confirmar la anchura libre en caminos y accesos.",
+    ],
+    sourceTags: ["aperos agrícolas", "desplazamientos"],
+  },
+  {
+    id: "mi-construction-01",
+    outcome: "minor-injury",
+    sector: "construction",
+    narrative:
+      "Óscar pisó un recorte de madera con un clavo sobresaliente mientras llevaba material. La suela reforzada limitó la herida a una punción superficial.",
+    hazard: "Elementos punzantes abandonados en una zona de paso.",
+    immediateCause: "Los restos del desencofrado no se retiraron ni se doblaron los clavos.",
+    consequence: "Herida leve en el pie que precisó cura y revisión médica.",
+    preventiveActions: [
+      "Retirar los residuos de obra de forma continua y eliminar clavos salientes.",
+      "Mantener calzado de seguridad con plantilla resistente a la perforación.",
+    ],
+    sourceTags: ["orden y limpieza", "riesgo de punción"],
+  },
+  {
+    id: "mi-construction-02",
+    outcome: "minor-injury",
+    sector: "construction",
+    narrative:
+      "Al cortar una baldosa, una pequeña esquirla alcanzó la mejilla de Leire por debajo de las gafas mal ajustadas. La lesión fue superficial y no afectó al ojo.",
+    hazard: "Proyección de fragmentos durante el corte de material cerámico.",
+    immediateCause: "Las gafas estaban holgadas y la pantalla de la cortadora mal colocada.",
+    consequence: "Pequeño corte facial atendido en el botiquín.",
+    preventiveActions: [
+      "Ajustar la pantalla del equipo y orientar el corte lejos de otras personas.",
+      "Utilizar protección ocular envolvente del tamaño adecuado.",
+    ],
+    sourceTags: ["corte de materiales", "protección ocular"],
+  },
+  {
+    id: "mi-production-01",
+    outcome: "minor-injury",
+    sector: "production",
+    narrative:
+      "Carla retiró una pieza recién soldada sin esperar a que enfriara. El guante fino no aisló el calor y sufrió una quemadura pequeña en dos dedos.",
+    hazard: "Contacto con una superficie metálica caliente.",
+    immediateCause: "La pieza no estaba marcada y se usó un guante inadecuado para temperatura.",
+    consequence: "Quemadura leve que requirió primeros auxilios.",
+    preventiveActions: [
+      "Señalizar y separar las piezas calientes hasta alcanzar una temperatura segura.",
+      "Usar guantes térmicos seleccionados para la tarea.",
+    ],
+    sourceTags: ["superficies calientes", "equipos de protección"],
+  },
+  {
+    id: "mi-production-02",
+    outcome: "minor-injury",
+    sector: "production",
+    narrative:
+      "Jon intentó abrir un embalaje con el cúter dirigido hacia su mano de apoyo. La hoja resbaló y le produjo un corte poco profundo en el pulgar.",
+    hazard: "Corte con herramienta manual afilada.",
+    immediateCause: "Se utilizó un cúter convencional con una técnica de corte insegura.",
+    consequence: "Herida leve que necesitó cura adhesiva y cambio de tarea.",
+    preventiveActions: [
+      "Cortar siempre alejando la hoja del cuerpo y de la mano de apoyo.",
+      "Facilitar cúteres de seguridad con hoja autorretráctil.",
+    ],
+    sourceTags: ["herramientas manuales", "cortes"],
+  },
+  {
+    id: "mi-logistics-01",
+    outcome: "minor-injury",
+    sector: "logistics",
+    narrative:
+      "Alicia levantó sola una caja de consumibles desde el suelo y notó un tirón lumbar. Pudo caminar, pero necesitó reposo y valoración sanitaria.",
+    hazard: "Manipulación manual de una carga desde una postura forzada.",
+    immediateCause: "No se comprobó el peso ni se utilizó la ayuda mecánica disponible.",
+    consequence: "Sobrecarga lumbar leve sin baja prolongada.",
+    preventiveActions: [
+      "Evaluar peso y agarre antes de levantar y pedir ayuda cuando sea necesario.",
+      "Acercar la carga al cuerpo y utilizar carros o elevadores disponibles.",
+    ],
+    sourceTags: ["manipulación manual de cargas", "ergonomía"],
+  },
+  {
+    id: "mi-logistics-02",
+    outcome: "minor-injury",
+    sector: "logistics",
+    narrative:
+      "Samuel se golpeó el hombro con el canto de una caja al girar en un pasillo estrecho. El cartón se deformó y amortiguó el impacto.",
+    hazard: "Golpe con una carga voluminosa en un espacio reducido.",
+    immediateCause:
+      "La caja impedía ver el recorrido y el pasillo tenía mercancía fuera de ubicación.",
+    consequence: "Contusión leve en el hombro.",
+    preventiveActions: [
+      "Mantener los pasillos libres y transportar cargas sin bloquear la visión.",
+      "Dividir los bultos voluminosos o emplear un equipo de transporte adecuado.",
+    ],
+    sourceTags: ["transporte manual", "vías de circulación"],
+  },
+  {
+    id: "mi-maintenance-01",
+    outcome: "minor-injury",
+    sector: "maintenance",
+    narrative:
+      "Al soltar un tornillo agarrotado, la llave se escapó y Elena golpeó los nudillos contra la bancada. La inflamación remitió tras aplicar frío.",
+    hazard: "Golpe por pérdida de control de una herramienta manual.",
+    immediateCause: "Se aplicó una palanca improvisada desde una postura sin espacio de escape.",
+    consequence: "Contusión leve y pequeñas abrasiones en la mano.",
+    preventiveActions: [
+      "Seleccionar la herramienta y el aflojatodo adecuados al tornillo.",
+      "Colocar el cuerpo y las manos fuera de la trayectoria si la herramienta resbala.",
+    ],
+    sourceTags: ["herramientas manuales", "golpes"],
+  },
+  {
+    id: "mi-maintenance-02",
+    outcome: "minor-injury",
+    sector: "maintenance",
+    narrative:
+      "Iker rozó el antebrazo con el borde de una bandeja de cables al acceder a un falso techo. El borde sin protección le produjo un corte superficial.",
+    hazard: "Contacto con un borde metálico cortante en un espacio reducido.",
+    immediateCause: "La bandeja estaba sin remate y la iluminación de la zona era insuficiente.",
+    consequence: "Corte leve tratado con limpieza y apósito.",
+    preventiveActions: [
+      "Instalar remates protectores en los cantos y corregir elementos deteriorados.",
+      "Iluminar el área de intervención y usar protección de brazos cuando proceda.",
+    ],
+    sourceTags: ["bordes cortantes", "espacios de trabajo"],
+  },
+  {
+    id: "mi-cleaning-01",
+    outcome: "minor-injury",
+    sector: "cleaning",
+    narrative:
+      "Noa cambió una bolsa de papelera y una lata con borde afilado atravesó el plástico. Sufrió un corte pequeño en la palma pese a llevar guantes finos.",
+    hazard: "Objeto cortante oculto dentro de una bolsa de residuos.",
+    immediateCause: "La bolsa se comprimió con la mano y los residuos no estaban segregados.",
+    consequence: "Herida leve que requirió cura y control preventivo.",
+    preventiveActions: [
+      "No introducir ni comprimir las manos dentro de bolsas de residuos.",
+      "Usar guantes resistentes al corte y contenedores específicos para objetos afilados.",
+    ],
+    sourceTags: ["gestión de residuos", "objetos cortantes"],
+  },
+  {
+    id: "mi-cleaning-02",
+    outcome: "minor-injury",
+    sector: "cleaning",
+    narrative:
+      "Tomás pulverizó limpiador sobre una mampara y una corriente devolvió gotas hacia su cara. El lavado inmediato evitó más que una irritación ocular pasajera.",
+    hazard: "Salpicadura de producto irritante en los ojos.",
+    immediateCause:
+      "El producto se aplicó a la altura de la cara sin gafas ni control de ventilación.",
+    consequence: "Irritación ocular leve sin lesión permanente.",
+    preventiveActions: [
+      "Aplicar el producto sobre el paño o por debajo del nivel de los ojos.",
+      "Usar protección ocular cuando exista riesgo de salpicadura y disponer de agua de lavado.",
+    ],
+    sourceTags: ["salpicaduras químicas", "protección ocular"],
+  },
+  {
+    id: "mi-hospitality-01",
+    outcome: "minor-injury",
+    sector: "hospitality",
+    narrative:
+      "Nerea cortaba pan con prisa cuando el cuchillo se desvió y rozó su dedo índice. La herida fue limpia y pudo atenderse en el establecimiento.",
+    hazard: "Corte con cuchillo durante la preparación de alimentos.",
+    immediateCause: "La tabla se movía y la mano de apoyo estaba delante de la hoja.",
+    consequence: "Corte leve en un dedo.",
+    preventiveActions: [
+      "Fijar la tabla con una base antideslizante y cortar alejándose de la mano.",
+      "Mantener los cuchillos afilados, con mango seguro y guardados correctamente.",
+    ],
+    sourceTags: ["cuchillos", "cocinas"],
+  },
+  {
+    id: "mi-hospitality-02",
+    outcome: "minor-injury",
+    sector: "hospitality",
+    narrative:
+      "Adrián abrió el horno y recibió una nube de vapor al destapar una bandeja. Apartó la cara, aunque sufrió un enrojecimiento leve en la muñeca.",
+    hazard: "Exposición a vapor caliente al abrir un recipiente.",
+    immediateCause: "La tapa se levantó hacia el cuerpo y el guante térmico no cubría la muñeca.",
+    consequence: "Quemadura superficial de pequeña extensión.",
+    preventiveActions: [
+      "Abrir tapas y puertas lentamente, orientando el vapor lejos del cuerpo.",
+      "Utilizar manoplas térmicas secas que protejan manos y muñecas.",
+    ],
+    sourceTags: ["quemaduras", "vapor"],
+  },
+  {
+    id: "mi-office-01",
+    outcome: "minor-injury",
+    sector: "office",
+    narrative:
+      "Irene bajaba una caja de archivo desde una balda y el canto de una carpeta le golpeó la frente. Solo tuvo una pequeña contusión.",
+    hazard: "Caída de objetos almacenados por encima de los hombros.",
+    immediateCause: "La caja estaba abierta, sobrecargada y situada en una balda alta.",
+    consequence: "Contusión leve sin pérdida de consciencia.",
+    preventiveActions: [
+      "Guardar los materiales pesados y de uso frecuente en baldas accesibles.",
+      "Cerrar las cajas y utilizar un medio estable para alcanzar niveles altos.",
+    ],
+    sourceTags: ["archivos", "caída de objetos"],
+  },
+  {
+    id: "mi-office-02",
+    outcome: "minor-injury",
+    sector: "office",
+    narrative:
+      "Tras varias horas trabajando con el portátil sobre una mesa baja, Rubén terminó la jornada con dolor cervical y hormigueo leve en el hombro.",
+    hazard: "Postura mantenida con cuello flexionado y hombros elevados.",
+    immediateCause: "El puesto temporal no tenía soporte de pantalla, teclado ni silla regulable.",
+    consequence: "Molestia musculoesquelética reversible tras descanso y ajuste del puesto.",
+    preventiveActions: [
+      "Ajustar silla, pantalla y periféricos para mantener una postura neutra.",
+      "Alternar tareas y realizar pausas breves de recuperación postural.",
+    ],
+    sourceTags: ["pantallas de visualización", "ergonomía"],
+  },
+  {
+    id: "mi-agriculture-01",
+    outcome: "minor-injury",
+    sector: "agriculture",
+    narrative:
+      "Mientras recogía cítricos, Ainhoa rozó una rama seca que le produjo un arañazo en la cara. Las gafas protegieron sus ojos.",
+    hazard: "Contacto con ramas rígidas durante la recolección manual.",
+    immediateCause: "Se avanzó entre ramas sin apartarlas ni comprobar el recorrido.",
+    consequence: "Arañazo superficial en la mejilla.",
+    preventiveActions: [
+      "Organizar la poda y despejar el acceso antes de la campaña de recolección.",
+      "Usar protección ocular y ropa que cubra la piel expuesta.",
+    ],
+    sourceTags: ["recolección", "protección personal"],
+  },
+  {
+    id: "mi-agriculture-02",
+    outcome: "minor-injury",
+    sector: "agriculture",
+    narrative:
+      "Pablo trasladó una caja de hortalizas por un surco irregular, apoyó mal el pie y sufrió una torcedura leve de tobillo sin llegar a caer.",
+    hazard: "Desplazamiento con carga sobre terreno irregular.",
+    immediateCause: "La ruta tenía surcos profundos y la caja ocultaba el apoyo de los pies.",
+    consequence: "Esguince leve con reposo durante la jornada.",
+    preventiveActions: [
+      "Acondicionar itinerarios de transporte y retirar obstáculos de las zonas de paso.",
+      "Usar ayudas de transporte y calzado con sujeción y suela antideslizante.",
+    ],
+    sourceTags: ["terreno irregular", "transporte de cargas"],
+  },
+  {
+    id: "si-construction-01",
+    outcome: "serious-injury",
+    sector: "construction",
+    narrative:
+      "Daniel trabajaba junto al hueco de un ascensor cuando cedió una barandilla provisional. Cayó a la planta inferior y sufrió fracturas en una pierna y la pelvis.",
+    hazard: "Caída a distinto nivel a través de un hueco de obra.",
+    immediateCause: "La protección colectiva estaba mal anclada y no había sido inspeccionada.",
+    consequence: "Fracturas múltiples, intervención quirúrgica y baja prolongada.",
+    preventiveActions: [
+      "Instalar protecciones colectivas resistentes y verificarlas antes de cada turno.",
+      "Impedir el acceso al hueco hasta reparar y documentar la protección.",
+    ],
+    sourceTags: ["huecos", "caídas en altura"],
+  },
+  {
+    id: "si-construction-02",
+    outcome: "serious-injury",
+    sector: "construction",
+    narrative:
+      "Una zanja sin entibación se desprendió mientras Fátima ajustaba una conducción. Sus compañeros la liberaron, pero sufrió lesiones torácicas y una fractura de brazo.",
+    hazard: "Sepultamiento parcial por derrumbe de una excavación.",
+    immediateCause: "Se entró en una zanja profunda sin entibación ni evaluación del terreno.",
+    consequence: "Traumatismos graves y hospitalización.",
+    preventiveActions: [
+      "Entibar o taluzar la excavación conforme al terreno y a la profundidad.",
+      "Inspeccionar la zanja tras cambios del terreno y antes de autorizar el acceso.",
+    ],
+    sourceTags: ["excavaciones", "sepultamiento"],
+  },
+  {
+    id: "si-production-01",
+    outcome: "serious-injury",
+    sector: "production",
+    narrative:
+      "Un operario retiró el resguardo para alinear una lámina y la prensa inició un ciclo automático. Su mano quedó atrapada y sufrió lesiones graves en varios dedos.",
+    hazard: "Atrapamiento en la zona de cierre de una prensa.",
+    immediateCause: "El enclavamiento del resguardo estaba puenteado y no se bloqueó el equipo.",
+    consequence: "Lesión traumática de la mano con cirugía y rehabilitación.",
+    preventiveActions: [
+      "Restablecer los enclavamientos y prohibir cualquier anulación de protecciones.",
+      "Consignar la prensa antes de ajustar, limpiar o desatascar.",
+    ],
+    sourceTags: ["prensas", "atrapamientos"],
+  },
+  {
+    id: "si-production-02",
+    outcome: "serious-injury",
+    sector: "production",
+    narrative:
+      "Durante el trasvase de sosa cáustica, una manguera deteriorada se soltó y salpicó a Marina. La ducha de emergencia limitó las quemaduras, pero necesitó hospitalización.",
+    hazard: "Proyección de una sustancia corrosiva durante un trasvase.",
+    immediateCause:
+      "La manguera superó su vida útil y el acoplamiento no tenía retención secundaria.",
+    consequence: "Quemaduras químicas graves en brazo y torso.",
+    preventiveActions: [
+      "Inspeccionar y sustituir mangueras según un programa documentado.",
+      "Usar conexiones seguras, pantalla facial y ropa de protección química adecuada.",
+    ],
+    sourceTags: ["agentes corrosivos", "trasvases"],
+  },
+  {
+    id: "si-logistics-01",
+    outcome: "serious-injury",
+    sector: "logistics",
+    narrative:
+      "Una carretilla giró con la carga elevada y volcó. El cinturón evitó que el conductor saliera despedido, aunque sufrió una fractura de hombro al impactar dentro de la cabina.",
+    hazard: "Vuelco de carretilla elevadora durante un giro.",
+    immediateCause: "Se circuló demasiado rápido con la carga alta y descentrada.",
+    consequence: "Fractura grave y varios meses de recuperación.",
+    preventiveActions: [
+      "Transportar la carga baja, centrada y dentro de la capacidad nominal.",
+      "Reducir la velocidad antes de girar y utilizar siempre el sistema de retención.",
+    ],
+    sourceTags: ["carretillas elevadoras", "vuelco"],
+  },
+  {
+    id: "si-logistics-02",
+    outcome: "serious-injury",
+    sector: "logistics",
+    narrative:
+      "Al subir a un remolque separado del muelle, Joel cayó por el hueco entre ambas plataformas. Sufrió fracturas costales y una lesión vertebral estable.",
+    hazard: "Caída entre el muelle de carga y un vehículo desplazado.",
+    immediateCause:
+      "El remolque no estaba inmovilizado y el puente se colocó sin verificar el apoyo.",
+    consequence: "Lesiones graves con hospitalización y rehabilitación.",
+    preventiveActions: [
+      "Inmovilizar el vehículo con calzos o bloqueo antes de iniciar la carga.",
+      "Comprobar el puente y señalizar la autorización de acceso al remolque.",
+    ],
+    sourceTags: ["muelles de carga", "caídas"],
+  },
+  {
+    id: "si-maintenance-01",
+    outcome: "serious-injury",
+    sector: "maintenance",
+    narrative:
+      "Mientras reparaba una cinta, el motor arrancó desde un puesto remoto. El brazo de Sergio quedó atrapado entre el tambor y la banda hasta que se accionó la parada.",
+    hazard: "Arranque inesperado de una instalación durante mantenimiento.",
+    immediateCause: "Se confió en el selector local sin bloquear la alimentación principal.",
+    consequence: "Fracturas y lesión muscular grave en el brazo.",
+    preventiveActions: [
+      "Aplicar bloqueo personal y señalización a todas las fuentes de energía.",
+      "Verificar energía cero e impedir el arranque remoto antes de intervenir.",
+    ],
+    sourceTags: ["bloqueo y etiquetado", "arranque intempestivo"],
+  },
+  {
+    id: "si-maintenance-02",
+    outcome: "serious-injury",
+    sector: "maintenance",
+    narrative:
+      "Lara accedió a una cubierta frágil para revisar un extractor. Una placa translúcida cedió y cayó sobre una red inferior, sufriendo fracturas en ambas piernas.",
+    hazard: "Caída a través de una cubierta no resistente.",
+    immediateCause: "No se instalaron pasarelas ni se identificaron las placas frágiles.",
+    consequence: "Fracturas graves, cirugía y baja prolongada.",
+    preventiveActions: [
+      "Planificar accesos mediante pasarelas y protecciones colectivas sobre cubiertas frágiles.",
+      "Señalizar las zonas no pisables y emplear un sistema anticaídas complementario.",
+    ],
+    sourceTags: ["cubiertas frágiles", "trabajos en altura"],
+  },
+  {
+    id: "si-cleaning-01",
+    outcome: "serious-injury",
+    sector: "cleaning",
+    narrative:
+      "Claudia limpió una ventana exterior subida a una silla con ruedas. La silla se desplazó y cayó, causándole una fractura de muñeca y un traumatismo craneal.",
+    hazard: "Caída desde un medio improvisado e inestable.",
+    immediateCause: "No se facilitó un equipo de acceso adecuado para alcanzar la parte superior.",
+    consequence: "Fractura, conmoción y hospitalización.",
+    preventiveActions: [
+      "Prohibir el uso de mobiliario como medio de acceso en altura.",
+      "Facilitar escaleras o plataformas adecuadas e instruir sobre su uso.",
+    ],
+    sourceTags: ["limpieza de ventanas", "caídas en altura"],
+  },
+  {
+    id: "si-cleaning-02",
+    outcome: "serious-injury",
+    sector: "cleaning",
+    narrative:
+      "Al desatascar una máquina de limpieza industrial conectada, el cepillo comenzó a girar. La mano de Ismael quedó atrapada y sufrió lesiones tendinosas graves.",
+    hazard: "Atrapamiento en elementos móviles de una máquina de limpieza.",
+    immediateCause: "No se desconectó la batería ni se esperó la parada completa.",
+    consequence: "Lesión grave de mano con intervención quirúrgica.",
+    preventiveActions: [
+      "Desconectar y bloquear la fuente de energía antes de retirar atascos.",
+      "Usar útiles específicos y mantener las manos fuera del mecanismo.",
+    ],
+    sourceTags: ["máquinas de limpieza", "consignación"],
+  },
+  {
+    id: "si-hospitality-01",
+    outcome: "serious-injury",
+    sector: "hospitality",
+    narrative:
+      "Una olla grande volcó al moverla entre dos fogones y derramó caldo hirviendo sobre las piernas de Víctor. Fue trasladado al hospital con quemaduras extensas.",
+    hazard: "Derrame de líquido hirviendo durante su manipulación.",
+    immediateCause: "La olla estaba demasiado llena y se movió sin ayuda ni recorrido despejado.",
+    consequence: "Quemaduras graves y baja prolongada.",
+    preventiveActions: [
+      "Reducir el volumen transportado y utilizar carros o recipientes con grifo.",
+      "Coordinar la maniobra entre dos personas y despejar previamente el recorrido.",
+    ],
+    sourceTags: ["líquidos calientes", "cocinas"],
+  },
+  {
+    id: "si-hospitality-02",
+    outcome: "serious-injury",
+    sector: "hospitality",
+    narrative:
+      "Mónica introdujo carne en una picadora usando la mano porque faltaba el empujador. El guante se enganchó y sufrió una lesión grave en los dedos.",
+    hazard: "Contacto con elementos cortantes de una picadora.",
+    immediateCause: "Se utilizó la máquina sin empujador y con el resguardo de entrada retirado.",
+    consequence: "Lesión traumática de la mano con secuelas funcionales.",
+    preventiveActions: [
+      "Impedir el funcionamiento si faltan resguardos o accesorios de empuje.",
+      "Usar exclusivamente el empujador y desconectar antes de limpiar o desatascar.",
+    ],
+    sourceTags: ["picadoras", "equipos de cocina"],
+  },
+  {
+    id: "si-office-01",
+    outcome: "serious-injury",
+    sector: "office",
+    narrative:
+      "Durante una evacuación, una caja almacenada en la escalera hizo tropezar a Manel. Cayó varios peldaños y sufrió una fractura de cadera.",
+    hazard: "Obstáculo en una vía de evacuación y escalera.",
+    immediateCause: "Se usó el rellano como almacén temporal pese a estar señalizado.",
+    consequence: "Fractura grave y hospitalización.",
+    preventiveActions: [
+      "Mantener escaleras y vías de evacuación libres en todo momento.",
+      "Realizar inspecciones periódicas y retirar de inmediato cualquier almacenamiento indebido.",
+    ],
+    sourceTags: ["evacuación", "caídas en escaleras"],
+  },
+  {
+    id: "si-office-02",
+    outcome: "serious-injury",
+    sector: "office",
+    narrative:
+      "Para cambiar una luminaria, Vera subió a una mesa plegable. Una pata cedió y la caída le provocó una fractura vertebral.",
+    hazard: "Caída desde mobiliario no diseñado como equipo de acceso.",
+    immediateCause: "La tarea se improvisó sin escalera adecuada ni solicitud de mantenimiento.",
+    consequence: "Lesión vertebral grave y rehabilitación prolongada.",
+    preventiveActions: [
+      "Reservar los trabajos eléctricos y en altura a personal autorizado.",
+      "Utilizar una escalera revisada y adecuada a la altura de trabajo.",
+    ],
+    sourceTags: ["trabajos ocasionales en altura", "mantenimiento de oficinas"],
+  },
+  {
+    id: "si-agriculture-01",
+    outcome: "serious-injury",
+    sector: "agriculture",
+    narrative:
+      "Un ternero asustado empujó a Xoán contra una valla durante el traslado. Sufrió fracturas costales y una lesión interna que requirió cirugía.",
+    hazard: "Golpe y aplastamiento durante el manejo de ganado.",
+    immediateCause: "Se trabajó solo, sin manga de manejo y dentro de la trayectoria del animal.",
+    consequence: "Traumatismos graves y hospitalización.",
+    preventiveActions: [
+      "Utilizar instalaciones de manejo que separen a la persona del animal.",
+      "Planificar el traslado con personal suficiente y una vía de escape.",
+    ],
+    sourceTags: ["ganadería", "manejo de animales"],
+  },
+  {
+    id: "si-agriculture-02",
+    outcome: "serious-injury",
+    sector: "agriculture",
+    narrative:
+      "Durante la poda, el apoyo de una plataforma elevadora se hundió y la cesta se inclinó. El arnés retuvo a Raquel, que sufrió una fractura de brazo al golpear la barandilla.",
+    hazard: "Inestabilidad de una plataforma elevadora sobre terreno blando.",
+    immediateCause: "No se comprobaron la capacidad portante ni la nivelación del suelo.",
+    consequence: "Fractura grave y rescate desde altura.",
+    preventiveActions: [
+      "Evaluar el terreno y colocar estabilizadores sobre bases resistentes.",
+      "Nivelar el equipo y mantener el sistema de retención conectado al punto previsto.",
+    ],
+    sourceTags: ["plataformas elevadoras", "poda"],
+  },
+  {
+    id: "fa-construction-01",
+    outcome: "fatality",
+    sector: "construction",
+    narrative:
+      "Durante el montaje de una cubierta, Emilio pisó una placa frágil no señalizada y cayó al interior de la nave. Las lesiones sufridas fueron mortales.",
+    hazard: "Caída a gran altura a través de una cubierta frágil.",
+    immediateCause:
+      "No había pasarelas, redes ni identificación de las superficies no resistentes.",
+    consequence: "Fallecimiento por traumatismos derivados de la caída.",
+    preventiveActions: [
+      "Instalar pasarelas, redes y protecciones colectivas antes de acceder a la cubierta.",
+      "Señalizar las placas frágiles y usar un sistema anticaídas anclado.",
+    ],
+    sourceTags: ["cubiertas frágiles", "protección contra caídas"],
+  },
+  {
+    id: "fa-construction-02",
+    outcome: "fatality",
+    sector: "construction",
+    narrative:
+      "Andrés entró en una excavación para medir una tubería cuando una pared de tierra saturada se desplomó. El equipo de rescate no pudo salvarle.",
+    hazard: "Sepultamiento por colapso de una excavación.",
+    immediateCause:
+      "Se permitió el acceso tras una lluvia intensa sin entibación ni nueva inspección.",
+    consequence: "Fallecimiento por aplastamiento y asfixia.",
+    preventiveActions: [
+      "Entibar o taluzar y controlar el agua antes de permitir la entrada.",
+      "Inspeccionar la excavación tras lluvias o cambios y mantener material lejos del borde.",
+    ],
+    sourceTags: ["excavaciones", "derrumbes"],
+  },
+  {
+    id: "fa-production-01",
+    outcome: "fatality",
+    sector: "production",
+    narrative:
+      "Una línea robotizada arrancó mientras Lucía se encontraba dentro de la célula retirando una pieza. El robot la alcanzó y las lesiones resultaron mortales.",
+    hazard: "Movimiento inesperado de un robot industrial dentro de una zona protegida.",
+    immediateCause: "La puerta tenía el enclavamiento anulado y no se aplicó bloqueo personal.",
+    consequence: "Fallecimiento por traumatismos graves.",
+    preventiveActions: [
+      "Mantener operativos los enclavamientos e impedir cualquier puenteado.",
+      "Bloquear y verificar energía cero antes de entrar en la célula.",
+    ],
+    sourceTags: ["robots industriales", "consignación"],
+  },
+  {
+    id: "fa-production-02",
+    outcome: "fatality",
+    sector: "production",
+    narrative:
+      "Durante una limpieza, un trabajador entró en un depósito que conservaba vapores de disolvente. Perdió el conocimiento y falleció antes de poder ser rescatado.",
+    hazard: "Atmósfera tóxica y deficiente en oxígeno dentro de un espacio confinado.",
+    immediateCause:
+      "Se accedió sin permiso, medición atmosférica, ventilación ni vigilancia exterior.",
+    consequence: "Fallecimiento por inhalación y falta de oxígeno.",
+    preventiveActions: [
+      "Aplicar un permiso de entrada con medición continua y ventilación suficiente.",
+      "Mantener vigilancia exterior y un plan de rescate con equipos preparados.",
+    ],
+    sourceTags: ["espacios confinados", "atmósferas peligrosas"],
+  },
+  {
+    id: "fa-logistics-01",
+    outcome: "fatality",
+    sector: "logistics",
+    narrative:
+      "Un mozo cruzó por detrás de un camión que retrocedía hacia el muelle. El conductor no podía verle y el atropello tuvo un desenlace mortal.",
+    hazard: "Atropello durante la maniobra de un vehículo pesado.",
+    immediateCause: "Peatones y camiones compartían la zona sin separación ni guía de maniobra.",
+    consequence: "Fallecimiento por lesiones ocasionadas por el vehículo.",
+    preventiveActions: [
+      "Segregar los recorridos y prohibir peatones en el área activa de maniobra.",
+      "Usar señalista, cámaras y sistemas de detección en las aproximaciones al muelle.",
+    ],
+    sourceTags: ["muelles de carga", "atropellos"],
+  },
+  {
+    id: "fa-logistics-02",
+    outcome: "fatality",
+    sector: "logistics",
+    narrative:
+      "Una estantería dañada por impactos colapsó cuando se depositó un palé pesado. La carga alcanzó a Diego, que trabajaba en el pasillo contiguo y falleció.",
+    hazard: "Colapso de una estantería industrial cargada.",
+    immediateCause:
+      "Los montantes deformados no se aislaron ni repararon y se superó la carga del nivel.",
+    consequence: "Fallecimiento por caída y aplastamiento de mercancía.",
+    preventiveActions: [
+      "Inspeccionar las estanterías, señalizar daños y descargar de inmediato los módulos afectados.",
+      "Respetar las placas de carga e instalar protecciones frente a impactos.",
+    ],
+    sourceTags: ["estanterías industriales", "colapso estructural"],
+  },
+  {
+    id: "fa-maintenance-01",
+    outcome: "fatality",
+    sector: "maintenance",
+    narrative:
+      "Óliver reparaba un cuadro eléctrico creyendo que estaba aislado. Un retorno no identificado mantuvo tensión en los bornes y el contacto eléctrico fue mortal.",
+    hazard: "Contacto directo con una parte energizada.",
+    immediateCause:
+      "No se identificaron todas las alimentaciones ni se verificó ausencia de tensión.",
+    consequence: "Fallecimiento por electrocución.",
+    preventiveActions: [
+      "Seccionar y bloquear todas las fuentes, incluidos retornos y alimentaciones auxiliares.",
+      "Verificar ausencia de tensión con un equipo adecuado antes de comenzar.",
+    ],
+    sourceTags: ["riesgo eléctrico", "consignación"],
+  },
+  {
+    id: "fa-maintenance-02",
+    outcome: "fatality",
+    sector: "maintenance",
+    narrative:
+      "En la revisión de un silo, Hamza entró para soltar material apelmazado. El producto comenzó a fluir y le sepultó antes de que pudiera alcanzar la salida.",
+    hazard: "Hundimiento y sepultamiento dentro de material a granel.",
+    immediateCause: "Se entró con la descarga operativa y sin aislamiento, arnés ni vigilancia.",
+    consequence: "Fallecimiento por asfixia bajo el material.",
+    preventiveActions: [
+      "Evitar la entrada y usar métodos externos para desatascar el material.",
+      "Si el acceso es imprescindible, consignar, autorizar y preparar vigilancia y rescate.",
+    ],
+    sourceTags: ["silos", "espacios confinados"],
+  },
+  {
+    id: "fa-cleaning-01",
+    outcome: "fatality",
+    sector: "cleaning",
+    narrative:
+      "Durante la limpieza exterior de una fachada, falló el anclaje improvisado de la línea de vida de Sara. Cayó desde la plataforma y falleció.",
+    hazard: "Caída desde una plataforma suspendida.",
+    immediateCause: "La línea se fijó a un elemento no certificado y no se revisó antes del uso.",
+    consequence: "Fallecimiento por caída a gran altura.",
+    preventiveActions: [
+      "Usar anclajes certificados y comprobar el sistema completo antes de cada trabajo.",
+      "Planificar la tarea con protecciones colectivas y un plan de rescate específico.",
+    ],
+    sourceTags: ["limpieza de fachadas", "sistemas anticaídas"],
+  },
+  {
+    id: "fa-cleaning-02",
+    outcome: "fatality",
+    sector: "cleaning",
+    narrative:
+      "Un trabajador limpió con una hidrolimpiadora cerca de un cable alargador deteriorado. El agua alcanzó el conductor expuesto y la descarga eléctrica fue mortal.",
+    hazard: "Contacto entre agua a presión y una instalación eléctrica defectuosa.",
+    immediateCause:
+      "Se mantuvo en servicio un alargador sin protección y sin diferencial adecuado.",
+    consequence: "Fallecimiento por electrocución.",
+    preventiveActions: [
+      "Retirar cables dañados y usar equipos con protección adecuada para ambientes húmedos.",
+      "Separar agua y electricidad y comprobar el diferencial antes de comenzar.",
+    ],
+    sourceTags: ["limpieza con agua", "riesgo eléctrico"],
+  },
+  {
+    id: "fa-hospitality-01",
+    outcome: "fatality",
+    sector: "hospitality",
+    narrative:
+      "Una fuga de gas se acumuló durante la noche en la cocina de un restaurante. Al encender un equipo, se produjo una explosión que causó la muerte de un cocinero.",
+    hazard: "Acumulación de gas combustible en un recinto cerrado.",
+    immediateCause:
+      "La válvula tenía una fuga y la ventilación y el detector estaban fuera de servicio.",
+    consequence: "Fallecimiento por la explosión y el incendio posterior.",
+    preventiveActions: [
+      "Mantener válvulas, detectores y ventilación mediante revisiones regladas.",
+      "Cerrar el suministro y evacuar ante olor o alarma, sin accionar interruptores.",
+    ],
+    sourceTags: ["gas combustible", "explosiones"],
+  },
+  {
+    id: "fa-hospitality-02",
+    outcome: "fatality",
+    sector: "hospitality",
+    narrative:
+      "En un almacén frigorífico, la puerta se bloqueó con Bruno dentro y el avisador interior no funcionaba. Fue encontrado demasiado tarde y no pudo ser reanimado.",
+    hazard: "Encierro prolongado dentro de una cámara frigorífica.",
+    immediateCause: "El mecanismo de apertura interior y la alarma no se probaron ni mantuvieron.",
+    consequence: "Fallecimiento por exposición al frío.",
+    preventiveActions: [
+      "Comprobar a diario la apertura interior, la alarma y la iluminación de emergencia.",
+      "Aplicar un sistema de control de presencia y evitar el trabajo aislado.",
+    ],
+    sourceTags: ["cámaras frigoríficas", "trabajo aislado"],
+  },
+  {
+    id: "fa-office-01",
+    outcome: "fatality",
+    sector: "office",
+    narrative:
+      "Un incendio originado en un cuarto eléctrico llenó de humo la planta. Una salida estaba bloqueada por mobiliario y una trabajadora no logró evacuar a tiempo.",
+    hazard: "Humo e incendio con una vía de evacuación inutilizada.",
+    immediateCause:
+      "Se almacenó mobiliario delante de la salida y no se detectó en las inspecciones.",
+    consequence: "Fallecimiento por inhalación de humo.",
+    preventiveActions: [
+      "Mantener todas las salidas despejadas y comprobarlas mediante inspecciones documentadas.",
+      "Conservar operativos detección, alarma y sectorización, y realizar simulacros.",
+    ],
+    sourceTags: ["evacuación", "protección contra incendios"],
+  },
+  {
+    id: "fa-office-02",
+    outcome: "fatality",
+    sector: "office",
+    narrative:
+      "Un técnico accedió solo al tejado del edificio para revisar una antena. Resbaló junto al borde sin protección y la caída resultó mortal.",
+    hazard: "Caída desde una cubierta sin protección perimetral.",
+    immediateCause:
+      "El acceso se realizó sin autorización, protección colectiva ni sistema anticaídas.",
+    consequence: "Fallecimiento por traumatismos de la caída.",
+    preventiveActions: [
+      "Restringir el acceso y encargar la tarea a personal autorizado con planificación previa.",
+      "Instalar protección perimetral o utilizar un sistema anticaídas certificado.",
+    ],
+    sourceTags: ["cubiertas", "trabajos en altura"],
+  },
+  {
+    id: "fa-agriculture-01",
+    outcome: "fatality",
+    sector: "agriculture",
+    narrative:
+      "El tractor de Manu volcó al girar en una ladera. La estructura de protección estaba abatida y no llevaba el cinturón, por lo que quedó atrapado bajo el vehículo.",
+    hazard: "Vuelco lateral de tractor en una pendiente.",
+    immediateCause:
+      "Se giró a velocidad inadecuada con la protección abatida y sin sistema de retención.",
+    consequence: "Fallecimiento por aplastamiento.",
+    preventiveActions: [
+      "Mantener desplegada la estructura de protección y utilizar el cinturón.",
+      "Evitar giros transversales en pendiente y adaptar velocidad y aperos al terreno.",
+    ],
+    sourceTags: ["tractores", "vuelco"],
+  },
+  {
+    id: "fa-agriculture-02",
+    outcome: "fatality",
+    sector: "agriculture",
+    narrative:
+      "Al intentar retirar unas hierbas con la cosechadora en marcha, el pantalón de Leo quedó enganchado en una transmisión sin resguardo. El accidente fue mortal.",
+    hazard: "Atrapamiento en elementos móviles de una cosechadora.",
+    immediateCause: "Se intervino con el motor encendido y un resguardo retirado.",
+    consequence: "Fallecimiento por lesiones traumáticas.",
+    preventiveActions: [
+      "Detener el motor, retirar la llave y esperar la parada total antes de desatascar.",
+      "Reponer y mantener todos los resguardos antes de utilizar la máquina.",
+    ],
+    sourceTags: ["cosechadoras", "atrapamientos"],
+  },
+] as const satisfies readonly Scenario[];
