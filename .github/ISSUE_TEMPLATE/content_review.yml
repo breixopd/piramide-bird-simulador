@@ -98,5 +98,5 @@ body:
       options:
         - label: La propuesta no contiene datos que permitan identificar personas, empresas o accidentes reales.
           required: true
-        - label: He distinguido entre la formulación histórica de Bird y la adaptación didáctica de la aplicación.
+        - label: Cuando la propuesta afecta a un modelo, he indicado si se refiere a la formulación histórica de Bird o a la adaptación didáctica de la aplicación.
           required: true
