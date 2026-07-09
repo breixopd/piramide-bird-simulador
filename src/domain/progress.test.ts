@@ -24,6 +24,21 @@ describe("progress and achievements", () => {
       totalBeforeRun: 0,
     });
     expect(next.unlocked).toContain("hard-lesson");
+
+    const classicFatality = updateProgress(INITIAL_PROGRESS, {
+      modelId: "bird-classic",
+      sequence: ["fatality"],
+      convergenceScore: 0,
+      totalBeforeRun: 0,
+    });
+    const extendedNearMiss = updateProgress(INITIAL_PROGRESS, {
+      modelId: "didactic-extended",
+      sequence: ["near-miss"],
+      convergenceScore: 0,
+      totalBeforeRun: 0,
+    });
+    expect(classicFatality.unlocked).not.toContain("hard-lesson");
+    expect(extendedNearMiss.unlocked).not.toContain("hard-lesson");
   });
 
   it("requires at least 1000 total outcomes for convergence mastery", () => {
