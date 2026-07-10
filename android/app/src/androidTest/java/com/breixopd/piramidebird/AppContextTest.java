@@ -2,10 +2,8 @@ package com.breixopd.piramidebird;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -30,7 +28,13 @@ public class AppContextTest {
     @Test
     public void mainActivityDisplaysTheCapacitorWebView() {
         try (ActivityScenario<MainActivity> ignored = ActivityScenario.launch(MainActivity.class)) {
-            onView(isAssignableFrom(WebView.class)).check(matches(isDisplayed()));
+            ignored.onActivity(activity -> {
+                WebView webView = activity.getBridge().getWebView();
+
+                assertNotNull(webView);
+                assertTrue(webView.isAttachedToWindow());
+                assertTrue(webView.isShown());
+            });
         }
     }
 
