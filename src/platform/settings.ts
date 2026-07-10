@@ -20,6 +20,7 @@ export interface KeyValuePort {
 }
 
 export const SETTINGS_STORAGE_KEY = "bird-pyramid.settings";
+export const ANALYTICS_CONSENT_STORAGE_KEY = "bird-pyramid.analytics-consent";
 
 export const DEFAULT_SETTINGS: Readonly<SettingsState> = Object.freeze({
   version: 1,
@@ -41,6 +42,8 @@ export const capacitorPreferencesAdapter: KeyValuePort = {
     await Preferences.set({ key, value });
   },
 };
+
+let settingsSaveQueue: Promise<void> = Promise.resolve();
 
 function isSettingsState(value: unknown): value is SettingsState {
   if (typeof value !== "object" || value === null) return false;
@@ -64,13 +67,34 @@ export async function loadSettings(
   storage: KeyValuePort = capacitorPreferencesAdapter,
 ): Promise<SettingsState> {
   const storedValue = await storage.get(SETTINGS_STORAGE_KEY);
-  if (storedValue === null) return { ...DEFAULT_SETTINGS };
+  const storedConsent = await storage.get(ANALYTICS_CONSENT_STORAGE_KEY);
+  let settings: SettingsState = { ...DEFAULT_SETTINGS };
 
-  try {
-    const parsed: unknown = JSON.parse(storedValue);
-    return isSettingsState(parsed) ? parsed : { ...DEFAULT_SETTINGS };
-  } catch {
-    return { ...DEFAULT_SETTINGS };
+  if (storedValue !== null) {
+    try {
+      const parsed: unknown = JSON.parse(storedValue);
+      if (isSettingsState(parsed)) settings = parsed;
+    } catch {
+      // Keep privacy-preserving defaults for malformed settings.
+    }
+  }
+
+  if (storedConsent === "unknown" || storedConsent === "granted" || storedConsent === "denied") {
+    settings = { ...settings, analyticsConsent: storedConsent };
+  } else if (storedConsent !== null) {
+    settings = { ...settings, analyticsConsent: "unknown" };
+  }
+
+  return settings;
+}
+
+async function persistSettings(settings: SettingsState, storage: KeyValuePort): Promise<void> {
+  const preCommitConsent =
+    settings.analyticsConsent === "granted" ? "denied" : settings.analyticsConsent;
+  await storage.set(ANALYTICS_CONSENT_STORAGE_KEY, preCommitConsent);
+  await storage.set(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  if (settings.analyticsConsent === "granted") {
+    await storage.set(ANALYTICS_CONSENT_STORAGE_KEY, "granted");
   }
 }
 
@@ -78,5 +102,7 @@ export async function saveSettings(
   settings: SettingsState,
   storage: KeyValuePort = capacitorPreferencesAdapter,
 ): Promise<void> {
-  await storage.set(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  const queuedSave = settingsSaveQueue.then(() => persistSettings(settings, storage));
+  settingsSaveQueue = queuedSave.catch(() => undefined);
+  await queuedSave;
 }
