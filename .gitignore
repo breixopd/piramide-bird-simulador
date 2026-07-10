@@ -5,10 +5,15 @@ coverage/
 .env.*
 !.env.example
 android/.gradle/
+.gradle-home/
 android/app/build/
 android/build/
+android/app/google-services.json
 *.jks
 *.keystore
+*.p12
+*.key
+keystore.properties
 *.pem
 .idea/
 .DS_Store
@@ -16,4 +21,3 @@ android/build/
 playwright-report/
 test-results/
 *.tsbuildinfo
-

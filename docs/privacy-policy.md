@@ -15,7 +15,7 @@ Estos datos no requieren una cuenta y no se sincronizan con un servidor propio. 
 
 ## Firebase Analytics y Crashlytics
 
-La recopilación mediante Firebase está **desactivada por defecto**. Solo se activa después de que la persona usuaria acepte expresamente el consentimiento mostrado en la aplicación. Puede retirarse en cualquier momento desde los ajustes; a partir de entonces se detiene la recopilación y se renueva el identificador local utilizado por la aplicación.
+La recopilación mediante Firebase está **desactivada por defecto**. Solo se activa después de que la persona usuaria acepte expresamente el consentimiento mostrado en la aplicación. Puede retirarse en cualquier momento desde los ajustes: la aplicación deja de emitir eventos propios y reinicia los datos analíticos locales; la desactivación completa de los SDK se aplica al reiniciar la aplicación.
 
 Con consentimiento, cada instalación puede enviar a Firebase Analytics eventos como:
 
@@ -54,7 +54,7 @@ Crashlytics conserva durante **90 días** las trazas de fallos, los datos extra�
 
 ## Derechos y contacto
 
-El responsable del tratamiento es **Breixo Paz** (`breixopd`), España. La aplicación no gestiona cuentas ni una base de datos propia de personas usuarias.
+El responsable del proyecto y del tratamiento se identifica públicamente como **breixopd**, España. La aplicación no gestiona cuentas ni una base de datos propia de personas usuarias. Los datos legales definitivos del responsable deberán confirmarse antes de distribuir la aplicación fuera del piloto técnico.
 
 Para consultas no sensibles sobre esta política, cuestiones generales de privacidad o ayuda para ejercer derechos relacionados con datos enviados por la aplicación, abre una incidencia en [GitHub Issues](https://github.com/breixopd/piramide-bird-simulador/issues). No incluyas información personal, sanitaria, laboral ni cualquier otro dato confidencial en una incidencia pública.
 

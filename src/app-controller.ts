@@ -8,9 +8,12 @@ import type {
   SimulationRunSummary,
 } from "./platform/history";
 import { DEFAULT_SETTINGS, type SettingsState } from "./platform/settings";
-
-type OutcomeCounts = Partial<Record<OutcomeId, number>>;
-type ModelTotals = Record<ModelId, OutcomeCounts>;
+import {
+  cloneModelTotals,
+  emptyModelTotals,
+  type ModelTotals,
+  type OutcomeCounts,
+} from "./platform/totals-storage";
 
 export interface AppState {
   readonly initialized: boolean;
@@ -22,6 +25,7 @@ export interface AppState {
   readonly selectedScenario: Scenario | null;
   readonly latestRun: SimulationRunSummary | null;
   readonly running: boolean;
+  readonly persistenceDegraded: boolean;
 }
 
 export interface AppControllerDependencies {
@@ -30,13 +34,11 @@ export interface AppControllerDependencies {
   readonly saveProgress: (progress: ProgressState) => Promise<void>;
   readonly loadSettings: () => Promise<SettingsState>;
   readonly saveSettings: (settings: SettingsState) => Promise<void>;
+  readonly loadTotals: () => Promise<ModelTotals | null>;
+  readonly saveTotals: (totals: ModelTotals) => Promise<void>;
   readonly now?: () => Date;
   readonly createId?: () => string;
   readonly scenarioRandom?: RandomSource;
-}
-
-function emptyTotals(): ModelTotals {
-  return { "bird-classic": {}, "didactic-extended": {} };
 }
 
 function addCounts(target: OutcomeCounts, source: Readonly<OutcomeCounts>): void {
@@ -62,11 +64,14 @@ export class AppController {
     settings: DEFAULT_SETTINGS,
     progress: INITIAL_PROGRESS,
     history: [],
-    totals: emptyTotals(),
+    totals: emptyModelTotals(),
     selectedScenario: null,
     latestRun: null,
     running: false,
+    persistenceDegraded: false,
   };
+
+  private inFlightRun?: Promise<SimulationRunSummary>;
 
   constructor(private readonly dependencies: AppControllerDependencies) {
     this.now = dependencies.now ?? (() => new Date());
@@ -80,32 +85,66 @@ export class AppController {
   }
 
   async initialize(): Promise<void> {
-    const [history, progress, settings] = await Promise.all([
+    const [historyResult, progressResult, settingsResult, totalsResult] = await Promise.allSettled([
       this.dependencies.history.list(),
       this.dependencies.loadProgress(),
       this.dependencies.loadSettings(),
+      this.dependencies.loadTotals(),
     ]);
-    const totals = emptyTotals();
-    for (const run of history) addCounts(totals[run.modelId], run.counts);
-    this.updateState({ history, progress, settings, totals, initialized: true });
+    const history = historyResult.status === "fulfilled" ? historyResult.value : [];
+    const progress =
+      progressResult.status === "fulfilled" ? progressResult.value : INITIAL_PROGRESS;
+    const settings =
+      settingsResult.status === "fulfilled" ? settingsResult.value : DEFAULT_SETTINGS;
+    let persistenceDegraded = [historyResult, progressResult, settingsResult, totalsResult].some(
+      ({ status }) => status === "rejected",
+    );
+    const totals =
+      totalsResult.status === "fulfilled" && totalsResult.value !== null
+        ? cloneModelTotals(totalsResult.value)
+        : emptyModelTotals();
+    if (totalsResult.status !== "fulfilled" || totalsResult.value === null) {
+      for (const run of history) addCounts(totals[run.modelId], run.counts);
+      try {
+        await this.dependencies.saveTotals(totals);
+      } catch {
+        persistenceDegraded = true;
+      }
+    }
+    this.updateState({
+      history,
+      progress,
+      settings,
+      totals,
+      persistenceDegraded,
+      initialized: true,
+    });
   }
 
   setModel(modelId: ModelId): void {
     this.updateState({ activeModelId: modelId, selectedScenario: null });
   }
 
-  async run(
+  run(
     iterations: SimulationBatchSize,
     random: RandomSource = Math.random,
+  ): Promise<SimulationRunSummary> {
+    if (this.inFlightRun) return this.inFlightRun;
+    this.inFlightRun = this.executeRun(iterations, random).finally(() => {
+      this.inFlightRun = undefined;
+    });
+    return this.inFlightRun;
+  }
+
+  private async executeRun(
+    iterations: SimulationBatchSize,
+    random: RandomSource,
   ): Promise<SimulationRunSummary> {
     this.updateState({ running: true });
     try {
       const model = MODELS[this.state.activeModelId];
       const result = simulate(model, iterations, random);
-      const totals = {
-        "bird-classic": { ...this.state.totals["bird-classic"] },
-        "didactic-extended": { ...this.state.totals["didactic-extended"] },
-      } satisfies ModelTotals;
+      const totals = cloneModelTotals(this.state.totals);
       const totalBeforeRun = countTotal(totals[model.id]);
       addCounts(totals[model.id], result.counts);
       const convergenceScore = calculateConvergence(model, totals[model.id]);
@@ -123,33 +162,62 @@ export class AppController {
         convergenceScore,
         totalBeforeRun,
       });
-      await Promise.all([
+      const persistenceResults = await Promise.allSettled([
         this.dependencies.history.save(run),
         this.dependencies.saveProgress(progress),
+        this.dependencies.saveTotals(totals),
       ]);
-      const history = await this.dependencies.history.list();
+      const persistenceDegraded =
+        this.state.persistenceDegraded ||
+        persistenceResults.some(({ status }) => status === "rejected");
+      const history = [run, ...this.state.history].slice(0, 500);
       const selectedScenario = this.pickScenario(result.sequence.at(-1) ?? "near-miss");
-      this.updateState({ totals, progress, history, latestRun: run, selectedScenario });
+      this.updateState({
+        totals,
+        progress,
+        history,
+        latestRun: run,
+        selectedScenario,
+        persistenceDegraded,
+      });
       return run;
     } finally {
       this.updateState({ running: false });
     }
   }
 
-  async updateSettings(patch: Partial<Omit<SettingsState, "version">>): Promise<void> {
+  async updateSettings(patch: Partial<Omit<SettingsState, "version">>): Promise<boolean> {
     const settings: SettingsState = { ...this.state.settings, ...patch, version: 1 };
-    await this.dependencies.saveSettings(settings);
-    this.updateState({ settings });
+    let persistenceDegraded = this.state.persistenceDegraded;
+    let persisted = true;
+    try {
+      await this.dependencies.saveSettings(settings);
+    } catch {
+      persistenceDegraded = true;
+      persisted = false;
+    }
+    this.updateState({ settings, persistenceDegraded });
+    return persisted;
   }
 
-  async resetStatistics(): Promise<void> {
-    await this.dependencies.history.clear();
+  async resetStatistics(): Promise<boolean> {
+    const totals = emptyModelTotals();
+    const results = await Promise.allSettled([
+      this.dependencies.history.clear(),
+      this.dependencies.saveTotals(totals),
+    ]);
+    const persisted = results.every(({ status }) => status === "fulfilled");
+    if (!persisted) {
+      this.updateState({ persistenceDegraded: true });
+      return false;
+    }
     this.updateState({
       history: [],
-      totals: emptyTotals(),
+      totals,
       latestRun: null,
       selectedScenario: null,
     });
+    return true;
   }
 
   private pickScenario(outcome: OutcomeId): Scenario | null {

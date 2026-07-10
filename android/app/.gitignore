@@ -1,0 +1,6 @@
+/build/*
+!/build/.npmkeep
+google-services.json
+keystore.properties
+*.jks
+*.keystore

@@ -57,11 +57,25 @@ npx cap open android
 
 Antes de sincronizar Android después de un cambio web, ejecuta de nuevo `npm run build`.
 
+La separación entre dominio, persistencia, adaptadores nativos e interfaz se explica en la [documentación de arquitectura](docs/architecture.md).
+
+## Configuración de Firebase
+
+El repositorio incluye la integración y mantiene Analytics y Crashlytics desactivados por defecto. Para activar la telemetría consentida en una compilación propia:
+
+1. Crea una aplicación Android en Firebase con el identificador `com.breixopd.piramidebird`.
+2. Copia su archivo `google-services.json` en `android/app/google-services.json`; el archivo está excluido de Git.
+3. Configura en Firebase/Google Analytics una retención de datos de usuario y eventos de 2 meses.
+4. Ejecuta `npm run cap:sync` y genera de nuevo la aplicación Android.
+5. Verifica en un dispositivo que no se recibe ningún evento antes de aceptar, que los eventos aparecen tras aceptar y reiniciar, y que dejan de aparecer tras retirar el consentimiento y reiniciar de nuevo.
+
+Si el archivo no existe o Firebase no está disponible, la compilación pública sigue funcionando sin telemetría. No añadas claves de firma ni archivos Firebase al repositorio.
+
 ## Privacidad y funcionamiento sin conexión
 
 El núcleo de la aplicación funciona sin conexión. El historial, los ajustes, el progreso y los logros se guardan localmente en el dispositivo.
 
-Firebase Analytics y Firebase Crashlytics permanecen desactivados hasta que la persona usuaria presta un consentimiento explícito. Si acepta, solo se recopilan métricas agregadas de uso y diagnósticos técnicos; no se envían relatos consultados, historial de simulaciones, estimaciones del desafío ni datos introducidos por la persona usuaria. El consentimiento puede retirarse desde los ajustes.
+Firebase Analytics y Firebase Crashlytics permanecen desactivados hasta que la persona usuaria presta un consentimiento explícito. Si acepta, una instalación puede enviar eventos de uso, identificadores de instalación y diagnósticos técnicos que después se muestran en informes agregados; no se envían relatos consultados, historial de simulaciones, estimaciones del desafío ni datos introducidos por la persona usuaria. El consentimiento puede retirarse desde los ajustes.
 
 La exportación y el uso del menú nativo para compartir solo se ejecutan por iniciativa de la persona usuaria. Consulta la [política de privacidad](docs/privacy-policy.md) para conocer todos los detalles.
 
