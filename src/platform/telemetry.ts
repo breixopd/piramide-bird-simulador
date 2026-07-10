@@ -62,21 +62,26 @@ export function createTelemetryService(
   crashlytics: CrashlyticsPort = firebaseCrashlyticsPort,
 ): TelemetryService {
   let consent: AnalyticsConsent = "unknown";
+  let consentRequest = 0;
   let consentUpdates: Promise<void> = Promise.resolve();
 
   return {
     async applyConsent(nextConsent) {
+      const request = ++consentRequest;
       if (nextConsent === "denied") consent = "denied";
 
       const update = consentUpdates.then(async () => {
         if (nextConsent === "granted") {
           try {
             await analytics.setConsent("granted");
+            if (request !== consentRequest) return;
             await crashlytics.deleteUnsentReports();
+            if (request !== consentRequest) return;
             await Promise.all([analytics.setEnabled(true), crashlytics.setEnabled(true)]);
+            if (request !== consentRequest) return;
             consent = "granted";
           } catch {
-            consent = "unknown";
+            if (request === consentRequest) consent = "unknown";
             await Promise.allSettled([
               analytics.setEnabled(false),
               crashlytics.setEnabled(false),

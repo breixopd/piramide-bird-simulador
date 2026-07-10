@@ -101,6 +101,8 @@ describe("telemetry consent", () => {
     expect(analyticsConsent).toBe("denied");
     expect(analyticsEnabled).toBe(false);
     expect(crashlyticsEnabled).toBe(false);
+    expect(analytics.setEnabled).not.toHaveBeenCalledWith(true);
+    expect(crashlytics.setEnabled).not.toHaveBeenCalledWith(true);
     expect(analytics.logEvent).not.toHaveBeenCalled();
   });
 
