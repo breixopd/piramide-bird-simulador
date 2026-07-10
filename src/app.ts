@@ -465,7 +465,7 @@ export class BirdApp extends LitElement {
     }
     this.announcement = persisted
       ? restartRequired
-        ? "Preferencia guardada. El cambio de telemetría se completará al reiniciar la aplicación."
+        ? "Preferencia guardada y aplicada. El estado completo de la telemetría se confirmará al reiniciar la aplicación."
         : "Preferencia guardada."
       : "Preferencia aplicada solo durante esta sesión; el guardado local no está disponible.";
   }

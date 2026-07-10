@@ -15,7 +15,7 @@ Estos datos no requieren una cuenta y no se sincronizan con un servidor propio. 
 
 ## Firebase Analytics y Crashlytics
 
-La recopilación mediante Firebase está **desactivada por defecto**. Solo se activa después de que la persona usuaria acepte expresamente el consentimiento mostrado en la aplicación. Puede retirarse en cualquier momento desde los ajustes: la aplicación deja de emitir eventos propios y reinicia los datos analíticos locales; la desactivación completa de los SDK se aplica al reiniciar la aplicación.
+La recopilación mediante Firebase está **desactivada por defecto**. Solo se activa después de que la persona usuaria acepte expresamente el consentimiento mostrado en la aplicación. Puede retirarse en cualquier momento desde los ajustes: la preferencia se aplica inmediatamente, la aplicación deja de emitir eventos propios y reinicia los datos analíticos locales; el estado completo de los SDK queda confirmado al reiniciar la aplicación.
 
 Con consentimiento, cada instalación puede enviar a Firebase Analytics eventos como:
 

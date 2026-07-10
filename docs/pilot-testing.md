@@ -61,7 +61,7 @@ Comunica cualquier corrección mediante la plantilla **Revisión de contenido PR
 
 ## Lista para personas en formación
 
-- [ ] El tutorial inicial permite comprender el objetivo sin ayuda externa.
+- [ ] La pantalla inicial permite comprender el objetivo sin ayuda externa.
 - [ ] Se distingue el modelo clásico de la adaptación didáctica.
 - [ ] Es fácil ejecutar una simulación y los lotes de 100 y 1.000.
 - [ ] Los símbolos y colores del dado se entienden sin memorizar instrucciones.

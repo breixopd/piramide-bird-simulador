@@ -10,7 +10,6 @@ export interface SettingsState {
   readonly haptics: boolean;
   readonly shakeToReset: boolean;
   readonly analyticsConsent: AnalyticsConsent;
-  readonly onboardingComplete: boolean;
   readonly extendedContentAcknowledged: boolean;
 }
 
@@ -29,7 +28,6 @@ export const DEFAULT_SETTINGS: Readonly<SettingsState> = Object.freeze({
   haptics: true,
   shakeToReset: true,
   analyticsConsent: "unknown",
-  onboardingComplete: false,
   extendedContentAcknowledged: false,
 });
 
@@ -58,7 +56,6 @@ function isSettingsState(value: unknown): value is SettingsState {
     (settings.analyticsConsent === "unknown" ||
       settings.analyticsConsent === "granted" ||
       settings.analyticsConsent === "denied") &&
-    typeof settings.onboardingComplete === "boolean" &&
     typeof settings.extendedContentAcknowledged === "boolean"
   );
 }

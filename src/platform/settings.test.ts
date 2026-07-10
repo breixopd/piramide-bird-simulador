@@ -34,7 +34,6 @@ describe("settings persistence", () => {
       haptics: true,
       shakeToReset: true,
       analyticsConsent: "unknown",
-      onboardingComplete: false,
       extendedContentAcknowledged: false,
     });
   });
@@ -48,7 +47,6 @@ describe("settings persistence", () => {
       haptics: false,
       shakeToReset: false,
       analyticsConsent: "granted",
-      onboardingComplete: true,
       extendedContentAcknowledged: true,
     };
 
