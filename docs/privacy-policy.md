@@ -58,7 +58,7 @@ El responsable del proyecto y del tratamiento se identifica públicamente como *
 
 Para consultas no sensibles sobre esta política, cuestiones generales de privacidad o ayuda para ejercer derechos relacionados con datos enviados por la aplicación, abre una incidencia en [GitHub Issues](https://github.com/breixopd/piramide-bird-simulador/issues). No incluyas información personal, sanitaria, laboral ni cualquier otro dato confidencial en una incidencia pública.
 
-Para comunicaciones confidenciales, utiliza la función de [reporte privado de vulnerabilidades](https://github.com/breixopd/piramide-bird-simulador/security) disponible en la pestaña **Security** del repositorio. Este canal se habilitará después de crear el repositorio. Hasta entonces, no publiques información sensible; las solicitudes confidenciales deberán esperar a que el canal privado esté disponible.
+Para comunicaciones confidenciales, utiliza la función de [reporte privado de vulnerabilidades](https://github.com/breixopd/piramide-bird-simulador/security) disponible en la pestaña **Security** del repositorio. No publiques información sensible en GitHub Issues ni en otros canales públicos.
 
 ## Cambios en esta política
 
