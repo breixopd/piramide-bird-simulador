@@ -84,11 +84,11 @@ La exportación y el uso del menú nativo para compartir solo se ejecutan por in
 El proceso de entrega previsto es:
 
 1. Comprobar tipos, pruebas y compilación web.
-2. Generar una APK `release` firmada fuera de la automatización pública.
-3. Publicar la APK como _prerelease_ de GitHub junto con su suma SHA-256.
+2. Generar una APK `release` firmada fuera de la automatización pública, exclusivamente para el piloto descargable.
+3. Publicar la APK como _prerelease_ de GitHub junto con su suma SHA-256 y advertir que puede requerir desinstalación antes de instalar una versión procedente de Google Play.
 4. Validar el piloto con profesionales de PRL y personas en formación siguiendo la [guía de pruebas](docs/pilot-testing.md).
 5. Corregir incidencias críticas o de contenido antes de generar el AAB final.
-6. Publicar manualmente en Google Play con la misma clave de firma, la política de privacidad y la declaración de seguridad de datos.
+6. Publicar manualmente en Google Play mediante Play App Signing: el equipo conserva la clave de carga y Google protege la clave que firma las APK entregadas. Las pruebas destinadas a actualizarse hasta producción deben distribuirse desde la pista interna de Play.
 
 Los fallos funcionales se pueden comunicar mediante la plantilla **Informe de error** de GitHub Issues. Las dudas o correcciones preventivas deben usar **Revisión de contenido PRL**.
 

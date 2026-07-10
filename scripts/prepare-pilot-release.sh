@@ -4,7 +4,7 @@ set -euo pipefail
 
 usage() {
   echo "Uso: $0 RUTA_APK [NOMBRE_PUBLICO.apk]" >&2
-  echo "Requiere EXPECTED_SIGNER_SHA256 y verifica firma, paquete y versión; no firma artefactos." >&2
+  echo "Requiere EXPECTED_SIGNER_SHA256 y EXPECTED_VERSION_CODE; verifica firma, paquete y versión, pero no firma artefactos." >&2
 }
 
 if [[ $# -lt 1 || $# -gt 2 ]]; then
@@ -16,10 +16,16 @@ apk_path=$1
 public_name=${2:-"piramide-bird-piloto.apk"}
 expected_application_id=${EXPECTED_APPLICATION_ID:-"com.breixopd.piramidebird"}
 expected_version_name=${EXPECTED_VERSION_NAME:-"0.1.0"}
+expected_version_code=${EXPECTED_VERSION_CODE:-}
 expected_signer=${EXPECTED_SIGNER_SHA256:-}
 
 if [[ -z "$expected_signer" ]]; then
   echo "Error: define EXPECTED_SIGNER_SHA256 con la huella SHA-256 aprobada de la clave de publicación." >&2
+  exit 64
+fi
+
+if [[ -z "$expected_version_code" ]]; then
+  echo "Error: define EXPECTED_VERSION_CODE con el código de versión aprobado para la publicación." >&2
   exit 64
 fi
 
@@ -58,12 +64,17 @@ fi
 
 actual_application_id=$(apkanalyzer manifest application-id "$apk_path")
 actual_version_name=$(apkanalyzer manifest version-name "$apk_path")
+actual_version_code=$(apkanalyzer manifest version-code "$apk_path")
 if [[ "$actual_application_id" != "$expected_application_id" ]]; then
   echo "Error: applicationId inesperado: $actual_application_id" >&2
   exit 65
 fi
 if [[ "$actual_version_name" != "$expected_version_name" ]]; then
   echo "Error: versionName inesperada: $actual_version_name" >&2
+  exit 65
+fi
+if [[ "$actual_version_code" != "$expected_version_code" ]]; then
+  echo "Error: versionCode inesperado: $actual_version_code" >&2
   exit 65
 fi
 

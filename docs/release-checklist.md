@@ -38,6 +38,7 @@ Esta lista cubre la APK pública de piloto y el AAB posterior para Google Play. 
 
    ```bash
    EXPECTED_SIGNER_SHA256="HUELLA_SHA256_APROBADA" \
+     EXPECTED_VERSION_CODE="1" \
      scripts/prepare-pilot-release.sh android/app/release/app-release.apk piramide-bird-0.1.0-pilot.1.apk
    ```
 
@@ -51,12 +52,14 @@ Esta lista cubre la APK pública de piloto y el AAB posterior para Google Play. 
 
 - [ ] El SHA-256 descargado desde GitHub coincide con el publicado.
 - [ ] La página de la release avisa de que es una versión piloto y enlaza la política de privacidad y la guía de incidencias.
+- [ ] La página avisa de que una APK instalada desde GitHub puede no actualizarse directamente a la compilación firmada por Google Play; el recorrido de actualización hasta producción se prueba en la pista interna de Play.
 - [ ] No quedan incidencias críticas, de privacidad o de contenido PRL abiertas antes de promover la versión.
 
 ## AAB para Google Play
 
 - [ ] Se incrementó `versionCode` y la versión visible es correcta.
-- [ ] El AAB se generó manualmente con la misma clave respaldada usada para la aplicación.
+- [ ] El AAB se firmó con la clave de carga respaldada y Play App Signing está habilitado para que Google proteja la clave de firma de la aplicación.
+- [ ] Las huellas de los certificados de carga y de firma de la aplicación están registradas por separado y se ha verificado cuál firma cada canal.
 - [ ] La ficha está en español, declara el carácter educativo y no presenta la adaptación fatal como modelo histórico de Bird.
 - [ ] Capturas, icono, descripción, URL de privacidad y correo/canal de soporte son accesibles.
 - [ ] Data safety declara los datos técnicos de Analytics/Crashlytics condicionados al consentimiento.

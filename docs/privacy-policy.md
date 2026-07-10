@@ -20,12 +20,9 @@ La recopilación mediante Firebase está **desactivada por defecto**. Solo se ac
 Con consentimiento, cada instalación puede enviar a Firebase Analytics eventos como:
 
 - pantalla consultada;
-- finalización del tutorial inicial;
 - modelo educativo seleccionado;
 - tamaño agregado de una simulación;
-- banda de resultado del desafío;
-- desbloqueo de un logro;
-- éxito o cancelación de una acción de compartir.
+- apertura correcta de una acción de compartir.
 
 Estos eventos se envían desde instalaciones individuales junto con datos técnicos; Firebase presenta los resultados en informes agregados. Según el servicio y cuando resulte aplicable, los datos transmitidos pueden incluir:
 
