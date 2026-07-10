@@ -16,11 +16,11 @@ import type { SimulationRunSummary } from "../platform/history";
 Chart.register(LineController, LineElement, LinearScale, PointElement, Tooltip, Legend);
 
 const outcomeColors: Readonly<Record<OutcomeId, string>> = {
-  "near-miss": "#527d4b",
-  "property-damage": "#858633",
-  "minor-injury": "#d4971d",
-  "serious-injury": "#c93a2d",
-  fatality: "#86241f",
+  "near-miss": "#69d39d",
+  "property-damage": "#d5d46e",
+  "minor-injury": "#f3bb54",
+  "serious-injury": "#ff875b",
+  fatality: "#e56673",
 };
 
 interface ConvergenceLine {
@@ -148,6 +148,11 @@ export class ConvergenceChart extends LitElement {
     if (!context) return;
     const model = MODELS[this.modelId];
     const series = buildConvergenceSeries(this.history, model);
+    const inkSoft = this.readThemeColor("--ink-soft", "#91a6b9");
+    const ink = this.readThemeColor("--ink", "#c4d1dc");
+    const surface = this.readThemeColor("--surface", "#07111d");
+    const line = this.readThemeColor("--line", "#263e55");
+    const lineStrong = this.readThemeColor("--line-strong", "#3c5a72");
     this.chart?.destroy();
     this.chart = new Chart(context, {
       type: "line",
@@ -160,29 +165,51 @@ export class ConvergenceChart extends LitElement {
           legend: {
             position: "bottom",
             labels: {
+              color: inkSoft,
               boxWidth: 18,
               boxHeight: 2,
               padding: 12,
               filter: (item) => !item.text.endsWith("· teórico"),
             },
           },
-          tooltip: { enabled: true },
+          tooltip: {
+            enabled: true,
+            backgroundColor: surface,
+            titleColor: ink,
+            bodyColor: inkSoft,
+            borderColor: lineStrong,
+            borderWidth: 1,
+          },
         },
         scales: {
           x: {
             type: "linear",
             min: 0,
-            title: { display: true, text: "Eventos acumulados" },
+            ticks: { color: inkSoft },
+            grid: { color: line },
+            border: { color: lineStrong },
+            title: { display: true, text: "Eventos acumulados", color: inkSoft },
           },
           y: {
             type: "linear",
             min: 0,
             max: 100,
-            title: { display: true, text: "Proporción observada (%)" },
+            ticks: { color: inkSoft },
+            grid: { color: line },
+            border: { color: lineStrong },
+            title: {
+              display: true,
+              text: "Proporción observada (%)",
+              color: inkSoft,
+            },
           },
         },
       },
     });
+  }
+
+  private readThemeColor(propertyName: string, fallback: string): string {
+    return getComputedStyle(this).getPropertyValue(propertyName).trim() || fallback;
   }
 
   private formatPercentage(value: number): string {

@@ -50,7 +50,7 @@ export class HomeView extends LitElement {
         <div class="home-identity">
           <span class="home-identity__mark">${icon("target")}</span>
           <span>PRL / CONTROL ROOM</span>
-          <span class="home-identity__status"><i></i> EN VIVO</span>
+          <span class="home-identity__status"><i></i> MODO LOCAL</span>
         </div>
         <div class="home-title-row">
           <div>

@@ -107,6 +107,7 @@ export class BirdApp extends LitElement {
       <p class="sr-only" role="status" aria-live="polite">${this.announcement}</p>
       <bottom-nav
         .active=${this.activeTab}
+        .running=${state.running}
         @tab-select=${this.onTabSelect}
         @simulate=${this.onSimulate}
       ></bottom-nav>
@@ -333,6 +334,7 @@ export class BirdApp extends LitElement {
   }
 
   private async onSimulate(event: CustomEvent<SimulationBatchSize>): Promise<void> {
+    if (this.controller?.state.running) return;
     const run = await this.controller?.run(event.detail);
     if (!run) return;
     if (this.controller?.state.settings.haptics) void this.hapticFeedback?.();

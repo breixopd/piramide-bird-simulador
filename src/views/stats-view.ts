@@ -115,7 +115,10 @@ export class StatsView extends LitElement {
                         <span
                           >${new Intl.DateTimeFormat("es-ES", { dateStyle: "medium", timeStyle: "short" }).format(new Date(run.createdAt))}</span
                         >
-                        <strong>${run.iterations.toLocaleString("es-ES")} eventos</strong>
+                        <strong
+                          >${run.iterations.toLocaleString("es-ES")}
+                          ${run.iterations === 1 ? "evento" : "eventos"}</strong
+                        >
                         <span>${(run.convergenceScore * 100).toFixed(1)} %</span>
                       </li>`,
                   )}

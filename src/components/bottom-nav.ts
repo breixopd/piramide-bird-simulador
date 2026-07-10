@@ -15,6 +15,7 @@ const tabs = [
 @customElement("bottom-nav")
 export class BottomNav extends LitElement {
   @property({ type: String }) active: AppTab = "home";
+  @property({ type: Boolean }) running = false;
 
   protected createRenderRoot(): HTMLElement | DocumentFragment {
     return this;
@@ -27,6 +28,7 @@ export class BottomNav extends LitElement {
         type="button"
         class="bottom-nav__launch"
         aria-label="Lanzar un evento rápido"
+        ?disabled=${this.running}
         @click=${this.quickLaunch}
       >
         <span>${icon("cube")}</span><small>Lanzar</small>

@@ -2048,44 +2048,71 @@ symbolic-die {
 }
 
 .symbolic-die {
-  width: 5.4rem;
-  height: 5.4rem;
-  margin: 0;
-  transform: rotate(-8deg);
+  --die-size: 3.8rem;
+  width: var(--die-size);
+  height: var(--die-size);
+  margin: 1rem;
+  transform: rotateX(-24deg) rotateY(34deg) rotateZ(-4deg);
+  transform-style: preserve-3d;
   filter: drop-shadow(0 1rem 1rem rgb(0 0 0 / 0.35));
 }
 
 .symbolic-die::after {
-  position: absolute;
-  right: -0.45rem;
-  bottom: -0.25rem;
-  width: 1.15rem;
-  height: 1.15rem;
-  border: 3px solid var(--surface);
-  border-radius: 50%;
-  background: var(--accent-warm);
-  content: "";
+  content: none;
 }
 
 .symbolic-die__face {
+  inset: 0;
+  width: var(--die-size);
+  height: var(--die-size);
   border: 2px solid var(--surface);
   border-radius: 0.55rem;
+  background: var(--outcome);
+  color: #07111d;
+  backface-visibility: hidden;
 }
 
 .symbolic-die__face--front {
-  inset: 0.85rem 0.85rem 0 0;
+  transform: translateZ(calc(var(--die-size) / 2));
 }
 
 .symbolic-die__face--top {
-  width: 4.3rem;
-  height: 1.45rem;
-  left: 0.45rem;
+  transform: rotateX(90deg) translateZ(calc(var(--die-size) / 2));
 }
 
-.symbolic-die__face--side {
-  width: 1.35rem;
-  height: 4.3rem;
-  top: 0.85rem;
+.symbolic-die__face--bottom {
+  transform: rotateX(-90deg) translateZ(calc(var(--die-size) / 2));
+}
+
+.symbolic-die__face--right {
+  transform: rotateY(90deg) translateZ(calc(var(--die-size) / 2));
+}
+
+.symbolic-die__face--left {
+  transform: rotateY(-90deg) translateZ(calc(var(--die-size) / 2));
+}
+
+.symbolic-die__face--back {
+  transform: rotateY(180deg) translateZ(calc(var(--die-size) / 2));
+}
+
+.symbolic-die__face .app-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+@keyframes die-roll {
+  0% {
+    transform: translateY(-6rem) rotateX(-210deg) rotateY(60deg) rotateZ(-70deg) scale(0.85);
+  }
+
+  65% {
+    transform: translateY(0.5rem) rotateX(-10deg) rotateY(390deg) rotateZ(8deg) scale(1.05);
+  }
+
+  100% {
+    transform: translateY(0) rotateX(-24deg) rotateY(394deg) rotateZ(-4deg) scale(1);
+  }
 }
 
 .simulation-controls {
@@ -2633,7 +2660,8 @@ symbolic-die {
 
   symbolic-die {
     right: 2.6rem;
-    bottom: 1rem;
+    top: 5.5rem;
+    bottom: auto;
     transform: scale(1.16);
   }
 
@@ -2731,10 +2759,10 @@ symbolic-die {
   }
 
   symbolic-die {
-    top: 9.2rem;
-    right: 0.7rem;
+    top: 2.2rem;
+    right: 0.35rem;
     bottom: auto;
-    transform: scale(0.9);
+    transform: scale(0.82);
     transform-origin: bottom right;
   }
 
@@ -2777,6 +2805,104 @@ symbolic-die {
 
   .pyramid__label,
   .pyramid__item:first-child .pyramid__label {
+    overflow: visible;
     font-size: 0.66rem;
+    text-overflow: clip;
+    white-space: nowrap;
   }
+
+  .simulation-stage {
+    min-height: 14.2rem;
+  }
+
+  .pyramid-viewport {
+    height: 12rem;
+  }
+
+  .pyramid-zoom-canvas {
+    min-height: 11.7rem;
+  }
+
+  .pyramid {
+    gap: 0.28rem;
+  }
+
+  .pyramid__level {
+    min-height: 2.5rem;
+  }
+
+  .pyramid__item:first-child .pyramid__level {
+    min-height: 2.8rem;
+    padding: 1.25rem 0.2rem 0.2rem;
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .pyramid__item:first-child .pyramid__label {
+    font-size: 0;
+  }
+
+  .pyramid__item:first-child .pyramid__label::after {
+    content: "GRAVE · 1";
+    font-size: 0.58rem;
+  }
+
+  .pyramid__item:first-child .pyramid__weight {
+    display: none;
+  }
+
+  symbolic-die {
+    top: 1.85rem;
+    right: 0.15rem;
+    transform: scale(0.72);
+  }
+
+  .zoom-controls {
+    margin-top: -2rem;
+  }
+}
+
+/* Keep the navigation in the app layout so it never covers interactive content. */
+html,
+body,
+bird-app {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+bird-app {
+  min-height: 0;
+}
+
+.app-shell {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-main {
+  min-height: 0;
+  padding-bottom: 1.5rem;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+bottom-nav {
+  display: block;
+  flex: 0 0 auto;
+}
+
+.bottom-nav {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  margin: 0.45rem auto max(0.65rem, var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+  transform: none;
 }
