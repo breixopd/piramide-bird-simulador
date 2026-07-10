@@ -62,33 +62,40 @@ export function createTelemetryService(
   crashlytics: CrashlyticsPort = firebaseCrashlyticsPort,
 ): TelemetryService {
   let consent: AnalyticsConsent = "unknown";
+  let consentUpdates: Promise<void> = Promise.resolve();
 
   return {
     async applyConsent(nextConsent) {
-      if (nextConsent === "granted") {
-        try {
-          await analytics.setConsent("granted");
-          await crashlytics.deleteUnsentReports();
-          await Promise.all([analytics.setEnabled(true), crashlytics.setEnabled(true)]);
-          consent = "granted";
-        } catch {
-          consent = "unknown";
+      if (nextConsent === "denied") consent = "denied";
+
+      const update = consentUpdates.then(async () => {
+        if (nextConsent === "granted") {
+          try {
+            await analytics.setConsent("granted");
+            await crashlytics.deleteUnsentReports();
+            await Promise.all([analytics.setEnabled(true), crashlytics.setEnabled(true)]);
+            consent = "granted";
+          } catch {
+            consent = "unknown";
+            await Promise.allSettled([
+              analytics.setEnabled(false),
+              crashlytics.setEnabled(false),
+              crashlytics.deleteUnsentReports(),
+            ]);
+          }
+        } else {
+          consent = "denied";
           await Promise.allSettled([
+            analytics.setConsent("denied"),
             analytics.setEnabled(false),
+            analytics.resetAnalyticsData(),
             crashlytics.setEnabled(false),
             crashlytics.deleteUnsentReports(),
           ]);
         }
-      } else {
-        consent = "denied";
-        await Promise.allSettled([
-          analytics.setConsent("denied"),
-          analytics.setEnabled(false),
-          analytics.resetAnalyticsData(),
-          crashlytics.setEnabled(false),
-          crashlytics.deleteUnsentReports(),
-        ]);
-      }
+      });
+      consentUpdates = update.catch(() => undefined);
+      await update;
       return { restartRequired: true };
     },
 

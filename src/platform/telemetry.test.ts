@@ -17,6 +17,14 @@ function ports() {
   return { analytics, crashlytics };
 }
 
+function deferred() {
+  let resolve!: () => void;
+  const promise = new Promise<void>((next) => {
+    resolve = next;
+  });
+  return { promise, resolve };
+}
+
 describe("telemetry consent", () => {
   it("does not emit events before consent", async () => {
     const { analytics, crashlytics } = ports();
@@ -54,6 +62,45 @@ describe("telemetry consent", () => {
     expect(analytics.resetAnalyticsData).toHaveBeenCalled();
     expect(crashlytics.setEnabled).toHaveBeenLastCalledWith(false);
     expect(crashlytics.deleteUnsentReports).toHaveBeenCalledTimes(2);
+    expect(analytics.logEvent).not.toHaveBeenCalled();
+  });
+
+  it("keeps the SDK and session denied when revocation follows a pending grant", async () => {
+    const { analytics, crashlytics } = ports();
+    const grantStarted = deferred();
+    const releaseGrant = deferred();
+    let analyticsConsent: "granted" | "denied" = "denied";
+    let analyticsEnabled = false;
+    let crashlyticsEnabled = false;
+
+    vi.mocked(analytics.setConsent).mockImplementation(async (status) => {
+      if (status === "granted") {
+        grantStarted.resolve();
+        await releaseGrant.promise;
+      }
+      analyticsConsent = status;
+    });
+    vi.mocked(analytics.setEnabled).mockImplementation(async (enabled) => {
+      analyticsEnabled = enabled;
+    });
+    vi.mocked(crashlytics.setEnabled).mockImplementation(async (enabled) => {
+      crashlyticsEnabled = enabled;
+    });
+
+    const telemetry = createTelemetryService(analytics, crashlytics);
+    const grant = telemetry.applyConsent("granted");
+    await grantStarted.promise;
+
+    const denial = telemetry.applyConsent("denied");
+    await Promise.resolve();
+    await Promise.resolve();
+    releaseGrant.resolve();
+    await Promise.all([grant, denial]);
+    await telemetry.log("simulation_run", { iterations: 1 });
+
+    expect(analyticsConsent).toBe("denied");
+    expect(analyticsEnabled).toBe(false);
+    expect(crashlyticsEnabled).toBe(false);
     expect(analytics.logEvent).not.toHaveBeenCalled();
   });
 
