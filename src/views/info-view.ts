@@ -77,7 +77,8 @@ export class InfoView extends LitElement {
           ${(["granted", "denied"] as const).map((consent) => html`<label><input type="radio" name="analytics" value=${consent} .checked=${this.state?.settings.analyticsConsent === consent} @change=${() => this.setConsent(consent)} /><span>${consent === "granted" ? "Permitir" : "No permitir"}</span></label>`)}
         </fieldset>
         <p class="settings-copy settings-copy--after">
-          Activar o retirar la telemetría se completa al reiniciar la aplicación.
+          La preferencia se aplica de inmediato. Reinicia la aplicación para confirmar el estado
+          completo de los SDK.
         </p>
         <a class="settings-link" href="./privacy.html" target="_blank" rel="noreferrer">
           Leer la política de privacidad <span aria-hidden="true">→</span>

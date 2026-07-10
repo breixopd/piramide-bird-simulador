@@ -25,7 +25,7 @@ Esta lista cubre la APK pública de piloto y el AAB posterior para Google Play. 
 
 - [ ] Analytics y Crashlytics permanecen desactivados en una instalación limpia antes del consentimiento.
 - [ ] Rechazar el consentimiento no genera eventos ni informes de fallos.
-- [ ] Aceptar activa solo los eventos documentados; activar o retirar el permiso se completa tras reiniciar la aplicación.
+- [ ] Aceptar activa solo los eventos documentados; la preferencia se aplica de inmediato y, tras reiniciar, se confirma el estado completo de los SDK.
 - [ ] No se envían historial, relatos, estimaciones del desafío, identificadores personalizados ni datos introducidos por la persona usuaria.
 - [ ] La retención de Analytics está configurada a 2 meses y se ha revisado la retención publicada de Crashlytics.
 - [ ] La recogida del identificador publicitario y las señales de personalización permanece desactivada.
