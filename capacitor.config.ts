@@ -4,7 +4,7 @@ const config: CapacitorConfig = {
   appId: "com.breixopd.piramidebird",
   appName: "Pirámide de Bird Simulador",
   webDir: "dist",
-  backgroundColor: "#f7f5f0",
+  backgroundColor: "#07111d",
   android: {
     minWebViewVersion: 107,
   },
@@ -12,7 +12,7 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchShowDuration: 1200,
       launchAutoHide: true,
-      backgroundColor: "#f7f5f0",
+      backgroundColor: "#07111d",
       androidScaleType: "CENTER_CROP",
       showSpinner: false,
     },

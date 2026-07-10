@@ -98,6 +98,38 @@ describe("bird-app", () => {
     expect(getByText(app, "Aún no hay simulaciones")).toBeTruthy();
   });
 
+  it("keeps a one-event launch action available in the bottom dock", async () => {
+    const app = await renderApp();
+
+    fireEvent.click(getByRole(app, "button", { name: "Lanzar un evento rápido" }));
+
+    await vi.waitFor(() => expect(app.controller?.state.latestRun?.iterations).toBe(1));
+    await app.updateComplete;
+    expect(getByRole(app, "status").textContent).toContain("1 evento simulado");
+  });
+
+  it("ignores repeated dock launches while a simulation is running", async () => {
+    const app = await renderApp();
+    const log = vi.fn(async () => undefined);
+    const hapticFeedback = vi.fn(async () => undefined);
+    app.telemetry = {
+      applyConsent: async () => ({ restartRequired: false }),
+      log,
+      recordError: async () => undefined,
+    };
+    app.hapticFeedback = hapticFeedback;
+    await app.updateComplete;
+
+    const launch = getByRole(app, "button", { name: "Lanzar un evento rápido" });
+    fireEvent.click(launch);
+    fireEvent.click(launch);
+
+    await vi.waitFor(() => expect(app.controller?.state.latestRun).not.toBeNull());
+    await app.updateComplete;
+    expect(log).toHaveBeenCalledTimes(1);
+    expect(hapticFeedback).toHaveBeenCalledTimes(1);
+  });
+
   it("requires an acknowledgement before activating the extended model", async () => {
     const app = await renderApp();
 

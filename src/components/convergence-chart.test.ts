@@ -99,6 +99,8 @@ describe("convergence chart series", () => {
     const chart = document.createElement("convergence-chart") as ConvergenceChart;
     chart.history = history;
     chart.modelId = "bird-classic";
+    chart.style.setProperty("--ink-soft", "#123456");
+    chart.style.setProperty("--surface", "#fefefe");
     document.body.append(chart);
     await chart.updateComplete;
 
@@ -114,12 +116,19 @@ describe("convergence chart series", () => {
         options: expect.objectContaining({
           scales: expect.objectContaining({
             y: expect.objectContaining({
-              title: { display: true, text: "Proporción observada (%)" },
+              title: expect.objectContaining({
+                display: true,
+                text: "Proporción observada (%)",
+              }),
             }),
           }),
         }),
       }),
     );
+    const config = vi.mocked(Chart).mock.calls.at(-1)?.[1];
+    expect(config?.options?.plugins?.legend?.labels?.color).toBe("#123456");
+    expect(config?.options?.scales?.x?.ticks?.color).toBe("#123456");
+    expect(config?.options?.plugins?.tooltip?.backgroundColor).toBe("#fefefe");
     contextSpy.mockRestore();
   });
 });

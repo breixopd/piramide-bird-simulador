@@ -77,4 +77,18 @@ describe("stats view data windows", () => {
     expect(text).toContain("lotes recientes retenidos (hasta 500)");
     expect(text).toContain("distribución superior usa el total histórico");
   });
+
+  it("uses the singular event label for a one-event run", async () => {
+    const view = await renderStats();
+    view.state = {
+      ...createState(),
+      history: [{ ...createState().history[0]!, iterations: 1 }],
+    };
+    await view.updateComplete;
+
+    expect(view.querySelector(".history-list")?.textContent?.replace(/\s+/g, " ")).toContain(
+      "1 evento",
+    );
+    expect(view.querySelector(".history-list")?.textContent).not.toContain("1 eventos");
+  });
 });

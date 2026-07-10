@@ -15,6 +15,7 @@ const tabs = [
 @customElement("bottom-nav")
 export class BottomNav extends LitElement {
   @property({ type: String }) active: AppTab = "home";
+  @property({ type: Boolean }) running = false;
 
   protected createRenderRoot(): HTMLElement | DocumentFragment {
     return this;
@@ -22,23 +23,38 @@ export class BottomNav extends LitElement {
 
   protected render() {
     return html`<nav class="bottom-nav" aria-label="Navegación principal">
-      ${tabs.map(
-        (tab) =>
-          html`<button
-            type="button"
-            class="bottom-nav__item ${this.active === tab.id ? "is-active" : ""}"
-            aria-label=${tab.accessibleLabel}
-            aria-current=${this.active === tab.id ? "page" : "false"}
-            @click=${() => this.selectTab(tab.id)}
-          >
-            ${icon(tab.icon)}<span>${tab.label}</span>
-          </button>`,
-      )}
+      ${tabs.slice(0, 2).map((tab) => this.renderTab(tab))}
+      <button
+        type="button"
+        class="bottom-nav__launch"
+        aria-label="Lanzar un evento rápido"
+        ?disabled=${this.running}
+        @click=${this.quickLaunch}
+      >
+        <span>${icon("cube")}</span><small>Lanzar</small>
+      </button>
+      ${tabs.slice(2).map((tab) => this.renderTab(tab))}
     </nav>`;
+  }
+
+  private renderTab(tab: (typeof tabs)[number]) {
+    return html`<button
+      type="button"
+      class="bottom-nav__item ${this.active === tab.id ? "is-active" : ""}"
+      aria-label=${tab.accessibleLabel}
+      aria-current=${this.active === tab.id ? "page" : "false"}
+      @click=${() => this.selectTab(tab.id)}
+    >
+      ${icon(tab.icon)}<span>${tab.label}</span>
+    </button>`;
   }
 
   private selectTab(tab: AppTab): void {
     this.dispatchEvent(new CustomEvent<AppTab>("tab-select", { detail: tab, bubbles: true }));
+  }
+
+  private quickLaunch(): void {
+    this.dispatchEvent(new CustomEvent("simulate", { detail: 1, bubbles: true, composed: true }));
   }
 }
 
