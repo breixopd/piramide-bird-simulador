@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2732 2732">
+  <rect width="2732" height="2732" fill="#f7f5f0"/>
+  <g transform="translate(854 620)">
+    <path d="M512 0 332 216h360L512 0Z" fill="#cf3428"/>
+    <path d="M296 248 192 400h640L728 248H296Z" fill="#e1a52b"/>
+    <path d="M176 432 80 576h864l-96-144H176Z" fill="#5e815b"/>
+    <rect x="444" y="74" width="136" height="136" rx="32" fill="#fff"/>
+    <path d="M492 102h40v80h-40zM472 122h80v40h-80z" fill="#cf3428"/>
+  </g>
+  <text x="1366" y="1480" text-anchor="middle" fill="#171715" font-family="DejaVu Sans, sans-serif" font-size="112" font-weight="700">PIRÁMIDE DE BIRD</text>
+  <text x="1366" y="1628" text-anchor="middle" fill="#cf3428" font-family="DejaVu Sans, sans-serif" font-size="58" font-weight="700">SIMULADOR PRL</text>
+</svg>

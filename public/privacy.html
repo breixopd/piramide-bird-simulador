@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f7f5f0" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'"
+    />
+    <title>Política de privacidad · Pirámide de Bird Simulador</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        font-synthesis: none;
+        --background: #f7f5f0;
+        --surface: #fffdfa;
+        --text: #191816;
+        --muted: #66615b;
+        --line: #ded9d0;
+        --accent: #9f2722;
+        --accent-soft: #f5dfdc;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--text);
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      a {
+        color: var(--accent);
+        font-weight: 650;
+        text-underline-offset: 0.18em;
+      }
+
+      a:focus-visible {
+        border-radius: 0.2rem;
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      header,
+      main,
+      footer {
+        width: min(100% - 2rem, 48rem);
+        margin-inline: auto;
+      }
+
+      header {
+        padding-block: clamp(3rem, 10vw, 6rem) 2rem;
+      }
+
+      .eyebrow {
+        margin: 0 0 0.8rem;
+        color: var(--accent);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 13ch;
+        margin: 0;
+        font-size: clamp(2.4rem, 9vw, 4.8rem);
+        line-height: 0.98;
+        letter-spacing: -0.055em;
+      }
+
+      .summary {
+        max-width: 42rem;
+        margin: 1.5rem 0 0;
+        color: var(--muted);
+        font-size: clamp(1.05rem, 3vw, 1.25rem);
+      }
+
+      .notice {
+        margin-block: 1.5rem 2.5rem;
+        padding: 1.1rem 1.25rem;
+        border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+        border-radius: 0.8rem;
+        background: var(--accent-soft);
+      }
+
+      article {
+        border: 1px solid var(--line);
+        border-radius: 1rem;
+        background: var(--surface);
+        overflow: hidden;
+      }
+
+      section {
+        padding: clamp(1.4rem, 5vw, 2.5rem);
+      }
+
+      section + section {
+        border-top: 1px solid var(--line);
+      }
+
+      h2 {
+        margin: 0 0 0.85rem;
+        font-size: clamp(1.35rem, 4vw, 1.8rem);
+        line-height: 1.2;
+        letter-spacing: -0.025em;
+      }
+
+      p,
+      ul {
+        margin-block: 0.7rem 0;
+      }
+
+      li + li {
+        margin-top: 0.35rem;
+      }
+
+      code {
+        padding: 0.1rem 0.3rem;
+        border-radius: 0.3rem;
+        background: var(--background);
+      }
+
+      footer {
+        padding-block: 1.5rem 3rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: #151412;
+          --surface: #1d1b19;
+          --text: #f4f0e9;
+          --muted: #beb7ad;
+          --line: #3d3934;
+          --accent: #f28b82;
+          --accent-soft: #342321;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p class="eyebrow">Privacidad · Información clara</p>
+      <h1>Política de privacidad</h1>
+      <p class="summary">
+        Pirámide de Bird Simulador funciona sin cuenta y conserva el núcleo de tus datos en el
+        dispositivo. Firebase solo se activa con tu permiso.
+      </p>
+    </header>
+
+    <main>
+      <p class="notice">
+        Esta política corresponde a
+        <a href="https://github.com/breixopd/piramide-bird-simulador">Pirámide de Bird Simulador</a
+        >, una aplicación educativa de prevención de riesgos laborales mantenida por
+        <a href="https://github.com/breixopd">breixopd</a>.
+      </p>
+
+      <article>
+        <section>
+          <h2>Funcionamiento local</h2>
+          <p>
+            La simulación y el contenido educativo funcionan sin conexión. La aplicación guarda en
+            el dispositivo:
+          </p>
+          <ul>
+            <li>preferencias de tema, accesibilidad y experiencia;</li>
+            <li>consentimiento o rechazo de la analítica;</li>
+            <li>historial resumido de simulaciones;</li>
+            <li>estadísticas acumuladas, progreso y logros.</li>
+          </ul>
+          <p>
+            Estos datos no requieren una cuenta ni se sincronizan con un servidor propio. Puedes
+            eliminarlos desde las opciones de restablecimiento o desinstalando la aplicación. El
+            restablecimiento de estadísticas puede conservar ajustes, consentimiento y logros cuando
+            así se indique en la confirmación.
+          </p>
+        </section>
+
+        <section>
+          <h2>Firebase Analytics y Crashlytics</h2>
+          <p>
+            La recopilación mediante Firebase está <strong>desactivada por defecto</strong>. Solo se
+            activa después de que aceptes expresamente el consentimiento mostrado en la aplicación.
+            Puedes retirarlo en cualquier momento desde los ajustes: la preferencia se aplica
+            inmediatamente, la aplicación deja de emitir eventos propios y reinicia los datos
+            analíticos locales; el estado completo de los SDK queda confirmado al reiniciar la
+            aplicación.
+          </p>
+          <p>Con consentimiento, una instalación puede enviar eventos como:</p>
+          <ul>
+            <li>pantalla consultada;</li>
+            <li>modelo educativo seleccionado y tamaño agregado de una simulación;</li>
+            <li>apertura correcta de una acción de compartir.</li>
+          </ul>
+          <p>Según el servicio y cuando resulte aplicable, los datos técnicos pueden incluir:</p>
+          <ul>
+            <li>identificador de instancia, de instalación de Firebase o de Crashlytics;</li>
+            <li>modelo del dispositivo, sistema operativo y versión de la aplicación;</li>
+            <li>estado de la aplicación, trazas de fallos y metadatos de diagnóstico.</li>
+          </ul>
+          <p>
+            Crashlytics utiliza esta información para agrupar y diagnosticar fallos. Consulta la
+            documentación de Google sobre
+            <a href="https://firebase.google.com/support/privacy"
+              >privacidad y seguridad en Firebase</a
+            >.
+          </p>
+          <p>
+            La aplicación no envía a Firebase el historial de simulaciones, los textos de
+            escenarios, la estimación numérica del desafío, identificadores personalizados ni datos
+            personales introducidos por la persona usuaria.
+          </p>
+        </section>
+
+        <section>
+          <h2>Exportación y uso compartido</h2>
+          <p>
+            Puedes generar una tarjeta de resultados y abrir el menú nativo para compartirla.
+            Contiene el modelo, la fecha, las iteraciones, los recuentos, la convergencia y un aviso
+            educativo; no incluye relatos ni datos personales.
+          </p>
+          <p>
+            La exportación solo se realiza tras una acción voluntaria. El tratamiento posterior
+            depende de la aplicación o servicio de destino. Pirámide de Bird Simulador no publica ni
+            envía automáticamente el contenido.
+          </p>
+        </section>
+
+        <section>
+          <h2>Finalidad y conservación</h2>
+          <p>
+            Los datos locales prestan las funciones solicitadas y mantienen el progreso. Permanecen
+            en el dispositivo hasta que se restablecen o se desinstala la aplicación.
+          </p>
+          <p>
+            Con consentimiento, la telemetría permite conocer el uso general, mejorar la experiencia
+            y corregir fallos. La retención de datos de usuario y eventos de Analytics se
+            configurará en <strong>2 meses</strong>. Consulta la
+            <a href="https://support.google.com/analytics/answer/7667196?hl=es"
+              >información de Google sobre retención de Analytics</a
+            >.
+          </p>
+          <p>
+            Crashlytics conserva durante <strong>90 días</strong> las trazas de fallos, datos
+            extraídos de minidumps e identificadores asociados antes de iniciar su eliminación,
+            conforme a la
+            <a href="https://firebase.google.com/support/privacy">política publicada de Firebase</a
+            >.
+          </p>
+        </section>
+
+        <section>
+          <h2>Derechos y contacto</h2>
+          <p>
+            El responsable del proyecto y del tratamiento se identifica públicamente como
+            <strong>breixopd</strong>, España. La aplicación no gestiona cuentas ni una base de
+            datos propia de personas usuarias. Los datos legales definitivos del responsable deberán
+            confirmarse antes de distribuir la aplicación fuera del piloto técnico.
+          </p>
+          <p>
+            Para consultas no sensibles, privacidad o ayuda para ejercer derechos, abre una
+            incidencia en
+            <a href="https://github.com/breixopd/piramide-bird-simulador/issues">GitHub Issues</a>.
+            No incluyas información personal, sanitaria, laboral ni confidencial en una incidencia
+            pública.
+          </p>
+          <p>
+            Para comunicaciones confidenciales utiliza el
+            <a href="https://github.com/breixopd/piramide-bird-simulador/security"
+              >canal privado de seguridad del repositorio</a
+            >. No publiques información sensible en GitHub Issues ni en otros canales públicos.
+          </p>
+        </section>
+
+        <section>
+          <h2>Cambios en esta política</h2>
+          <p>
+            Los cambios relevantes se publicarán en esta página y, cuando sea necesario, se
+            comunicarán en la aplicación antes de solicitar un nuevo consentimiento.
+          </p>
+          <p><strong>Última actualización:</strong> 10 de julio de 2026.</p>
+        </section>
+      </article>
+    </main>
+
+    <footer>
+      <a href="https://github.com/breixopd/piramide-bird-simulador/blob/main/docs/privacy-policy.md"
+        >Ver la versión fuente de esta política</a
+      >
+    </footer>
+  </body>
+</html>

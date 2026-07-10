@@ -1,0 +1,63 @@
+{
+  "name": "piramide-bird-simulador",
+  "version": "1.0.0-alpha.1",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Simulador educativo móvil de la pirámide de Bird para formación en PRL.",
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/breixopd/piramide-bird-simulador.git"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc -b --pretty false",
+    "lint": "eslint . --max-warnings 0",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "cap:sync": "npm run build && cap sync android",
+    "android": "npm run cap:sync && cap open android",
+    "android:build": "npm run cap:sync && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor-firebase/analytics": "8.3.0",
+    "@capacitor-firebase/crashlytics": "8.3.0",
+    "@capacitor/android": "8.4.1",
+    "@capacitor/core": "8.4.1",
+    "@capacitor/filesystem": "8.1.2",
+    "@capacitor/haptics": "8.0.2",
+    "@capacitor/motion": "8.0.0",
+    "@capacitor/preferences": "8.0.1",
+    "@capacitor/share": "8.0.1",
+    "@capacitor/splash-screen": "8.0.1",
+    "chart.js": "4.5.1",
+    "firebase": "12.16.0",
+    "idb": "8.0.3",
+    "lit": "3.3.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.4.1",
+    "@testing-library/dom": "^10.4.0",
+    "@types/node": "^24.0.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "eslint": "^9.30.0",
+    "eslint-plugin-lit": "^2.1.1",
+    "eslint-plugin-wc": "^3.0.1",
+    "fake-indexeddb": "6.2.4",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.35.1",
+    "vite": "^7.0.4",
+    "vitest": "^3.2.4"
+  }
+}

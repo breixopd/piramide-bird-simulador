@@ -1,0 +1,102 @@
+name: Revisión de contenido PRL
+description: Propón una corrección técnica, terminológica o pedagógica del contenido preventivo.
+title: "[Contenido PRL]: "
+labels:
+  - content
+  - prl-review
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Esta plantilla es para revisar modelos, escenarios, medidas preventivas, avisos y lenguaje. La aplicación es educativa y no sustituye una evaluación de riesgos. No compartas casos reales identificables ni información sensible.
+
+  - type: dropdown
+    id: content-type
+    attributes:
+      label: Tipo de contenido
+      options:
+        - Modelo Bird clásico
+        - Adaptación didáctica
+        - Escenario narrativo
+        - Peligro, causa o consecuencia
+        - Medidas preventivas
+        - Desafío o explicación estadística
+        - Logro o mensaje pedagógico
+        - Aviso o descargo educativo
+        - Terminología o redacción
+        - Otro
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Ubicación o identificador
+      description: Indica pantalla, sección, categoría o ID del escenario para localizarlo.
+      placeholder: "Ejemplo: escenario serious-injury-07, segunda medida preventiva"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-content
+    attributes:
+      label: Contenido actual
+      description: Cita solo el fragmento imprescindible o descríbelo con precisión.
+    validations:
+      required: true
+
+  - type: textarea
+    id: concern
+    attributes:
+      label: Problema detectado
+      description: Explica por qué puede ser incorrecto, ambiguo, inadecuado o poco útil para la formación.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Cambio propuesto
+      description: Redacta una alternativa concreta cuando sea posible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: basis
+    attributes:
+      label: Fundamento o fuentes
+      description: Añade enlaces a normativa, guías del INSST u otras fuentes técnicas fiables. Indica si se trata de criterio profesional.
+      placeholder: "URL, referencia bibliográfica o razonamiento técnico"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impacto estimado
+      options:
+        - Crítico — puede inducir una práctica insegura
+        - Alto — error técnico o conceptual relevante
+        - Medio — ambigüedad o problema pedagógico
+        - Bajo — estilo, terminología o mejora menor
+    validations:
+      required: true
+
+  - type: input
+    id: background
+    attributes:
+      label: Experiencia relevante (opcional)
+      description: Puedes indicar tu ámbito profesional o formativo sin revelar identidad ni datos laborales.
+      placeholder: "Ejemplo: técnico superior de PRL, especialidad Seguridad"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmaciones
+      options:
+        - label: La propuesta no contiene datos que permitan identificar personas, empresas o accidentes reales.
+          required: true
+        - label: Cuando la propuesta afecta a un modelo, he indicado si se refiere a la formulación histórica de Bird o a la adaptación didáctica de la aplicación.
+          required: true

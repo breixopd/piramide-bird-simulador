@@ -1,0 +1,116 @@
+name: Informe de error
+description: Comunica un fallo funcional, visual, de accesibilidad o de rendimiento durante el piloto.
+title: "[Error]: "
+labels:
+  - bug
+  - pilot
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por ayudar a mejorar el piloto. No incluyas datos personales, sanitarios o laborales sensibles. Comprueba antes si ya existe una incidencia similar.
+
+  - type: input
+    id: app-version
+    attributes:
+      label: Versión de la aplicación
+      description: Se encuentra en Información o en las notas de la prerelease.
+      placeholder: "Ejemplo: 1.0.0-pilot.1"
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Dispositivo y versión de Android
+      placeholder: "Ejemplo: Pixel 7, Android 15"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área afectada
+      options:
+        - Tutorial inicial
+        - Inicio y simulación
+        - Estadísticas e historial
+        - Desafío
+        - Logros
+        - Información y ajustes
+        - Exportación o compartir
+        - Accesibilidad
+        - Instalación o arranque
+        - Otra
+    validations:
+      required: true
+
+  - type: dropdown
+    id: connectivity
+    attributes:
+      label: Estado de conexión
+      options:
+        - Sin conexión o modo avión
+        - Wi-Fi
+        - Datos móviles
+        - No relevante
+    validations:
+      required: true
+
+  - type: dropdown
+    id: analytics-consent
+    attributes:
+      label: Consentimiento de analítica
+      description: No cambies el ajuste para responder; indica el estado que tenía cuando ocurrió el problema.
+      options:
+        - No aceptado
+        - Aceptado
+        - Retirado después de aceptarlo
+        - No lo sé
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducir
+      description: Enumera las acciones exactas desde que abres la aplicación.
+      placeholder: |
+        1. Abrir Inicio
+        2. Seleccionar...
+        3. Pulsar...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Resultado esperado
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Resultado observado
+      description: Indica también si ocurre siempre o de forma intermitente.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Capturas o información adicional
+      description: Arrastra aquí capturas sin datos personales. No pegues identificadores ni informes que contengan información sensible.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmaciones
+      options:
+        - label: He comprobado que no existe una incidencia abierta equivalente.
+          required: true
+        - label: He eliminado de esta incidencia cualquier dato personal, sanitario o laboral sensible.
+          required: true
