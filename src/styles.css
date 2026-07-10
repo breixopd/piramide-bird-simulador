@@ -120,6 +120,7 @@ bird-app {
   display: block;
   min-height: 100vh;
   background: var(--bg);
+  color: var(--ink);
 }
 
 bird-app[data-theme="dark"] {
