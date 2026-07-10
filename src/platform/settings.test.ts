@@ -29,7 +29,7 @@ describe("settings persistence", () => {
     await expect(loadSettings(storage)).resolves.toEqual(DEFAULT_SETTINGS);
     expect(DEFAULT_SETTINGS).toEqual({
       version: 1,
-      theme: "system",
+      theme: "dark",
       reducedMotion: false,
       haptics: true,
       shakeToReset: true,

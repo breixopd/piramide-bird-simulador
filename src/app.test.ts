@@ -98,6 +98,16 @@ describe("bird-app", () => {
     expect(getByText(app, "Aún no hay simulaciones")).toBeTruthy();
   });
 
+  it("keeps a one-event launch action available in the bottom dock", async () => {
+    const app = await renderApp();
+
+    fireEvent.click(getByRole(app, "button", { name: "Lanzar un evento rápido" }));
+
+    await vi.waitFor(() => expect(app.controller?.state.latestRun?.iterations).toBe(1));
+    await app.updateComplete;
+    expect(getByRole(app, "status").textContent).toContain("1 evento simulado");
+  });
+
   it("requires an acknowledgement before activating the extended model", async () => {
     const app = await renderApp();
 

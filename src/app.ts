@@ -105,7 +105,11 @@ export class BirdApp extends LitElement {
         ${this.renderActiveView()}
       </main>
       <p class="sr-only" role="status" aria-live="polite">${this.announcement}</p>
-      <bottom-nav .active=${this.activeTab} @tab-select=${this.onTabSelect}></bottom-nav>
+      <bottom-nav
+        .active=${this.activeTab}
+        @tab-select=${this.onTabSelect}
+        @simulate=${this.onSimulate}
+      ></bottom-nav>
       ${this.renderModal()}
     </div>`;
   }

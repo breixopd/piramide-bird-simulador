@@ -47,9 +47,25 @@ export class HomeView extends LitElement {
     const latestOutcome = this.state.selectedScenario?.outcome ?? "near-miss";
     return html`<section class="view home-view" aria-labelledby="home-title">
       <header class="page-header page-header--home">
-        <p class="eyebrow">Simulador PRL</p>
-        <h1 id="home-title" tabindex="-1">Pirámide de Bird</h1>
-        <p>Explora cómo los eventos cotidianos construyen la estadística preventiva.</p>
+        <div class="home-identity">
+          <span class="home-identity__mark">${icon("target")}</span>
+          <span>PRL / CONTROL ROOM</span>
+          <span class="home-identity__status"><i></i> EN VIVO</span>
+        </div>
+        <div class="home-title-row">
+          <div>
+            <p class="eyebrow">Simulador educativo</p>
+            <h1 id="home-title" tabindex="-1">Pirámide de Bird</h1>
+            <p>
+              Los incidentes pequeños también cuentan. Explora la proporción detrás de la
+              prevención.
+            </p>
+          </div>
+          <div class="home-ratio" aria-label="Proporción clásica de Bird">
+            <span>RATIO BIRD</span>
+            <strong>600<span>:</span>30<span>:</span>10<span>:</span>1</strong>
+          </div>
+        </div>
       </header>
 
       <div class="model-switch" role="group" aria-label="Modelo de simulación">
@@ -77,6 +93,10 @@ export class HomeView extends LitElement {
       }
 
       <div class="simulation-stage">
+        <div class="stage-meta" aria-hidden="true">
+          <span><i></i> ${model.label}</span>
+          <span>TOCA UN NIVEL PARA EXPLORAR</span>
+        </div>
         <div
           class="pyramid-viewport"
           data-gesture-surface="pyramid"
