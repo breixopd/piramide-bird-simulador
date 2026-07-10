@@ -47,7 +47,6 @@ export class BirdPyramid extends LitElement {
         aria-label="Ver detalle de ${outcome.label}"
         title="Mantén pulsado o toca para ver el detalle de ${outcome.label}"
         @click=${() => this.onLevelClick(outcome.id)}
-        @keydown=${(event: KeyboardEvent) => this.onLevelKeyDown(event, outcome.id)}
         @pointerdown=${(event: PointerEvent) => this.startLongPress(event, outcome.id)}
         @pointermove=${this.onPointerMove}
         @pointerup=${this.cancelLongPress}
@@ -66,12 +65,6 @@ export class BirdPyramid extends LitElement {
       this.suppressClickUntil = 0;
       return;
     }
-    this.openDetail(outcomeId);
-  }
-
-  private onLevelKeyDown(event: KeyboardEvent, outcomeId: OutcomeId): void {
-    if (event.key !== "Enter") return;
-    event.preventDefault();
     this.openDetail(outcomeId);
   }
 

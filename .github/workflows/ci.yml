@@ -130,6 +130,14 @@ jobs:
           npm run build
           npx cap sync android
 
+      # The emulator runner requires access to KVM on GitHub's Linux runner;
+      # without it API 36 boots in unusably slow software emulation.
+      - name: Enable KVM acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
       - name: Run Android instrumented tests on API 36
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -137,4 +145,5 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -no-metrics
           script: cd android && ./gradlew --no-daemon connectedDebugAndroidTest
