@@ -98,7 +98,7 @@ export class InfoView extends LitElement {
 
       <footer class="app-footer">
         <strong>Pirámide de Bird Simulador</strong
-        ><span>v1.0.0-alpha.1 · Desarrollado por breixopd</span>
+        ><span>v1.0.0-alpha.2 · Desarrollado por breixopd</span>
         <p>Recurso educativo. No sustituye una evaluación de riesgos ni asesoramiento técnico.</p>
       </footer>
     </section>`;
