@@ -1,4 +1,5 @@
 import type { SimulationModel } from "../domain/models";
+import { calculateConvergence } from "../domain/simulation";
 import type { SimulationRunSummary } from "./history";
 
 export interface ShareCanvas {
@@ -63,10 +64,12 @@ export async function renderShareCard(
       context.fillText(String(run.counts[outcome.id] ?? 0), 126, y + 112);
     });
 
-  const convergence = `${(run.convergenceScore * 100).toFixed(1).replace(".", ",")} %`;
+  const batchConvergenceScore =
+    run.batchConvergenceScore ?? calculateConvergence(model, run.counts);
+  const convergence = `${(batchConvergenceScore * 100).toFixed(1).replace(".", ",")} %`;
   context.fillStyle = "#171715";
   context.font = "700 44px 'Space Grotesk', sans-serif";
-  context.fillText(`Convergencia ${convergence}`, 72, 1190);
+  context.fillText(`Convergencia del lote ${convergence}`, 72, 1190);
   context.fillStyle = "#686761";
   context.font = "500 25px Inter, sans-serif";
   context.fillText("Herramienta educativa · No sustituye una evaluación de riesgos", 72, 1262);

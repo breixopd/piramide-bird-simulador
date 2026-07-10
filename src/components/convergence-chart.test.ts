@@ -1,4 +1,19 @@
+import { Chart } from "chart.js";
 import { describe, expect, it, vi } from "vitest";
+
+vi.mock("chart.js", () => {
+  const ChartMock = vi.fn(() => ({ destroy: vi.fn() }));
+  Object.assign(ChartMock, { register: vi.fn() });
+  return {
+    Chart: ChartMock,
+    Legend: {},
+    LineController: {},
+    LineElement: {},
+    LinearScale: {},
+    PointElement: {},
+    Tooltip: {},
+  };
+});
 
 import { MODELS } from "../domain/models";
 import type { SimulationRunSummary } from "../platform/history";
@@ -73,6 +88,37 @@ describe("convergence chart series", () => {
 
     expect(chart.textContent?.replace(/\s+/g, " ")).toContain(
       "100 eventos: Cuasi-accidente observado 90,0 %, teórico 93,6 %.",
+    );
+    contextSpy.mockRestore();
+  });
+
+  it("describes the plotted metric and retained recent window accessibly", async () => {
+    const contextSpy = vi
+      .spyOn(HTMLCanvasElement.prototype, "getContext")
+      .mockImplementation(() => ({}) as CanvasRenderingContext2D);
+    const chart = document.createElement("convergence-chart") as ConvergenceChart;
+    chart.history = history;
+    chart.modelId = "bird-classic";
+    document.body.append(chart);
+    await chart.updateComplete;
+
+    expect(chart.querySelector("canvas")?.getAttribute("aria-label")).toBe(
+      "Proporción observada (%) en lotes recientes retenidos (hasta 500)",
+    );
+    expect(chart.querySelector("ul")?.getAttribute("aria-label")).toBe(
+      "Datos de proporción observada por nivel en lotes recientes retenidos (hasta 500)",
+    );
+    expect(Chart).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        options: expect.objectContaining({
+          scales: expect.objectContaining({
+            y: expect.objectContaining({
+              title: { display: true, text: "Proporción observada (%)" },
+            }),
+          }),
+        }),
+      }),
     );
     contextSpy.mockRestore();
   });

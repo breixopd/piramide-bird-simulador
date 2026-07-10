@@ -52,20 +52,23 @@ export class StatsView extends LitElement {
             </div>`
           : html`<div class="stats-overview">
                 <article>
-                  <span>Eventos</span><strong>${totalEvents.toLocaleString("es-ES")}</strong>
+                  <span>Eventos (total histórico)</span
+                  ><strong>${totalEvents.toLocaleString("es-ES")}</strong>
                 </article>
                 <article>
-                  <span>Convergencia</span
+                  <span>Última convergencia</span
                   ><strong>${(latestConvergence * 100).toFixed(1)} %</strong>
                 </article>
-                <article><span>Lotes</span><strong>${modelHistory.length}</strong></article>
+                <article>
+                  <span>Lotes retenidos</span><strong>${modelHistory.length}</strong>
+                </article>
               </div>
 
               <section class="stats-section" aria-labelledby="distribution-title">
                 <div class="section-heading">
                   <div>
                     <p class="eyebrow">Distribución</p>
-                    <h2 id="distribution-title">Resultado por nivel</h2>
+                    <h2 id="distribution-title">Resultado por nivel (total histórico)</h2>
                   </div>
                 </div>
                 <div class="distribution-list">
@@ -90,13 +93,15 @@ export class StatsView extends LitElement {
 
               <section class="stats-section" aria-labelledby="convergence-title">
                 <p class="eyebrow">Evolución</p>
-                <h2 id="convergence-title">Convergencia estadística</h2>
+                <h2 id="convergence-title">Proporciones observadas recientes</h2>
                 <convergence-chart
                   .history=${this.state.history}
                   .modelId=${activeModel.id}
                 ></convergence-chart>
                 <p class="chart-legend-note">
-                  Color continuo: resultado observado. Color discontinuo: proporción teórica.
+                  El gráfico usa los lotes recientes retenidos (hasta 500); la distribución superior
+                  usa el total histórico. Color continuo: resultado observado. Color discontinuo:
+                  proporción teórica.
                 </p>
               </section>
 

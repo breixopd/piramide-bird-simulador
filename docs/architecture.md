@@ -16,10 +16,10 @@ Pirámide de Bird Simulador es una aplicación web local empaquetada para Androi
 1. La vista solicita un lote de 1, 100 o 1000 iteraciones.
 2. El controlador elige el modelo activo y ejecuta el motor ponderado.
 3. Se calculan los acumulados, la convergencia y los logros.
-4. El resumen se guarda en IndexedDB y el progreso en Capacitor Preferences.
+4. El resumen, los acumulados y el progreso se confirman juntos en una única transacción IndexedDB; un fallo revierte el conjunto completo.
 5. La interfaz recibe el nuevo estado y actualiza pirámide, dado, escenario, historial y gráfico.
 
-El historial conserva como máximo las 500 ejecuciones más recientes. Los relatos consultados nunca salen del dispositivo.
+El historial conserva como máximo las 500 ejecuciones más recientes, mientras el mismo registro transaccional mantiene los acumulados históricos. Los relatos consultados nunca salen del dispositivo.
 
 ## Modelos educativos
 
@@ -28,6 +28,8 @@ El modelo clásico representa `600:30:10:1` como cuasi accidentes, daños materi
 ## Privacidad y telemetría
 
 Analytics y Crashlytics están desactivados en el manifiesto Android. El adaptador solo intenta habilitarlos después de un consentimiento explícito; una revocación deshabilita la recopilación, reinicia los datos de Analytics y elimina informes de fallos pendientes. Cualquier fallo del proveedor queda contenido para que Firebase nunca impida abrir o utilizar la aplicación.
+
+El consentimiento se guarda antes que el resto de ajustes en un marcador independiente y las escrituras se serializan. Una revocación posterior siempre prevalece y un permiso interrumpido permanece denegado al reiniciar.
 
 `google-services.json` y las claves de firma están excluidos de Git. Sin configuración Firebase, la aplicación conserva toda la funcionalidad local y la telemetría permanece inactiva.
 

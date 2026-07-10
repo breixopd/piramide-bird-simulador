@@ -44,7 +44,7 @@ function isOutcomeCounts(value: unknown): value is OutcomeCounts {
   );
 }
 
-function isModelTotals(value: unknown): value is ModelTotals {
+export function isModelTotals(value: unknown): value is ModelTotals {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
   const totals = value as Record<string, unknown>;
   return (

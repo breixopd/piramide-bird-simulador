@@ -2,23 +2,36 @@ import { describe, expect, it } from "vitest";
 
 import { AppController } from "./app-controller";
 import { INITIAL_PROGRESS, type ProgressState } from "./domain/progress";
-import type { HistoryRepository, SimulationRunSummary } from "./platform/history";
+import type {
+  HistoryRepository,
+  SimulationRunSummary,
+  SimulationSnapshot,
+} from "./platform/history";
 import { DEFAULT_SETTINGS, type SettingsState } from "./platform/settings";
 import { emptyModelTotals, type ModelTotals } from "./platform/totals-storage";
 
 class MemoryHistory implements HistoryRepository {
   runs: SimulationRunSummary[] = [];
+  snapshot: SimulationSnapshot | null = null;
   cleared = false;
 
-  async save(run: SimulationRunSummary) {
+  async save(run: SimulationRunSummary, snapshot: SimulationSnapshot) {
     this.runs = [run, ...this.runs].slice(0, 500);
+    this.snapshot = snapshot;
   }
   async list() {
     return this.runs;
   }
-  async clear() {
+  async loadSnapshot() {
+    return this.snapshot;
+  }
+  async saveSnapshot(snapshot: SimulationSnapshot) {
+    this.snapshot = snapshot;
+  }
+  async clear(snapshot: SimulationSnapshot) {
     this.cleared = true;
     this.runs = [];
+    this.snapshot = snapshot;
   }
   async close() {}
 }
@@ -30,22 +43,18 @@ function createController(options?: {
   totals?: ModelTotals | null;
 }) {
   const history = options?.history ?? new MemoryHistory();
-  let progress = options?.progress ?? INITIAL_PROGRESS;
   let settings = options?.settings ?? DEFAULT_SETTINGS;
-  let totals = options?.totals ?? null;
+  if (options?.progress !== undefined || options?.totals !== undefined) {
+    history.snapshot = {
+      progress: options.progress ?? INITIAL_PROGRESS,
+      totals: options.totals ?? emptyModelTotals(),
+    };
+  }
   const controller = new AppController({
     history,
-    loadProgress: async () => progress,
-    saveProgress: async (next) => {
-      progress = next;
-    },
     loadSettings: async () => settings,
     saveSettings: async (next) => {
       settings = next;
-    },
-    loadTotals: async () => totals,
-    saveTotals: async (next) => {
-      totals = next;
     },
     now: () => new Date("2026-07-10T10:00:00.000Z"),
     createId: () => "run-1",
@@ -53,9 +62,9 @@ function createController(options?: {
   return {
     controller,
     history,
-    getProgress: () => progress,
+    getProgress: () => history.snapshot?.progress ?? INITIAL_PROGRESS,
     getSettings: () => settings,
-    getTotals: () => totals,
+    getTotals: () => history.snapshot?.totals ?? null,
   };
 }
 
@@ -122,6 +131,27 @@ describe("AppController", () => {
     expect(controller.state.totals["bird-classic"]["near-miss"]).toBe(10_000);
   });
 
+  it("reports batch convergence separately from cumulative convergence", async () => {
+    const totals = emptyModelTotals();
+    totals["bird-classic"] = {
+      "near-miss": 60_000,
+      "property-damage": 3_000,
+      "minor-injury": 1_000,
+      "serious-injury": 100,
+    };
+    const { controller } = createController({ totals });
+    await controller.initialize();
+
+    const run = await controller.run(1, () => 640 / 641);
+
+    expect(run.convergenceScore).toBeGreaterThan(0.99);
+    expect(run).toHaveProperty("batchConvergenceScore");
+    expect(
+      (run as SimulationRunSummary & { readonly batchConvergenceScore: number })
+        .batchConvergenceScore,
+    ).toBeCloseTo(1 / 641, 10);
+  });
+
   it("coalesces rapid duplicate run requests into one persisted execution", async () => {
     const { controller, history } = createController();
     await controller.initialize();
@@ -142,21 +172,79 @@ describe("AppController", () => {
       history: {
         save: failure,
         list: failure,
+        loadSnapshot: failure,
+        saveSnapshot: failure,
         clear: failure,
         close: async () => undefined,
       },
-      loadProgress: failure,
-      saveProgress: failure,
       loadSettings: failure,
       saveSettings: failure,
-      loadTotals: failure,
-      saveTotals: failure,
     });
 
     await expect(controller.initialize()).resolves.toBeUndefined();
     expect(controller.state.initialized).toBe(true);
     expect(controller.state.persistenceDegraded).toBe(true);
     await expect(controller.run(1, () => 0)).resolves.toBeDefined();
+  });
+
+  it("does not leave partial history, totals or progress after an atomic save fails", async () => {
+    const history = new MemoryHistory();
+    const { controller } = createController({ history });
+    await controller.initialize();
+    const persist = history.save.bind(history);
+    let shouldFail = true;
+    history.save = async (run, snapshot) => {
+      if (shouldFail) {
+        shouldFail = false;
+        throw new Error("IndexedDB transaction aborted");
+      }
+      await persist(run, snapshot);
+    };
+
+    await controller.run(1, () => 0);
+
+    expect(controller.state.latestRun).not.toBeNull();
+    expect(controller.state.history).toEqual([]);
+    expect(controller.state.totals["bird-classic"]).toEqual({});
+    expect(controller.state.progress).toEqual(INITIAL_PROGRESS);
+    expect(controller.state.persistenceDegraded).toBe(true);
+
+    await controller.run(1, () => 0);
+    expect(controller.state.history).toHaveLength(1);
+    expect(controller.state.totals["bird-classic"]["near-miss"]).toBe(1);
+    expect(controller.state.progress.unlocked).toContain("first-simulation");
+
+    const resumed = createController({ history }).controller;
+    await resumed.initialize();
+    expect(resumed.state.history).toHaveLength(1);
+    expect(resumed.state.totals["bird-classic"]["near-miss"]).toBe(1);
+    expect(resumed.state.progress.unlocked).toContain("first-simulation");
+  });
+
+  it("never overwrites a valid snapshot after a transient snapshot read failure", async () => {
+    const totals = emptyModelTotals();
+    totals["bird-classic"]["near-miss"] = 10_000;
+    const progress: ProgressState = {
+      ...INITIAL_PROGRESS,
+      unlocked: ["first-simulation"],
+    };
+    const history = new MemoryHistory();
+    history.snapshot = { totals, progress };
+    let saveSnapshotCalled = false;
+    history.loadSnapshot = async () => {
+      throw new Error("Transient IndexedDB read failure");
+    };
+    history.saveSnapshot = async () => {
+      saveSnapshotCalled = true;
+    };
+
+    const degraded = createController({ history }).controller;
+    await degraded.initialize();
+
+    expect(degraded.state.persistenceDegraded).toBe(true);
+    expect(saveSnapshotCalled).toBe(false);
+    expect(history.snapshot.totals["bird-classic"]["near-miss"]).toBe(10_000);
+    expect(history.snapshot.progress.unlocked).toContain("first-simulation");
   });
 
   it("resets statistics and history but preserves settings and achievements", async () => {

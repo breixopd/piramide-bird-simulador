@@ -5,36 +5,45 @@ import { AppController } from "./app-controller";
 import "./app";
 import type { BirdApp } from "./app";
 import { INITIAL_PROGRESS } from "./domain/progress";
-import type { HistoryRepository, SimulationRunSummary } from "./platform/history";
+import type {
+  HistoryRepository,
+  SimulationRunSummary,
+  SimulationSnapshot,
+} from "./platform/history";
 import { DEFAULT_SETTINGS } from "./platform/settings";
 import { emptyModelTotals } from "./platform/totals-storage";
 
 function createController() {
   let history: SimulationRunSummary[] = [];
-  let totals = emptyModelTotals();
+  let snapshot: SimulationSnapshot = {
+    totals: emptyModelTotals(),
+    progress: INITIAL_PROGRESS,
+  };
   const repository: HistoryRepository = {
-    async save(run) {
+    async save(run, nextSnapshot) {
       history = [run, ...history];
+      snapshot = nextSnapshot;
     },
     async list() {
       return history;
     },
-    async clear() {
+    async loadSnapshot() {
+      return snapshot;
+    },
+    async saveSnapshot(nextSnapshot) {
+      snapshot = nextSnapshot;
+    },
+    async clear(nextSnapshot) {
       history = [];
+      snapshot = nextSnapshot;
     },
     async close() {},
   };
 
   return new AppController({
     history: repository,
-    loadProgress: async () => INITIAL_PROGRESS,
-    saveProgress: async () => undefined,
     loadSettings: async () => ({ ...DEFAULT_SETTINGS }),
     saveSettings: async () => undefined,
-    loadTotals: async () => totals,
-    saveTotals: async (next) => {
-      totals = next;
-    },
     createId: () => "run-1",
     now: () => new Date("2026-07-10T10:30:00.000Z"),
     scenarioRandom: () => 0,
@@ -145,7 +154,7 @@ describe("bird-app", () => {
     await app.updateComplete;
 
     const level = getByRole(app, "button", { name: "Ver detalle de Cuasi-accidente" });
-    fireEvent.keyDown(level, { key: "Enter" });
+    fireEvent.click(level);
     await app.updateComplete;
 
     const dialog = getByRole(app, "dialog", { name: "Cuasi-accidente" });
@@ -291,13 +300,16 @@ describe("bird-app", () => {
       throw new Error("Storage unavailable");
     };
     const controller = new AppController({
-      history: { save: failure, list: failure, clear: failure, close: async () => undefined },
-      loadProgress: failure,
-      saveProgress: failure,
+      history: {
+        save: failure,
+        list: failure,
+        loadSnapshot: failure,
+        saveSnapshot: failure,
+        clear: failure,
+        close: async () => undefined,
+      },
       loadSettings: failure,
       saveSettings: failure,
-      loadTotals: failure,
-      saveTotals: failure,
     });
     await controller.initialize();
     const app = document.createElement("bird-app") as BirdApp;

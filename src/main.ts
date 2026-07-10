@@ -8,21 +8,15 @@ import type { BirdApp } from "./app";
 import { MODELS } from "./domain/models";
 import { createHistoryRepository } from "./platform/history";
 import { createShakePreferenceController } from "./platform/motion";
-import { loadProgress, saveProgress } from "./platform/progress-storage";
 import { renderShareCard } from "./platform/share-card";
 import { sharePng } from "./platform/share";
 import { loadSettings, saveSettings } from "./platform/settings";
 import { createTelemetryService } from "./platform/telemetry";
-import { loadModelTotals, saveModelTotals } from "./platform/totals-storage";
 
 const controller = new AppController({
   history: createHistoryRepository("bird-pyramid-history"),
-  loadProgress,
-  saveProgress,
   loadSettings,
   saveSettings,
-  loadTotals: loadModelTotals,
-  saveTotals: saveModelTotals,
 });
 
 const app = document.querySelector<BirdApp>("bird-app");

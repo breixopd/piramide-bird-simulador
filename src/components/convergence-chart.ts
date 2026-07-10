@@ -108,13 +108,16 @@ export class ConvergenceChart extends LitElement {
     const theoreticalTotal = model.outcomes.reduce((sum, { weight }) => sum + weight, 0);
     return html`<div class="chart-frame">
         <canvas
-          aria-label="Evolución de la convergencia estadística"
+          aria-label="Proporción observada (%) en lotes recientes retenidos (hasta 500)"
           role="img"
           width="620"
           height="260"
         ></canvas>
       </div>
-      <ul class="sr-only" aria-label="Datos de convergencia por nivel">
+      <ul
+        class="sr-only"
+        aria-label="Datos de proporción observada por nivel en lotes recientes retenidos (hasta 500)"
+      >
         ${series.labels.flatMap((events, index) =>
           model.outcomes.map((outcome) => {
             const observed =
@@ -175,7 +178,7 @@ export class ConvergenceChart extends LitElement {
             type: "linear",
             min: 0,
             max: 100,
-            title: { display: true, text: "Convergencia (%)" },
+            title: { display: true, text: "Proporción observada (%)" },
           },
         },
       },
