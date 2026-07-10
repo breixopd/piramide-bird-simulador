@@ -69,6 +69,7 @@ export class AppController {
   };
 
   private inFlightRun?: Promise<SimulationRunSummary>;
+  private settingsUpdateQueue: Promise<void> = Promise.resolve();
 
   constructor(private readonly dependencies: AppControllerDependencies) {
     this.now = dependencies.now ?? (() => new Date());
@@ -192,7 +193,19 @@ export class AppController {
     }
   }
 
-  async updateSettings(patch: Partial<Omit<SettingsState, "version">>): Promise<boolean> {
+  updateSettings(patch: Partial<Omit<SettingsState, "version">>): Promise<boolean> {
+    const pendingPatch = { ...patch };
+    const update = this.settingsUpdateQueue.then(() => this.persistSettingsPatch(pendingPatch));
+    this.settingsUpdateQueue = update.then(
+      () => undefined,
+      () => undefined,
+    );
+    return update;
+  }
+
+  private async persistSettingsPatch(
+    patch: Partial<Omit<SettingsState, "version">>,
+  ): Promise<boolean> {
     const settings: SettingsState = { ...this.state.settings, ...patch, version: 1 };
     let persistenceDegraded = this.state.persistenceDegraded;
     let persisted = true;

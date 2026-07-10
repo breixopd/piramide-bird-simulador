@@ -7,7 +7,13 @@ import type {
   SimulationRunSummary,
   SimulationSnapshot,
 } from "./platform/history";
-import { DEFAULT_SETTINGS, type SettingsState } from "./platform/settings";
+import {
+  DEFAULT_SETTINGS,
+  loadSettings,
+  saveSettings,
+  type KeyValuePort,
+  type SettingsState,
+} from "./platform/settings";
 import { emptyModelTotals, type ModelTotals } from "./platform/totals-storage";
 
 class MemoryHistory implements HistoryRepository {
@@ -245,6 +251,35 @@ describe("AppController", () => {
     expect(saveSnapshotCalled).toBe(false);
     expect(history.snapshot.totals["bird-classic"]["near-miss"]).toBe(10_000);
     expect(history.snapshot.progress.unlocked).toContain("first-simulation");
+  });
+
+  it("preserves a consent denial when another setting changes immediately afterwards", async () => {
+    const values = new Map<string, string>();
+    const storage: KeyValuePort = {
+      async get(key) {
+        return values.get(key) ?? null;
+      },
+      async set(key, value) {
+        values.set(key, value);
+      },
+    };
+    await saveSettings({ ...DEFAULT_SETTINGS, analyticsConsent: "granted" }, storage);
+    const controller = new AppController({
+      history: new MemoryHistory(),
+      loadSettings: () => loadSettings(storage),
+      saveSettings: (settings) => saveSettings(settings, storage),
+    });
+    await controller.initialize();
+
+    const denial = controller.updateSettings({ analyticsConsent: "denied" });
+    const themeChange = controller.updateSettings({ theme: "dark" });
+    await Promise.all([denial, themeChange]);
+
+    await expect(loadSettings(storage)).resolves.toMatchObject({
+      analyticsConsent: "denied",
+      theme: "dark",
+    });
+    expect(controller.state.settings).toMatchObject({ analyticsConsent: "denied", theme: "dark" });
   });
 
   it("resets statistics and history but preserves settings and achievements", async () => {
