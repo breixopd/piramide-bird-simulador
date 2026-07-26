@@ -116,6 +116,67 @@ describe("AppController", () => {
     expect(getProgress().unlocked).toContain("first-simulation");
   });
 
+  it("records one persisted learning answer for the active run", async () => {
+    const { controller, history } = createController();
+    await controller.initialize();
+    const run = await controller.run(1, () => 0);
+    const scenario = controller.state.selectedScenario;
+    if (!scenario) throw new Error("Expected a selected scenario");
+
+    await expect(
+      controller.recordLearningAnswer({
+        runId: run.id,
+        scenarioId: scenario.id,
+        correct: true,
+      }),
+    ).resolves.toBe(true);
+    await expect(
+      controller.recordLearningAnswer({
+        runId: run.id,
+        scenarioId: scenario.id,
+        correct: false,
+      }),
+    ).resolves.toBe(false);
+
+    expect(controller.state.progress.questionsAnswered).toBe(1);
+    expect(controller.state.progress.correctAnswers).toBe(1);
+    expect(history.snapshot?.progress.unlocked).toContain("hazard-spotter");
+  });
+
+  it("keeps a learning answer when another simulation is launched while it saves", async () => {
+    const history = new MemoryHistory();
+    const { controller } = createController({ history });
+    await controller.initialize();
+    const firstRun = await controller.run(1, () => 0);
+    const scenario = controller.state.selectedScenario;
+    if (!scenario) throw new Error("Expected a selected scenario");
+
+    let releaseSnapshot!: () => void;
+    const snapshotGate = new Promise<void>((resolve) => {
+      releaseSnapshot = resolve;
+    });
+    const saveSnapshot = history.saveSnapshot.bind(history);
+    history.saveSnapshot = async (snapshot) => {
+      await snapshotGate;
+      await saveSnapshot(snapshot);
+    };
+
+    const answer = controller.recordLearningAnswer({
+      runId: firstRun.id,
+      scenarioId: scenario.id,
+      correct: true,
+    });
+    const secondRun = controller.run(1, () => 0);
+
+    expect(controller.state.progress.correctAnswers).toBe(1);
+    expect(controller.state.running).toBe(true);
+    releaseSnapshot();
+    await Promise.all([answer, secondRun]);
+
+    expect(history.snapshot?.progress.correctAnswers).toBe(1);
+    expect(history.snapshot?.totals["bird-classic"]["near-miss"]).toBe(2);
+  });
+
   it("uses persisted lifetime totals instead of the capped history window", async () => {
     const totals = emptyModelTotals();
     totals["bird-classic"]["near-miss"] = 10_000;
@@ -284,6 +345,7 @@ describe("AppController", () => {
 
   it("resets statistics and history but preserves settings and achievements", async () => {
     const progress: ProgressState = {
+      ...INITIAL_PROGRESS,
       unlocked: ["first-simulation"],
       currentNearMissStreak: 2,
       bestNearMissStreak: 8,

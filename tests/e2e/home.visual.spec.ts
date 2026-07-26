@@ -98,3 +98,38 @@ test("cycles through outcome colours and symbols before settling", async ({ page
     expect(state.className).toContain(`outcome-${state.outcome}`);
   }
 });
+
+test("carries hazard-question progress into statistics and achievements", async ({ page }) => {
+  await page.getByRole("button", { name: "Simular 1 evento" }).click();
+  const question = page.getByRole("group", { name: "¿Cuál es el peligro principal?" });
+  await expect(question).toBeVisible();
+  await question.locator(".learning-check__options button").nth(2).click();
+  await expect(page.getByText("Correcto: has identificado el peligro.")).toBeVisible();
+
+  await page.getByRole("button", { name: "Estadísticas" }).click();
+  const learningStats = page.getByRole("heading", {
+    name: "Tus respuestas sobre peligros",
+  });
+  await expect(learningStats).toBeVisible();
+  const learningSection = page.locator('[aria-labelledby="learning-stats-title"]');
+  await expect(learningSection).toContainText("Preguntas respondidas");
+  await expect(learningSection).toContainText("Precisión");
+  await expect(learningSection).toContainText("100 %");
+  await expect(learningSection).toContainText("Casos explorados");
+  await learningSection.scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0);
+  await expect(page).toHaveScreenshot("learning-stats.png");
+
+  await page.getByRole("button", { name: "Logros" }).click();
+  const spotter = page.getByRole("article").filter({ hasText: "Detector de peligros" });
+  await expect(spotter).toContainText("Desbloqueado");
+  await expect(page.getByRole("article").filter({ hasText: "Racha preventiva" })).toContainText(
+    "1 de 5",
+  );
+  await expect(page.getByRole("article").filter({ hasText: "Explorador de casos" })).toContainText(
+    "1 de 10",
+  );
+  await spotter.scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0);
+  await expect(page).toHaveScreenshot("question-achievements.png");
+});

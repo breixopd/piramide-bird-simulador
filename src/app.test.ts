@@ -269,10 +269,13 @@ describe("bird-app", () => {
     const hazard = app.controller?.state.selectedScenario?.hazard;
     if (!hazard) throw new Error("Expected a preventive scenario hazard");
     fireEvent.click(getByRole(app, "button", { name: hazard }));
+    await vi.waitFor(() => expect(app.controller?.state.progress.questionsAnswered).toBe(1));
     await app.updateComplete;
 
     expect(getByText(app, "Correcto: has identificado el peligro.")).toBeTruthy();
     expect(getByText(app, "Qué habría que hacer")).toBeTruthy();
+    expect(app.controller?.state.progress.correctAnswers).toBe(1);
+    expect(app.controller?.state.progress.unlocked).toContain("hazard-spotter");
   });
 
   it("shares the latest run through the injected native adapter", async () => {

@@ -28,7 +28,14 @@ function createState(): AppState {
     initialized: true,
     activeModelId: "bird-classic",
     settings: DEFAULT_SETTINGS,
-    progress: INITIAL_PROGRESS,
+    progress: {
+      ...INITIAL_PROGRESS,
+      questionsAnswered: 8,
+      correctAnswers: 6,
+      currentCorrectStreak: 2,
+      bestCorrectStreak: 4,
+      answeredScenarioIds: ["one", "two", "three", "four", "five"],
+    },
     history: [run],
     totals,
     selectedScenario: null,
@@ -90,5 +97,16 @@ describe("stats view data windows", () => {
       "1 evento",
     );
     expect(view.querySelector(".history-list")?.textContent).not.toContain("1 eventos");
+  });
+
+  it("summarizes hazard-question learning separately from simulation totals", async () => {
+    const view = await renderStats();
+    const learning = view.querySelector('[aria-labelledby="learning-stats-title"]');
+    const text = learning?.textContent?.replace(/\s+/g, " ");
+
+    expect(text).toContain("Preguntas respondidas");
+    expect(text).toMatch(/Precisión\s*75/);
+    expect(text).toMatch(/Mejor racha\s*4/);
+    expect(text).toMatch(/Casos explorados\s*5/);
   });
 });

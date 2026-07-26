@@ -318,8 +318,15 @@ export class HomeView extends LitElement {
 
   private answerLearningCheck(choice: LearningChoice): void {
     const runId = this.state?.latestRun?.id;
-    if (!runId || this.learningAnswer?.runId === runId) return;
+    const scenarioId = this.state?.selectedScenario?.id;
+    if (!runId || !scenarioId || this.learningAnswer?.runId === runId) return;
     this.learningAnswer = { runId, choice };
+    this.dispatchEvent(
+      new CustomEvent("learning-answer", {
+        detail: { runId, scenarioId, correct: choice === "hazard" },
+        bubbles: true,
+      }),
+    );
   }
 
   private onTouchStart(event: TouchEvent): void {

@@ -171,4 +171,51 @@ describe("simulation history", () => {
     await expect(history.loadSnapshot()).resolves.toBeNull();
     await history.close();
   });
+
+  it("migrates snapshots saved before question metrics without losing totals", async () => {
+    const databaseName = uniqueDatabaseName();
+    const history = createHistoryRepository(databaseName);
+    const state = snapshot();
+    state.totals["bird-classic"]["near-miss"] = 321;
+    await history.save(run("legacy-progress", "2026-01-01T09:00:00.000Z"), state);
+    await history.close();
+
+    await new Promise<void>((resolve, reject) => {
+      const request = indexedDB.open(databaseName, 2);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const database = request.result;
+        const transaction = database.transaction("metadata", "readwrite");
+        transaction.objectStore("metadata").put({
+          key: "current",
+          version: 1,
+          snapshot: {
+            totals: state.totals,
+            progress: {
+              unlocked: ["first-simulation"],
+              currentNearMissStreak: 2,
+              bestNearMissStreak: 8,
+            },
+          },
+        });
+        transaction.oncomplete = () => {
+          database.close();
+          resolve();
+        };
+        transaction.onerror = () => reject(transaction.error);
+      };
+    });
+
+    const reopened = createHistoryRepository(databaseName);
+    await expect(reopened.loadSnapshot()).resolves.toEqual({
+      totals: state.totals,
+      progress: {
+        ...INITIAL_PROGRESS,
+        unlocked: ["first-simulation"],
+        currentNearMissStreak: 2,
+        bestNearMissStreak: 8,
+      },
+    });
+    await reopened.close();
+  });
 });
