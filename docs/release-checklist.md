@@ -38,8 +38,8 @@ Esta lista cubre la APK pública de piloto y el AAB posterior para Google Play. 
 
    ```bash
    EXPECTED_SIGNER_SHA256="HUELLA_SHA256_APROBADA" \
-     EXPECTED_VERSION_CODE="1000003" \
-     scripts/prepare-pilot-release.sh android/app/release/app-release.apk piramide-bird-1.0.0-alpha.3.apk
+     EXPECTED_VERSION_CODE="1000004" \
+     scripts/prepare-pilot-release.sh android/app/release/app-release.apk piramide-bird-1.0.0-alpha.4.apk
    ```
 
 4. Instala la APK resultante con `adb install --replace RUTA_APK` en, al menos, Android API 24 y API 36.
@@ -47,7 +47,7 @@ Esta lista cubre la APK pública de piloto y el AAB posterior para Google Play. 
 6. Crea un tag anotado desde el commit verificado y publícalo como _prerelease_. Adjunta exclusivamente la APK y su `.sha256`:
 
    ```bash
-   gh release create v1.0.0-alpha.3 RUTA_APK RUTA_APK.sha256 --prerelease --generate-notes
+   gh release create v1.0.0-alpha.4 RUTA_APK RUTA_APK.sha256 --prerelease --generate-notes
    ```
 
 - [ ] El SHA-256 descargado desde GitHub coincide con el publicado.
