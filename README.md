@@ -1,142 +1,84 @@
-# Pirámide de Bird Simulador
+# Pirámide de Bird
 
-Aplicación móvil educativa, gratuita y en español para explorar de forma visual la relación estadística entre cuasi accidentes, daños y lesiones. Permite ejecutar simulaciones individuales o por lotes, observar la convergencia de los resultados, consultar escenarios preventivos y aprender mediante desafíos y logros.
+Una aplicación educativa, gratuita y en español para aprender cómo se relacionan los
+cuasi accidentes, los daños y las lesiones. Cada lanzamiento presenta un caso de
+prevención, una pregunta para identificar el peligro y medidas que ayudan a evitar que
+se repita.
 
-La aplicación está pensada como apoyo para formación y sensibilización en prevención de riesgos laborales (PRL). No sustituye una evaluación de riesgos, una investigación de accidentes, una norma técnica ni el criterio de un profesional competente.
+La aplicación está pensada para formación y sensibilización en prevención de riesgos
+laborales (PRL). No sustituye una evaluación de riesgos, una investigación de
+accidentes, una norma técnica ni el criterio de un profesional competente.
+
+[Probar la aplicación web](https://breixopd.github.io/piramide-bird-simulador/)
+· [Ver las versiones para Android](https://github.com/breixopd/piramide-bird-simulador/releases)
+· [Ver una prueba en móvil](docs/demo/bird-pyramid-testing.mp4)
 
 <table>
   <tr>
     <td align="center">
-      <img src="docs/screenshots/home.png" width="320" alt="Pantalla principal con la pirámide de Bird y el control Lanzar" />
+      <img src="docs/screenshots/home.png" width="320" alt="Pantalla principal con la pirámide de Bird y el botón Lanzar" />
       <br />
-      <sub>Pirámide interactiva y simulación</sub>
+      <sub>Explora la pirámide y lanza eventos</sub>
     </td>
     <td align="center">
-      <img src="docs/screenshots/result.png" width="320" alt="Resultado de una simulación con una pregunta guiada sobre el peligro principal" />
+      <img src="docs/screenshots/result.png" width="320" alt="Caso preventivo con una pregunta para identificar el peligro principal" />
       <br />
-      <sub>Identificación guiada del peligro</sub>
+      <sub>Practica con casos preventivos</sub>
     </td>
   </tr>
 </table>
 
-▶️ [Ver el vídeo de prueba en vista móvil Android (MP4)](docs/demo/bird-pyramid-testing.mp4)
-· [Consultar el informe verificable](docs/demo/bird-pyramid-testing.report.json)
+## Cómo se utiliza
 
-## Qué incluye
+1. Elige el modelo que quieres explorar.
+2. Pulsa **Lanzar** para recorrer los posibles sucesos y descubrir un resultado.
+3. Lee el caso, responde cuál es el peligro principal y revisa la explicación y las
+   medidas preventivas.
+4. Consulta **Datos** para ver tu progreso y la evolución de los resultados.
+5. Visita **Logros** para seguir tus respuestas, rachas y casos explorados.
 
-- Lanzamiento visual que recorre los símbolos y colores de los posibles sucesos antes de detenerse en el resultado.
-- Pirámide interactiva, simulaciones de 1, 100 o 1000 eventos y comparación entre resultados teóricos y observados.
-- 80 casos preventivos de ocho sectores, con una pregunta guiada antes de revelar el peligro, la causa inmediata y las medidas recomendadas.
-- Vista de escritorio y tableta en dos columnas para comparar la simulación con el caso preventivo sin perder contexto.
-- Historial, estadísticas, desafío probabilístico y logros guardados en el dispositivo.
-- Funcionamiento sin conexión, tema claro/oscuro, movimiento reducido y navegación accesible por teclado o lector de pantalla.
-- Aplicación web instalable dentro del proyecto Android mediante Capacitor, sin cuentas, publicidad ni compras.
+También puedes simular 100 o 1000 eventos de una vez, tocar cualquier nivel de la
+pirámide para conocerlo mejor y compartir un resultado desde Android.
 
-## Modelos educativos
+## Qué encontrarás
 
-- **Bird clásico:** 600 cuasi accidentes, 30 daños materiales, 10 lesiones menores y 1 lesión grave o incapacitante.
-- **Adaptación didáctica:** 600 cuasi accidentes, 30 lesiones menores, 10 lesiones graves y 1 fatalidad.
+- 80 casos preventivos de ocho sectores diferentes.
+- Preguntas guiadas sobre peligros, causas y medidas preventivas.
+- Comparación entre los resultados observados y las proporciones teóricas.
+- Historial, estadísticas, desafíos y logros guardados en tu dispositivo.
+- Tema claro u oscuro, movimiento reducido y navegación accesible.
+- Funcionamiento sin conexión para las funciones principales.
 
-La adaptación didáctica no es la formulación histórica de Bird. Se incluye para explicar eventos de baja frecuencia y alto impacto, y se identifica como tal dentro de la aplicación. Las simulaciones representan probabilidades teóricas; no predicen cuándo ocurrirá un accidente real ni permiten estimar el riesgo de una empresa o tarea concreta.
+## Los dos modelos
 
-## Requisitos
+- **Bird clásico:** 600 cuasi accidentes, 30 daños materiales, 10 lesiones menores y
+  1 lesión grave o incapacitante.
+- **Modelo extendido:** una adaptación educativa que organiza los niveles por gravedad
+  e incluye sucesos fatales para explicar eventos de muy baja frecuencia y alto
+  impacto.
 
-- Node.js 22 o posterior.
-- npm.
-- Para Android: Android Studio y un SDK de Android compatible con Capacitor.
+El modelo extendido no es la formulación histórica de Bird y la aplicación lo identifica
+siempre como una adaptación. Las simulaciones representan probabilidades teóricas: no
+predicen cuándo ocurrirá un accidente ni calculan el riesgo real de una empresa o tarea.
 
-## Desarrollo local
+## Privacidad
 
-Instala las dependencias:
+No necesitas crear una cuenta. El historial, los ajustes, el progreso y los logros se
+guardan localmente en el dispositivo.
 
-```bash
-npm install
-```
+Analytics y los informes de fallos permanecen desactivados hasta que aceptas de forma
+explícita. Puedes cambiar esa decisión en los ajustes. La aplicación no envía los casos
+que consultas, tu historial de simulaciones ni tus respuestas.
 
-Inicia el servidor de desarrollo:
+Consulta la
+[política de privacidad completa](https://breixopd.github.io/piramide-bird-simulador/privacy.html).
 
-```bash
-npm run dev
-```
+## Disponibilidad y ayuda
 
-Ejecuta las pruebas:
+La primera versión está orientada a Android y a español de España. Es gratuita y no
+incluye publicidad, compras, cuentas, sonidos ni notificaciones.
 
-```bash
-npm run test
-```
+Si encuentras un problema, tienes una sugerencia o quieres proponer una corrección de
+contenido preventivo, [abre una incidencia](https://github.com/breixopd/piramide-bird-simulador/issues).
 
-Instala Chromium una vez y ejecuta las regresiones visuales compactas y de escritorio:
-
-```bash
-npx playwright install chromium
-npm run test:visual
-```
-
-Cuando un cambio visual sea intencionado, revisa las imágenes generadas antes de actualizar las referencias:
-
-```bash
-npm run test:visual:update
-```
-
-Genera la compilación web de producción:
-
-```bash
-npm run build
-```
-
-Sincroniza la compilación web y los plugins con el proyecto Android:
-
-```bash
-npx cap sync android
-```
-
-Abre el proyecto nativo en Android Studio:
-
-```bash
-npx cap open android
-```
-
-Antes de sincronizar Android después de un cambio web, ejecuta de nuevo `npm run build`.
-
-La separación entre dominio, persistencia, adaptadores nativos e interfaz se explica en la [documentación de arquitectura](docs/architecture.md).
-
-## Configuración de Firebase
-
-El repositorio incluye la integración y mantiene Analytics y Crashlytics desactivados por defecto. Para activar la telemetría consentida en una compilación propia:
-
-1. Crea una aplicación Android en Firebase con el identificador `com.breixopd.piramidebird`.
-2. Copia su archivo `google-services.json` en `android/app/google-services.json`; el archivo está excluido de Git.
-3. Configura en Firebase/Google Analytics una retención de datos de usuario y eventos de 2 meses.
-4. Ejecuta `npm run cap:sync` y genera de nuevo la aplicación Android.
-5. Verifica en un dispositivo que no se recibe ningún evento antes de aceptar, que los eventos aparecen tras aceptar y reiniciar, y que dejan de aparecer tras retirar el consentimiento y reiniciar de nuevo.
-
-Si el archivo no existe o Firebase no está disponible, la compilación pública sigue funcionando sin telemetría. No añadas claves de firma ni archivos Firebase al repositorio.
-
-## Privacidad y funcionamiento sin conexión
-
-El núcleo de la aplicación funciona sin conexión. El historial, los ajustes, el progreso y los logros se guardan localmente en el dispositivo.
-
-Firebase Analytics y Firebase Crashlytics permanecen desactivados hasta que la persona usuaria presta un consentimiento explícito. Si acepta, una instalación puede enviar eventos de uso, identificadores de instalación y diagnósticos técnicos que después se muestran en informes agregados; no se envían relatos consultados, historial de simulaciones, estimaciones del desafío ni datos introducidos por la persona usuaria. El consentimiento puede retirarse desde los ajustes.
-
-La exportación y el uso del menú nativo para compartir solo se ejecutan por iniciativa de la persona usuaria. Consulta la [política de privacidad](docs/privacy-policy.md) para conocer todos los detalles.
-
-## Piloto y publicación
-
-El proceso de entrega previsto es:
-
-1. Comprobar tipos, pruebas y compilación web.
-2. Generar una APK `release` firmada fuera de la automatización pública, exclusivamente para el piloto descargable.
-3. Publicar la APK como _prerelease_ de GitHub junto con su suma SHA-256 y advertir que puede requerir desinstalación antes de instalar una versión procedente de Google Play.
-4. Validar el piloto con profesionales de PRL y personas en formación siguiendo la [guía de pruebas](docs/pilot-testing.md).
-5. Corregir incidencias críticas o de contenido antes de generar el AAB final.
-6. Publicar manualmente en Google Play mediante Play App Signing: el equipo conserva la clave de carga y Google protege la clave que firma las APK entregadas. Las pruebas destinadas a actualizarse hasta producción deben distribuirse desde la pista interna de Play.
-
-Los fallos funcionales se pueden comunicar mediante la plantilla **Informe de error** de GitHub Issues. Las dudas o correcciones preventivas deben usar **Revisión de contenido PRL**.
-
-## Alcance inicial
-
-La primera versión está orientada a Android y a español de España. Es gratuita, no incluye publicidad, cuentas, compras, sonidos ni notificaciones. iOS y otros modelos históricos quedan fuera de esta primera entrega.
-
-## Contacto
-
-Proyecto mantenido por [breixopd](https://github.com/breixopd) en [breixopd/piramide-bird-simulador](https://github.com/breixopd/piramide-bird-simulador). Para soporte, privacidad o sugerencias, abre una incidencia en [GitHub Issues](https://github.com/breixopd/piramide-bird-simulador/issues).
+Proyecto mantenido por [breixopd](https://github.com/breixopd).

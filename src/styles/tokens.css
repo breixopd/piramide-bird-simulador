@@ -73,6 +73,7 @@
   --content-width: 72rem;
   --nav-height: 4.5rem;
   --nav-margin: 0.75rem;
+  --nav-bottom-margin: 1rem;
   --nav-inset: env(safe-area-inset-bottom, 0px);
 
   /* ---- Tipografía ---- */

@@ -45,7 +45,7 @@ bird-app {
   width: 100%;
   min-height: 100%;
   padding: calc(var(--space-5) + env(safe-area-inset-top, 0px)) var(--space-4)
-    calc(var(--nav-height) + var(--nav-margin) + var(--nav-inset));
+    calc(var(--nav-height) + var(--nav-bottom-margin) + var(--nav-inset));
 }
 
 .view:not(.home-view) {
@@ -91,7 +91,7 @@ bottom-nav {
   position: absolute;
   left: var(--nav-margin);
   right: var(--nav-margin);
-  bottom: calc(var(--nav-margin) + var(--nav-inset));
+  bottom: calc(var(--nav-bottom-margin) + var(--nav-inset));
   min-height: var(--nav-height);
   padding: var(--space-2);
   display: grid;

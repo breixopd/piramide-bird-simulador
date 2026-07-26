@@ -31,6 +31,15 @@ test.afterEach(async ({ page }) => {
 
 test("keeps the responsive home composition visually stable", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Abrir desafío estadístico" })).toHaveCount(0);
+
+  if (page.viewportSize()?.width === 390) {
+    const navigationBox = await page
+      .getByRole("navigation", { name: "Navegación principal" })
+      .boundingBox();
+    expect(navigationBox).not.toBeNull();
+    expect(page.viewportSize()!.height - (navigationBox!.y + navigationBox!.height)).toBe(16);
+  }
+
   await expect(page).toHaveScreenshot("home.png");
 });
 
