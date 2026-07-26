@@ -20,8 +20,8 @@ apksigner() {
 apkanalyzer() {
   case "$2" in
     application-id) printf '%s\n' 'com.breixopd.piramidebird' ;;
-    version-name) printf '%s\n' '1.0.0-alpha.2' ;;
-    version-code) printf '%s\n' '1000002' ;;
+    version-name) printf '%s\n' '1.0.0-alpha.3' ;;
+    version-code) printf '%s\n' '1000003' ;;
     *) return 64 ;;
   esac
 }
@@ -62,7 +62,7 @@ if [[ "$output" != *'versionCode inesperado'* ]]; then
 fi
 
 EXPECTED_SIGNER_SHA256='aa:bb:cc:dd' \
-  EXPECTED_VERSION_CODE='1000002' \
+  EXPECTED_VERSION_CODE='1000003' \
   "$release_script" "$apk_path" piramide-bird-correct-version.apk >/dev/null
 
 if [[ ! -f "$fixture_dir/piramide-bird-correct-version.apk.sha256" ]]; then

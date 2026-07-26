@@ -64,7 +64,8 @@ Comunica cualquier corrección mediante la plantilla **Revisión de contenido PR
 - [ ] La pantalla inicial permite comprender el objetivo sin ayuda externa.
 - [ ] Se distingue el modelo clásico de la adaptación didáctica.
 - [ ] Es fácil ejecutar una simulación y los lotes de 100 y 1.000.
-- [ ] Los símbolos y colores del dado se entienden sin memorizar instrucciones.
+- [ ] El recorrido de símbolos y colores del botón **Lanzar** se entiende sin memorizar
+      instrucciones y se detiene claramente en el resultado.
 - [ ] La pirámide, las tarjetas y las estadísticas son legibles en el móvil.
 - [ ] El gráfico de convergencia y su explicación resultan comprensibles.
 - [ ] Los escenarios ayudan a relacionar un evento con causas y prevención.
