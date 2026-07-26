@@ -1,6 +1,6 @@
 # Lista de publicación
 
-Esta lista cubre la APK pública de piloto y el AAB posterior para Google Play. La firma es deliberadamente manual: ninguna clave, contraseña ni configuración de Firebase debe almacenarse en Git, GitHub Actions o los artefactos del repositorio.
+Esta lista cubre la APK local de prueba y el AAB para Google Play. La firma es deliberadamente manual: ninguna clave, contraseña ni configuración de Firebase debe almacenarse en Git ni en artefactos públicos.
 
 ## Requisitos locales
 
@@ -30,29 +30,20 @@ Esta lista cubre la APK pública de piloto y el AAB posterior para Google Play. 
 - [ ] La retención de Analytics está configurada a 2 meses y se ha revisado la retención publicada de Crashlytics.
 - [ ] La recogida del identificador publicitario y las señales de personalización permanece desactivada.
 
-## APK piloto firmada
+## APK local de prueba
 
-1. En Android Studio, abre `android/`, selecciona **Build > Generate Signed App Bundle or APK**, elige **APK** y la variante `release`.
-2. Selecciona la clave externa y escribe sus credenciales únicamente en el diálogo local. No generes ni copies `keystore.properties` al repositorio.
-3. Verifica la firma y prepara el hash:
-
-   ```bash
-   EXPECTED_SIGNER_SHA256="HUELLA_SHA256_APROBADA" \
-     EXPECTED_VERSION_CODE="1000006" \
-     scripts/prepare-pilot-release.sh android/app/release/app-release.apk piramide-bird-1.0.0-alpha.6.apk
-   ```
-
-4. Instala la APK resultante con `adb install --replace RUTA_APK` en, al menos, Android API 24 y API 36.
-5. Ejecuta la guía de `docs/pilot-testing.md`, incluida la prueba sin conexión, segundo plano, reinicio, exportación y consentimiento.
-6. Crea un tag anotado desde el commit verificado y publícalo como _prerelease_. Adjunta exclusivamente la APK y su `.sha256`:
+1. Sincroniza los recursos con `npm run cap:sync`.
+2. Genera la variante `debug` con `cd android && ./gradlew assembleDebug`.
+3. Verifica el paquete, versión, firma y hash antes de instalarla:
 
    ```bash
-   gh release create v1.0.0-alpha.6 RUTA_APK RUTA_APK.sha256 --prerelease --generate-notes
+   ALLOW_DEBUG_SIGNER="1" EXPECTED_VERSION_CODE="1000007" \
+     scripts/prepare-pilot-release.sh android/app/build/outputs/apk/debug/app-debug.apk piramide-bird-1.0.0-device-test.apk
    ```
 
-- [ ] El SHA-256 descargado desde GitHub coincide con el publicado.
-- [ ] La página de la release avisa de que es una versión piloto y enlaza la política de privacidad y la guía de incidencias.
-- [ ] La página avisa de que una APK instalada desde GitHub puede no actualizarse directamente a la compilación firmada por Google Play; el recorrido de actualización hasta producción se prueba en la pista interna de Play.
+4. Instala la APK con `adb install --replace RUTA_APK` y ejecuta `docs/pilot-testing.md`, incluida la prueba sin conexión, segundo plano, reinicio, exportación y consentimiento.
+5. Desinstala esta variante antes de instalar una compilación de Google Play: la APK de prueba usa la clave de depuración local y no representa la firma de producción.
+
 - [ ] No quedan incidencias críticas, de privacidad o de contenido PRL abiertas antes de promover la versión.
 
 ## AAB para Google Play
@@ -68,4 +59,4 @@ Esta lista cubre la APK pública de piloto y el AAB posterior para Google Play. 
 
 ## Retirada o reversión
 
-Si aparece una incidencia crítica, detén el despliegue en Play Console, conserva la evidencia, publica un aviso en la release afectada y prepara un nuevo `versionCode` desde el último tag conocido como estable. Una APK/AAB ya distribuida no se sustituye en el mismo tag ni con el mismo código de versión.
+Si aparece una incidencia crítica, detén el despliegue en Play Console, conserva la evidencia y prepara un nuevo `versionCode` desde el último commit conocido como estable. Un APK o AAB ya distribuido no se sustituye con el mismo código de versión.

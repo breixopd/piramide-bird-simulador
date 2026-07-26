@@ -4,7 +4,8 @@ set -euo pipefail
 
 usage() {
   echo "Uso: $0 RUTA_APK [NOMBRE_PUBLICO.apk]" >&2
-  echo "Requiere EXPECTED_SIGNER_SHA256 y EXPECTED_VERSION_CODE; verifica firma, paquete y versión, pero no firma artefactos." >&2
+  echo "Requiere EXPECTED_VERSION_CODE y, salvo una prueba local explícita, EXPECTED_SIGNER_SHA256." >&2
+  echo "ALLOW_DEBUG_SIGNER=1 permite preparar una APK de depuración solo para pruebas en dispositivo." >&2
 }
 
 if [[ $# -lt 1 || $# -gt 2 ]]; then
@@ -13,13 +14,19 @@ if [[ $# -lt 1 || $# -gt 2 ]]; then
 fi
 
 apk_path=$1
-public_name=${2:-"piramide-bird-piloto.apk"}
+public_name=${2:-"piramide-bird-device-test.apk"}
 expected_application_id=${EXPECTED_APPLICATION_ID:-"com.breixopd.piramidebird"}
-expected_version_name=${EXPECTED_VERSION_NAME:-"1.0.0-alpha.6"}
+expected_version_name=${EXPECTED_VERSION_NAME:-"1.0.0"}
 expected_version_code=${EXPECTED_VERSION_CODE:-}
 expected_signer=${EXPECTED_SIGNER_SHA256:-}
+allow_debug_signer=${ALLOW_DEBUG_SIGNER:-0}
 
-if [[ -z "$expected_signer" ]]; then
+if [[ "$allow_debug_signer" != "0" && "$allow_debug_signer" != "1" ]]; then
+  echo "Error: ALLOW_DEBUG_SIGNER debe ser 0 o 1." >&2
+  exit 64
+fi
+
+if [[ -z "$expected_signer" && "$allow_debug_signer" != "1" ]]; then
   echo "Error: define EXPECTED_SIGNER_SHA256 con la huella SHA-256 aprobada de la clave de publicación." >&2
   exit 64
 fi
@@ -49,7 +56,7 @@ done
 verification_output=$(apksigner verify --verbose --print-certs "$apk_path")
 printf '%s\n' "$verification_output"
 
-if grep -q "CN=Android Debug" <<<"$verification_output"; then
+if grep -q "CN=Android Debug" <<<"$verification_output" && [[ "$allow_debug_signer" != "1" ]]; then
   echo "Error: la APK usa el certificado de depuración y no puede publicarse." >&2
   exit 65
 fi
@@ -57,7 +64,11 @@ fi
 actual_signer=$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' <<<"$verification_output" | head -n 1)
 actual_signer=$(tr '[:upper:]' '[:lower:]' <<<"$actual_signer" | tr -d '[:space:]:')
 expected_signer=$(tr '[:upper:]' '[:lower:]' <<<"$expected_signer" | tr -d '[:space:]:')
-if [[ -z "$actual_signer" || "$actual_signer" != "$expected_signer" ]]; then
+if [[ -z "$actual_signer" ]]; then
+  echo "Error: no se pudo leer la huella de la firma." >&2
+  exit 65
+fi
+if [[ -n "$expected_signer" && "$actual_signer" != "$expected_signer" ]]; then
   echo "Error: la huella de firma no coincide con EXPECTED_SIGNER_SHA256." >&2
   exit 65
 fi
@@ -98,7 +109,7 @@ echo
 echo "Artefactos preparados:"
 echo "  $artifact_path"
 echo "  $artifact_path.sha256"
-echo
-echo "Publicación manual sugerida:"
-printf '  gh release create <vX.Y.Z-pilot.N> %q %q --prerelease --generate-notes\n' \
-  "$artifact_path" "$artifact_path.sha256"
+if grep -q "CN=Android Debug" <<<"$verification_output"; then
+  echo
+  echo "Aviso: esta APK usa la clave de depuración local. Es solo para pruebas en dispositivo y no debe subirse a Google Play."
+fi

@@ -36,4 +36,4 @@ El consentimiento se guarda antes que el resto de ajustes en un marcador indepen
 
 ## Entrega
 
-Vite genera `dist`, Capacitor lo sincroniza con `android/app/src/main/assets/public` y Gradle produce el APK o AAB. GitHub Actions repite formato, lint, tipos, pruebas, auditoría de dependencias, compilación web, sincronización y verificaciones Android antes de publicar artefactos.
+Vite genera `dist`, Capacitor lo sincroniza con `android/app/src/main/assets/public` y Gradle produce el APK o AAB. Antes de entregar una compilación se ejecutan localmente el formato, lint, tipos, pruebas, auditoría de dependencias, compilación web, sincronización y verificaciones Android.

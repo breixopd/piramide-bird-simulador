@@ -1,5 +1,8 @@
 # Pirámide de Bird
 
+[![Licencia: PolyForm Shield 1.0.0](https://img.shields.io/badge/licencia-PolyForm%20Shield%201.0.0-5c4ee5)](LICENSE)
+![Android 7 o posterior](https://img.shields.io/badge/Android-7%2B-3DDC84?logo=android&logoColor=white)
+
 Una aplicación educativa, gratuita y en español para aprender cómo se relacionan los
 cuasi accidentes, los daños y las lesiones. Cada lanzamiento presenta un caso de
 prevención, una pregunta para identificar el peligro y medidas que ayudan a evitar que
@@ -10,8 +13,9 @@ laborales (PRL). No sustituye una evaluación de riesgos, una investigación de
 accidentes, una norma técnica ni el criterio de un profesional competente.
 
 [Probar la aplicación web](https://breixopd.github.io/piramide-bird-simulador/)
-· [Ver las versiones para Android](https://github.com/breixopd/piramide-bird-simulador/releases)
 · [Ver una prueba en móvil](docs/demo/bird-pyramid-testing.mp4)
+
+La versión para Android se publicará en Google Play.
 
 <table>
   <tr>

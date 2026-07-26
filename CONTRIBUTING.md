@@ -1,16 +1,18 @@
-# Contributing
+# Contribuir
 
-Issues, corrections and suggestions are welcome through
+Puedes enviar incidencias, correcciones y sugerencias mediante
 [GitHub Issues](https://github.com/breixopd/piramide-bird-simulador/issues).
 
-Before submitting code, visual assets or educational content in a pull request,
-contact the maintainer first. Contributions are accepted only when their author has
-the right to provide them and agrees in writing to terms that let the maintainer:
+Antes de enviar código, recursos visuales o contenido educativo mediante una
+solicitud de cambios, contacta primero con el mantenedor. Solo se aceptan
+contribuciones cuando su autor tiene derecho a aportarlas y acepta por escrito unas
+condiciones que permitan al mantenedor:
 
-- include the contribution in the PolyForm Shield edition;
-- maintain the reserved-branding and content boundaries described in
-  [BRANDING.md](BRANDING.md); and
-- grant separate permissions for competing or commercial uses.
+- incluir la contribución en la edición con licencia PolyForm Shield;
+- mantener los límites de marca y contenido reservado descritos en
+  [BRANDING.md](BRANDING.md);
+- conceder permisos independientes para usos comerciales o competidores.
 
-Opening an issue does not transfer copyright. A pull request may remain unmerged
-until the necessary contributor terms are recorded.
+Abrir una incidencia no transfiere derechos de autor. Una solicitud de cambios puede
+permanecer sin integrar hasta que queden registradas las condiciones necesarias para
+la contribución.

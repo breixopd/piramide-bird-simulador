@@ -1,22 +1,20 @@
-# Guía del piloto público para Android
+# Guía de prueba local para Android
 
-Esta guía sirve para probar una versión preliminar de Pirámide de Bird Simulador distribuida como APK en una _prerelease_ pública de GitHub. No instales APK recibidas por mensajería, correo o enlaces distintos al repositorio oficial.
+Esta guía sirve para probar en un dispositivo una compilación de Pirámide de Bird Simulador antes de distribuirla mediante Google Play. La APK local usa una firma de depuración y no debe publicarse ni subirse a Play Console.
 
-## Descargar e instalar de forma segura
+## Instalar de forma segura
 
-1. Abre la sección [**Releases** del repositorio oficial](https://github.com/breixopd/piramide-bird-simulador/releases).
-2. Comprueba que la versión aparece como _prerelease_ y lee sus notas y limitaciones conocidas.
-3. Descarga la APK y el valor SHA-256 publicado en esa misma versión.
-4. Verifica el archivo antes de instalarlo siguiendo el apartado siguiente.
-5. En Android, permite temporalmente a tu navegador o gestor de archivos **Instalar aplicaciones desconocidas**.
-6. Abre la APK verificada y revisa el nombre de la aplicación antes de confirmar.
-7. Después de instalarla, desactiva de nuevo el permiso **Instalar aplicaciones desconocidas**.
+1. Utiliza únicamente la APK generada localmente o enviada directamente por el mantenedor para esta prueba.
+2. Conserva junto a ella el archivo `.sha256` entregado y verifica la suma siguiendo el apartado siguiente.
+3. En Android, permite temporalmente a tu navegador o gestor de archivos **Instalar aplicaciones desconocidas**.
+4. Abre la APK verificada y revisa el nombre y la versión de la aplicación antes de confirmar.
+5. Después de instalarla, desactiva de nuevo el permiso **Instalar aplicaciones desconocidas**.
 
-Una APK de piloto se instala fuera de Google Play y Android mostrará una advertencia. No desactives Play Protect. Si el nombre, la versión, el tamaño o la huella no coinciden con la publicación, cancela la instalación y comunica la incidencia.
+Android mostrará una advertencia porque esta APK se instala fuera de Google Play. No desactives Play Protect. Si el nombre, la versión, el tamaño o la suma no coinciden con los datos entregados, cancela la instalación y comunica la incidencia.
 
 ## Verificar la suma SHA-256
 
-Compara el resultado completo del comando con el SHA-256 publicado en la _prerelease_. Deben coincidir todos los caracteres.
+Compara el resultado completo del comando con el contenido del archivo `.sha256` entregado. Deben coincidir todos los caracteres.
 
 ### Linux
 

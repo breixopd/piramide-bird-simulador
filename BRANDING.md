@@ -1,24 +1,28 @@
-# Branding, visual assets and educational content
+# Marca, recursos visuales y contenido educativo
 
-Copyright © 2026 Breixo Paz. All rights reserved.
+Copyright © 2026 Breixo Paz. Todos los derechos reservados.
 
-The PolyForm Shield License in [LICENSE](LICENSE) applies to the original source
-code and build tooling in this repository. It does not grant permission to reuse:
+La licencia PolyForm Shield incluida en [LICENSE](LICENSE) se aplica al código
+fuente original y a las herramientas de compilación de este repositorio. No concede
+permiso para reutilizar:
 
-- the **Pirámide de Bird Simulador** name or visual identity;
-- the application icon, logo, splash artwork or favicon;
-- screenshots, demonstration videos or promotional artwork;
-- original Spanish educational cases, questions, explanations or preventive guidance.
+- el nombre o la identidad visual de **Pirámide de Bird Simulador**;
+- el icono, el logotipo, la imagen de inicio o el favicon de la aplicación;
+- las capturas, los vídeos de demostración o los recursos promocionales;
+- los casos educativos, preguntas, explicaciones u orientaciones preventivas originales
+  en español.
 
-Those items are reserved materials. They may be viewed and used as part of an
-unmodified copy of this application where the PolyForm Shield License permits that
-use. They may not be extracted, rebranded, republished or used to market another
-product without prior written permission from Breixo Paz.
+Estos elementos son materiales reservados. Pueden visualizarse y utilizarse como
+parte de una copia sin modificar de la aplicación cuando la licencia PolyForm Shield
+permita ese uso. No pueden extraerse, cambiarse de marca, volver a publicarse ni
+utilizarse para promocionar otro producto sin el permiso previo y por escrito de
+Breixo Paz.
 
-Third-party names, theories, standards and trademarks remain the property of their
-respective owners. This notice does not claim exclusive rights over the historical
-Bird accident-ratio concept or general occupational-risk-prevention knowledge.
+Los nombres, teorías, normas y marcas de terceros siguen perteneciendo a sus
+respectivos titulares. Este aviso no reclama derechos exclusivos sobre el concepto
+histórico de las proporciones de accidentes de Bird ni sobre el conocimiento general
+de prevención de riesgos laborales.
 
-For permission to use reserved materials or to offer a competing commercial product,
-contact the repository owner through
+Para solicitar permiso para utilizar materiales reservados u ofrecer un producto
+comercial competidor, contacta con el titular del repositorio a través de
 [GitHub](https://github.com/breixopd/piramide-bird-simulador).

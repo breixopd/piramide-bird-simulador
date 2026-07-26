@@ -11,17 +11,18 @@ apk_path="$fixture_dir/app-release.apk"
 : >"$apk_path"
 
 apksigner() {
+  local signer_dn=${FAKE_SIGNER_DN:-'CN=Pirámide de Bird Upload'}
   printf '%s\n' \
     'Verifies' \
-    'Signer #1 certificate DN: CN=Pirámide de Bird Upload' \
+    "Signer #1 certificate DN: $signer_dn" \
     'Signer #1 certificate SHA-256 digest: aabbccdd'
 }
 
 apkanalyzer() {
   case "$2" in
     application-id) printf '%s\n' 'com.breixopd.piramidebird' ;;
-    version-name) printf '%s\n' '1.0.0-alpha.6' ;;
-    version-code) printf '%s\n' '1000006' ;;
+    version-name) printf '%s\n' '1.0.0' ;;
+    version-code) printf '%s\n' '1000007' ;;
     *) return 64 ;;
   esac
 }
@@ -62,7 +63,7 @@ if [[ "$output" != *'versionCode inesperado'* ]]; then
 fi
 
 EXPECTED_SIGNER_SHA256='aa:bb:cc:dd' \
-  EXPECTED_VERSION_CODE='1000006' \
+  EXPECTED_VERSION_CODE='1000007' \
   "$release_script" "$apk_path" piramide-bird-correct-version.apk >/dev/null
 
 if [[ ! -f "$fixture_dir/piramide-bird-correct-version.apk.sha256" ]]; then
@@ -70,4 +71,29 @@ if [[ ! -f "$fixture_dir/piramide-bird-correct-version.apk.sha256" ]]; then
   exit 1
 fi
 
-echo 'OK: EXPECTED_VERSION_CODE es obligatorio, rechaza discrepancias y acepta coincidencias.'
+set +e
+debug_output=$(
+  FAKE_SIGNER_DN='C=US, O=Android, CN=Android Debug' \
+    EXPECTED_SIGNER_SHA256='aa:bb:cc:dd' \
+    EXPECTED_VERSION_CODE='1000007' \
+    "$release_script" "$apk_path" piramide-bird-debug-rejected.apk 2>&1
+)
+debug_status=$?
+set -e
+
+if [[ $debug_status -eq 0 || "$debug_output" != *'certificado de depuración'* ]]; then
+  printf 'Fallo: una firma de depuración debería rechazarse por defecto. Salida:\n%s\n' "$debug_output" >&2
+  exit 1
+fi
+
+FAKE_SIGNER_DN='C=US, O=Android, CN=Android Debug' \
+  ALLOW_DEBUG_SIGNER='1' \
+  EXPECTED_VERSION_CODE='1000007' \
+  "$release_script" "$apk_path" piramide-bird-debug-device-test.apk >/dev/null
+
+if [[ ! -f "$fixture_dir/piramide-bird-debug-device-test.apk.sha256" ]]; then
+  echo 'Fallo: el modo explícito de prueba no preparó la APK de depuración.' >&2
+  exit 1
+fi
+
+echo 'OK: versiones y firmantes se validan; la firma de depuración exige autorización explícita.'
