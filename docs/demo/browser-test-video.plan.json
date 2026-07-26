@@ -1,0 +1,90 @@
+{
+  "title": "Bird Pyramid Android-sized mobile test",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "videoSize": {
+    "width": 390,
+    "height": 844
+  },
+  "isMobile": true,
+  "hasTouch": true,
+  "deviceScaleFactor": 1,
+  "locale": "es-ES",
+  "timezoneId": "Europe/Madrid",
+  "colorScheme": "light",
+  "deterministicRandom": 0,
+  "defaultPause": 700,
+  "startCaption": "Opening the Android-sized mobile view",
+  "endCaption": "All recorded checks passed",
+  "endPause": 1400,
+  "steps": [
+    {
+      "action": "assertVisible",
+      "role": "heading",
+      "name": "Pirámide de Bird",
+      "caption": "Checking the mobile layout",
+      "waitAfter": 1100
+    },
+    {
+      "action": "click",
+      "role": "button",
+      "name": "Simular 1 evento",
+      "caption": "Tapping Lanzar",
+      "waitAfter": 250
+    },
+    {
+      "action": "pause",
+      "caption": "Cycling symbols and colours",
+      "duration": 1700
+    },
+    {
+      "action": "assertVisible",
+      "role": "group",
+      "name": "¿Cuál es el peligro principal?",
+      "caption": "Actions stay hidden before the answer",
+      "waitAfter": 500
+    },
+    {
+      "action": "scroll",
+      "role": "group",
+      "name": "¿Cuál es el peligro principal?",
+      "waitAfter": 650
+    },
+    {
+      "action": "click",
+      "role": "button",
+      "name": "Trabajo en altura sobre una escalera apoyada en terreno inestable.",
+      "caption": "Choosing the main hazard",
+      "waitAfter": 800
+    },
+    {
+      "action": "assertText",
+      "text": "Correcto: has identificado el peligro.",
+      "caption": "Checking the feedback",
+      "waitAfter": 700
+    },
+    {
+      "action": "scroll",
+      "role": "heading",
+      "name": "Qué habría que hacer",
+      "caption": "Preventive measures revealed",
+      "waitAfter": 1300
+    },
+    {
+      "action": "click",
+      "role": "button",
+      "name": "Estadísticas",
+      "caption": "Opening saved statistics",
+      "waitAfter": 1000
+    },
+    {
+      "action": "assertVisible",
+      "role": "heading",
+      "name": "Estadísticas",
+      "caption": "Statistics loaded successfully",
+      "waitAfter": 1300
+    }
+  ]
+}

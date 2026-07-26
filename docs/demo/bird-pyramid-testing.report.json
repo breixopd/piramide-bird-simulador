@@ -1,0 +1,104 @@
+{
+  "title": "Bird Pyramid Android-sized mobile test",
+  "url": "http://127.0.0.1:4174/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "videoSize": {
+    "width": 390,
+    "height": 844
+  },
+  "startedAt": "2026-07-26T16:26:10.461Z",
+  "success": true,
+  "steps": [
+    {
+      "index": 0,
+      "action": "assertVisible",
+      "caption": "Checking the mobile layout",
+      "success": true,
+      "detail": "visible",
+      "durationMs": 1135
+    },
+    {
+      "index": 1,
+      "action": "click",
+      "caption": "Tapping Lanzar",
+      "success": true,
+      "detail": "clicked",
+      "durationMs": 952
+    },
+    {
+      "index": 2,
+      "action": "pause",
+      "caption": "Cycling symbols and colours",
+      "success": true,
+      "detail": "paused",
+      "durationMs": 1703
+    },
+    {
+      "index": 3,
+      "action": "assertVisible",
+      "caption": "Actions stay hidden before the answer",
+      "success": true,
+      "detail": "visible",
+      "durationMs": 509
+    },
+    {
+      "index": 4,
+      "action": "scroll",
+      "caption": "",
+      "success": true,
+      "detail": "scrolled into view",
+      "durationMs": 689
+    },
+    {
+      "index": 5,
+      "action": "click",
+      "caption": "Choosing the main hazard",
+      "success": true,
+      "detail": "clicked",
+      "durationMs": 1506
+    },
+    {
+      "index": 6,
+      "action": "assertText",
+      "caption": "Checking the feedback",
+      "success": true,
+      "detail": "contains \"Correcto: has identificado el peligro.\"",
+      "durationMs": 727
+    },
+    {
+      "index": 7,
+      "action": "scroll",
+      "caption": "Preventive measures revealed",
+      "success": true,
+      "detail": "scrolled into view",
+      "durationMs": 1353
+    },
+    {
+      "index": 8,
+      "action": "click",
+      "caption": "Opening saved statistics",
+      "success": true,
+      "detail": "clicked",
+      "durationMs": 1727
+    },
+    {
+      "index": 9,
+      "action": "assertVisible",
+      "caption": "Statistics loaded successfully",
+      "success": true,
+      "detail": "visible",
+      "durationMs": 1308
+    }
+  ],
+  "consoleProblems": [],
+  "requestFailures": [],
+  "output": "docs/demo/bird-pyramid-testing.mp4",
+  "video": "docs/demo/bird-pyramid-testing.mp4",
+  "videoFormat": "mp4",
+  "convertedToMp4": true,
+  "finishedAt": "2026-07-26T16:26:26.549Z",
+  "durationMs": 16088
+}

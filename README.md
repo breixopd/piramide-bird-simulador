@@ -19,6 +19,9 @@ La aplicación está pensada como apoyo para formación y sensibilización en pr
   </tr>
 </table>
 
+▶️ [Ver el vídeo de prueba en vista móvil Android (MP4)](docs/demo/bird-pyramid-testing.mp4)
+· [Consultar el informe verificable](docs/demo/bird-pyramid-testing.report.json)
+
 ## Qué incluye
 
 - Lanzamiento visual que recorre los símbolos y colores de los posibles sucesos antes de detenerse en el resultado.
