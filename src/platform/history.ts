@@ -1,6 +1,6 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
 
-import { ACHIEVEMENTS, type ProgressState } from "../domain/progress";
+import { normalizeProgress, type ProgressState } from "../domain/progress";
 import type { ModelId, OutcomeId } from "../domain/models";
 import { cloneModelTotals, isModelTotals, type ModelTotals } from "./totals-storage";
 
@@ -51,38 +51,27 @@ export interface HistoryRepository {
 
 const DATABASE_VERSION = 2;
 const MAX_HISTORY_ENTRIES = 500;
-const achievementIds = new Set(ACHIEVEMENTS.map(({ id }) => id));
-
-function isProgressState(value: unknown): value is ProgressState {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
-  const progress = value as Record<string, unknown>;
-  return (
-    Array.isArray(progress.unlocked) &&
-    progress.unlocked.every((id) => achievementIds.has(id as ProgressState["unlocked"][number])) &&
-    Number.isSafeInteger(progress.currentNearMissStreak) &&
-    Number(progress.currentNearMissStreak) >= 0 &&
-    Number.isSafeInteger(progress.bestNearMissStreak) &&
-    Number(progress.bestNearMissStreak) >= Number(progress.currentNearMissStreak)
-  );
-}
-
 function cloneSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
   return {
     totals: cloneModelTotals(snapshot.totals),
     progress: {
       ...snapshot.progress,
       unlocked: [...snapshot.progress.unlocked],
+      answeredScenarioIds: [...snapshot.progress.answeredScenarioIds],
     },
   };
 }
 
-function isSnapshotRecord(value: unknown): value is SnapshotRecord {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+function readSnapshotRecord(value: unknown): SimulationSnapshot | null {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return null;
   const record = value as Record<string, unknown>;
-  if (record.key !== "current" || record.version !== 1) return false;
-  if (typeof record.snapshot !== "object" || record.snapshot === null) return false;
+  if (record.key !== "current" || record.version !== 1) return null;
+  if (typeof record.snapshot !== "object" || record.snapshot === null) return null;
   const snapshot = record.snapshot as Record<string, unknown>;
-  return isModelTotals(snapshot.totals) && isProgressState(snapshot.progress);
+  const progress = normalizeProgress(snapshot.progress);
+  return isModelTotals(snapshot.totals) && progress
+    ? { totals: cloneModelTotals(snapshot.totals), progress }
+    : null;
 }
 
 export function createHistoryRepository(databaseName: string): HistoryRepository {
@@ -147,7 +136,8 @@ export function createHistoryRepository(databaseName: string): HistoryRepository
     async loadSnapshot() {
       const database = await getDatabase();
       const stored: unknown = await database.get("metadata", "current");
-      return isSnapshotRecord(stored) ? cloneSnapshot(stored.snapshot) : null;
+      const snapshot = readSnapshotRecord(stored);
+      return snapshot ? cloneSnapshot(snapshot) : null;
     },
 
     async saveSnapshot(snapshot) {

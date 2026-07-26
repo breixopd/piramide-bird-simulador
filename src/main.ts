@@ -9,7 +9,7 @@ import { MODELS } from "./domain/models";
 import { createHistoryRepository } from "./platform/history";
 import { createShakePreferenceController } from "./platform/motion";
 import { renderShareCard } from "./platform/share-card";
-import { sharePng } from "./platform/share";
+import { buildShareContent, sharePng } from "./platform/share";
 import { loadSettings, saveSettings } from "./platform/settings";
 import { createTelemetryService } from "./platform/telemetry";
 
@@ -25,8 +25,9 @@ app.controller = controller;
 app.telemetry = createTelemetryService();
 app.hapticFeedback = () => Haptics.impact({ style: ImpactStyle.Light });
 app.shareLatest = async (run) => {
-  const card = await renderShareCard(run, MODELS[run.modelId]);
-  await sharePng(card);
+  const model = MODELS[run.modelId];
+  const card = await renderShareCard(run, model);
+  await sharePng(card, buildShareContent(run, model));
 };
 
 const shakePreference = createShakePreferenceController(() => app.requestStatisticsReset());

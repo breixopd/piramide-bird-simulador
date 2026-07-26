@@ -29,6 +29,7 @@ const outcomeCycle: ReadonlyArray<{ id: OutcomeId; icon: AppIconName }> = [
   { id: "fatality", icon: "fatality" },
 ];
 const defaultOutcomeEntry = outcomeCycle[0]!;
+type LearningChoice = "hazard" | "cause" | "action";
 
 @customElement("home-view")
 export class HomeView extends LitElement {
@@ -38,6 +39,7 @@ export class HomeView extends LitElement {
    * near-instant controller `running` flag so motion actually has time to run. */
   @state() private isAnimating = false;
   @state() private cycleIndex = 0;
+  @state() private learningAnswer?: { runId: string; choice: LearningChoice };
 
   private readonly animationDurations: Record<SimulationBatchSize, number> = {
     1: 1400,
@@ -126,75 +128,66 @@ export class HomeView extends LitElement {
           : nothing
       }
 
-      <div class="simulation-area">
-        <div class="simulation-stage">
-          <div class="stage-meta" aria-hidden="true">
-            <span class="stage-meta__model"><i></i> ${model.label}</span>
-            <span class="stage-meta__hint">Toca un nivel para explorar</span>
+      <div class="home-workspace">
+        <div class="home-workspace__simulation">
+          <div class="simulation-area">
+            <div class="simulation-stage">
+              <div class="stage-meta" aria-hidden="true">
+                <span class="stage-meta__model"><i></i> ${model.label}</span>
+                <span class="stage-meta__hint">Toca un nivel para explorar</span>
+              </div>
+              <div
+                class="pyramid-viewport"
+                data-gesture-surface="pyramid"
+                @touchstart=${this.onTouchStart}
+                @touchend=${this.onTouchEnd}
+                @touchcancel=${this.resetTouchGesture}
+              >
+                <bird-pyramid .model=${model} .highlighted=${latestOutcome}></bird-pyramid>
+              </div>
+              <event-rain
+                .run=${this.state.latestRun}
+                .reducedMotion=${this.state.settings.reducedMotion}
+              ></event-rain>
+            </div>
           </div>
-          <div
-            class="pyramid-viewport"
-            data-gesture-surface="pyramid"
-            @touchstart=${this.onTouchStart}
-            @touchend=${this.onTouchEnd}
-            @touchcancel=${this.resetTouchGesture}
-          >
-            <bird-pyramid .model=${model} .highlighted=${latestOutcome}></bird-pyramid>
+
+          <div class="simulation-controls" aria-label="Controles de simulación">
+            <button
+              type="button"
+              class="primary-action outcome-${launchOutcome.id} ${
+                this.isAnimating ? "is-cycling" : ""
+              }"
+              data-outcome=${launchOutcome.id}
+              aria-label="Simular 1 evento"
+              ?disabled=${this.state.running || this.isAnimating}
+              @click=${() => this.simulate(1)}
+            >
+              <span class="launch-symbol" aria-hidden="true">${icon(launchOutcome.icon)}</span>
+              <span>${this.isAnimating ? "Lanzando…" : "Lanzar"}</span>
+            </button>
+            <button
+              type="button"
+              class="batch-action"
+              aria-label="Simular 100 eventos"
+              ?disabled=${this.state.running || this.isAnimating}
+              @click=${() => this.simulate(100)}
+            >
+              <strong>×100</strong><small>eventos</small>
+            </button>
+            <button
+              type="button"
+              class="batch-action"
+              aria-label="Simular 1000 eventos"
+              ?disabled=${this.state.running || this.isAnimating}
+              @click=${() => this.simulate(1000)}
+            >
+              <strong>×1000</strong><small>eventos</small>
+            </button>
           </div>
-          <event-rain
-            .run=${this.state.latestRun}
-            .reducedMotion=${this.state.settings.reducedMotion}
-          ></event-rain>
         </div>
+        <div class="home-workspace__result">${this.renderResult()}</div>
       </div>
-
-      <div class="simulation-controls" aria-label="Controles de simulación">
-        <button
-          type="button"
-          class="primary-action outcome-${launchOutcome.id} ${this.isAnimating ? "is-cycling" : ""}"
-          data-outcome=${launchOutcome.id}
-          aria-label="Simular 1 evento"
-          ?disabled=${this.state.running || this.isAnimating}
-          @click=${() => this.simulate(1)}
-        >
-          <span class="launch-symbol" aria-hidden="true">${icon(launchOutcome.icon)}</span>
-          <span>${this.isAnimating ? "Lanzando…" : "Lanzar"}</span>
-        </button>
-        <button
-          type="button"
-          class="batch-action"
-          aria-label="Simular 100 eventos"
-          ?disabled=${this.state.running || this.isAnimating}
-          @click=${() => this.simulate(100)}
-        >
-          <strong>×100</strong><small>eventos</small>
-        </button>
-        <button
-          type="button"
-          class="batch-action"
-          aria-label="Simular 1000 eventos"
-          ?disabled=${this.state.running || this.isAnimating}
-          @click=${() => this.simulate(1000)}
-        >
-          <strong>×1000</strong><small>eventos</small>
-        </button>
-      </div>
-
-      <button
-        type="button"
-        class="challenge-entry"
-        aria-label="Abrir desafío estadístico"
-        @click=${this.openChallenge}
-      >
-        ${icon("target")}
-        <span
-          ><strong>Desafío estadístico</strong
-          ><small>¿Cuándo aparecerá el evento de la cúspide?</small></span
-        >
-        <span aria-hidden="true">→</span>
-      </button>
-
-      ${this.renderResult()}
     </section>`;
   }
 
@@ -206,6 +199,10 @@ export class HomeView extends LitElement {
       </aside>`;
     }
     const scenario = this.state.selectedScenario;
+    const answer =
+      this.learningAnswer?.runId === this.state.latestRun.id
+        ? this.learningAnswer.choice
+        : undefined;
     return html`<section class="result-card" aria-labelledby="case-title">
       <div class="result-card__summary">
         <span class="result-card__count">${this.state.latestRun.iterations}</span>
@@ -235,20 +232,66 @@ export class HomeView extends LitElement {
               <p class="sector-label">${sectorNames[scenario.sector]}</p>
               <h2 id="case-title">Caso preventivo</h2>
               <p>${scenario.narrative}</p>
-              <dl class="scenario-details">
-                <div>
-                  <dt>Peligro</dt>
-                  <dd>${scenario.hazard}</dd>
+              <fieldset class="learning-check">
+                <legend>¿Cuál es el peligro principal?</legend>
+                <p>Elige la fuente o situación con potencial de causar daño.</p>
+                <div class="learning-check__options">
+                  ${[
+                    { choice: "cause" as const, label: scenario.immediateCause },
+                    { choice: "action" as const, label: scenario.preventiveActions[0] },
+                    { choice: "hazard" as const, label: scenario.hazard },
+                  ].map(
+                    ({ choice, label }) =>
+                      html`<button
+                        type="button"
+                        class=${answer === choice ? "is-selected" : ""}
+                        ?disabled=${Boolean(answer)}
+                        @click=${() => this.answerLearningCheck(choice)}
+                      >
+                        ${answer && choice === "hazard" ? icon("check") : nothing}
+                        <span>${label}</span>
+                      </button>`,
+                  )}
                 </div>
-                <div>
-                  <dt>Causa inmediata</dt>
-                  <dd>${scenario.immediateCause}</dd>
-                </div>
-              </dl>
-              <h3>Qué habría que hacer</h3>
-              <ul>
-                ${scenario.preventiveActions.map((action) => html`<li>${icon("check")}<span>${action}</span></li>`)}
-              </ul>
+              </fieldset>
+              ${
+                answer
+                  ? html`<p
+                        class="learning-feedback ${
+                          answer === "hazard" ? "is-correct" : "is-learning"
+                        }"
+                        role="status"
+                        aria-live="polite"
+                      >
+                        ${icon(answer === "hazard" ? "check" : "info")}
+                        <span
+                          >${
+                            answer === "hazard"
+                              ? "Correcto: has identificado el peligro."
+                              : "Sigue aprendiendo: el peligro es la fuente o situación con potencial de causar daño."
+                          }</span
+                        >
+                      </p>
+                      <div class="learning-reveal">
+                        <dl class="scenario-details">
+                          <div>
+                            <dt>Peligro</dt>
+                            <dd>${scenario.hazard}</dd>
+                          </div>
+                          <div>
+                            <dt>Causa inmediata</dt>
+                            <dd>${scenario.immediateCause}</dd>
+                          </div>
+                        </dl>
+                        <h3>Qué habría que hacer</h3>
+                        <ul>
+                          ${scenario.preventiveActions.map(
+                            (action) => html`<li>${icon("check")}<span>${action}</span></li>`,
+                          )}
+                        </ul>
+                      </div>`
+                  : nothing
+              }
             </div>`
           : nothing
       }
@@ -257,6 +300,19 @@ export class HomeView extends LitElement {
 
   private selectModel(modelId: ModelId): void {
     this.dispatchEvent(new CustomEvent("model-select", { detail: modelId, bubbles: true }));
+  }
+
+  private answerLearningCheck(choice: LearningChoice): void {
+    const runId = this.state?.latestRun?.id;
+    const scenarioId = this.state?.selectedScenario?.id;
+    if (!runId || !scenarioId || this.learningAnswer?.runId === runId) return;
+    this.learningAnswer = { runId, choice };
+    this.dispatchEvent(
+      new CustomEvent("learning-answer", {
+        detail: { runId, scenarioId, correct: choice === "hazard" },
+        bubbles: true,
+      }),
+    );
   }
 
   private onTouchStart(event: TouchEvent): void {
@@ -311,10 +367,6 @@ export class HomeView extends LitElement {
       clearInterval(this.cycleTimer);
       this.isAnimating = false;
     }, duration);
-  }
-
-  private openChallenge(): void {
-    this.dispatchEvent(new CustomEvent("challenge-open", { bubbles: true }));
   }
 
   private shareResult(): void {

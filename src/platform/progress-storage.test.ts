@@ -26,11 +26,27 @@ describe("achievement persistence", () => {
   it("round-trips unlocked achievements and streaks", async () => {
     const port = memoryPort();
     const progress = {
+      ...INITIAL_PROGRESS,
       unlocked: ["first-simulation", "bulk-runner"] as const,
       currentNearMissStreak: 4,
       bestNearMissStreak: 72,
     };
     await saveProgress(progress, port);
     await expect(loadProgress(port)).resolves.toEqual(progress);
+  });
+
+  it("migrates progress saved before question metrics were introduced", async () => {
+    const legacy = JSON.stringify({
+      unlocked: ["first-simulation"],
+      currentNearMissStreak: 2,
+      bestNearMissStreak: 8,
+    });
+
+    await expect(loadProgress(memoryPort(legacy))).resolves.toEqual({
+      ...INITIAL_PROGRESS,
+      unlocked: ["first-simulation"],
+      currentNearMissStreak: 2,
+      bestNearMissStreak: 8,
+    });
   });
 });

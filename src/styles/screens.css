@@ -112,6 +112,10 @@
   gap: var(--space-4);
 }
 
+.home-workspace {
+  display: grid;
+}
+
 /* Stage — floating white card containing the pyramid. */
 .simulation-area {
   position: relative;
@@ -304,7 +308,7 @@ bird-pyramid {
 /* Challenge entry. */
 .challenge-entry {
   width: 100%;
-  margin-top: var(--space-4);
+  margin: var(--space-4) 0;
   padding: var(--space-3) var(--space-4);
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -394,6 +398,102 @@ bird-pyramid {
   font-size: var(--font-size-sm);
 }
 
+.learning-check {
+  min-width: 0;
+  margin: var(--space-4) 0 0;
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
+}
+
+.learning-check legend {
+  padding: 0 var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.learning-check > p {
+  margin-bottom: var(--space-3);
+  color: var(--ink-soft);
+  font-size: var(--font-size-xs);
+}
+
+.learning-check__options {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.learning-check__options button {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: var(--space-3);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  text-align: left;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.learning-check__options button:not(:disabled):hover {
+  border-color: var(--accent);
+  background: var(--accent-softer);
+}
+
+.learning-check__options button.is-selected {
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.learning-check__options button:disabled {
+  opacity: 0.72;
+}
+
+.learning-check__options button .app-icon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  color: var(--success);
+}
+
+.learning-feedback {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.learning-feedback.is-correct {
+  color: var(--success);
+  background: var(--success-soft);
+}
+
+.learning-feedback.is-learning {
+  color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.learning-feedback .app-icon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+
+.learning-reveal {
+  animation: bird-fade-up 350ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .scenario-details {
   margin-top: var(--space-3);
   display: grid;
@@ -481,6 +581,43 @@ bird-pyramid {
   background: var(--surface);
   border: 1px solid var(--line);
   box-shadow: var(--shadow-card);
+}
+
+.learning-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.learning-stats-grid article {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+}
+
+.learning-stats-grid span,
+.learning-stats-grid strong {
+  display: block;
+}
+
+.learning-stats-grid span {
+  color: var(--ink-soft);
+  font-size: var(--font-size-2xs);
+  font-weight: 650;
+}
+
+.learning-stats-grid strong {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.learning-stats__hint {
+  margin-top: var(--space-3);
+  color: var(--ink-soft);
+  font-size: var(--font-size-xs);
 }
 
 .distribution-list {
@@ -680,6 +817,17 @@ convergence-chart,
 .achievement__badge.is-locked {
   background: var(--surface-muted);
   color: var(--ink-faint);
+}
+
+.achievement__goal {
+  display: block;
+  height: 0.3rem;
+  margin-top: var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background:
+    linear-gradient(90deg, var(--accent) var(--achievement-goal), transparent 0),
+    var(--surface-muted);
 }
 
 /* ===== Information ===== */
@@ -938,6 +1086,24 @@ convergence-chart,
 
   .stats-overview {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 64rem) {
+  .home-workspace {
+    grid-template-columns: minmax(0, 1.05fr) minmax(22rem, 0.95fr);
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .home-workspace__result {
+    position: sticky;
+    top: var(--space-5);
+  }
+
+  .home-workspace__result .empty-prompt,
+  .home-workspace__result .result-card {
+    margin-top: var(--space-4);
   }
 }
 

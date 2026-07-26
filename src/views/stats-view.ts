@@ -22,6 +22,11 @@ export class StatsView extends LitElement {
     const totalEvents = Object.values(totals).reduce<number>((sum, count) => sum + (count ?? 0), 0);
     const modelHistory = this.state.history.filter(({ modelId }) => modelId === activeModel.id);
     const latestConvergence = modelHistory[0]?.convergenceScore ?? 0;
+    const learning = this.state.progress;
+    const learningAccuracy =
+      learning.questionsAnswered === 0
+        ? 0
+        : Math.round((learning.correctAnswers / learning.questionsAnswered) * 100);
 
     return html`<section class="view stats-view" aria-labelledby="stats-title">
       <header class="page-header">
@@ -43,6 +48,20 @@ export class StatsView extends LitElement {
             </button>`,
         )}
       </div>
+
+      <button
+        type="button"
+        class="challenge-entry"
+        aria-label="Abrir desafío estadístico"
+        @click=${this.openChallenge}
+      >
+        ${icon("target")}
+        <span
+          ><strong>Desafío estadístico</strong
+          ><small>Estima cuándo aparecerá el evento de la cúspide.</small></span
+        >
+        <span aria-hidden="true">→</span>
+      </button>
 
       ${
         totalEvents === 0
@@ -74,6 +93,37 @@ export class StatsView extends LitElement {
                   ></strong>
                 </article>
               </div>
+
+              <section class="stats-section learning-stats" aria-labelledby="learning-stats-title">
+                <p class="eyebrow">Aprendizaje preventivo</p>
+                <h2 id="learning-stats-title">Tus respuestas sobre peligros</h2>
+                <div class="learning-stats-grid">
+                  <article>
+                    <span>Preguntas respondidas</span>
+                    <strong>${learning.questionsAnswered.toLocaleString("es-ES")}</strong>
+                  </article>
+                  <article>
+                    <span>Precisión</span>
+                    <strong>${learningAccuracy} %</strong>
+                  </article>
+                  <article>
+                    <span>Mejor racha</span>
+                    <strong>${learning.bestCorrectStreak}</strong>
+                  </article>
+                  <article>
+                    <span>Casos explorados</span>
+                    <strong>${learning.answeredScenarioIds.length}</strong>
+                  </article>
+                </div>
+                <p class="learning-stats__hint">
+                  ${
+                    learning.questionsAnswered === 0
+                      ? "Responde la pregunta del próximo caso para empezar a medir tu aprendizaje."
+                      : html`${learning.correctAnswers.toLocaleString("es-ES")} respuestas correctas
+                        de ${learning.questionsAnswered.toLocaleString("es-ES")}.`
+                  }
+                </p>
+              </section>
 
               <section class="stats-section" aria-labelledby="distribution-title">
                 <div class="section-heading">
@@ -141,6 +191,10 @@ export class StatsView extends LitElement {
 
   private selectModel(modelId: ModelId): void {
     this.dispatchEvent(new CustomEvent("model-select", { detail: modelId, bubbles: true }));
+  }
+
+  private openChallenge(): void {
+    this.dispatchEvent(new CustomEvent("challenge-open", { bubbles: true }));
   }
 }
 

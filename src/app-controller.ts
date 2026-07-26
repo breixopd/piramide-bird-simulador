@@ -1,6 +1,11 @@
 import { scenarios, type Scenario } from "./data/scenarios";
 import { MODELS, type ModelId, type OutcomeId } from "./domain/models";
-import { INITIAL_PROGRESS, type ProgressState, updateProgress } from "./domain/progress";
+import {
+  INITIAL_PROGRESS,
+  type ProgressState,
+  updateLearningProgress,
+  updateProgress,
+} from "./domain/progress";
 import { calculateConvergence, simulate, type RandomSource } from "./domain/simulation";
 import type {
   HistoryRepository,
@@ -38,6 +43,12 @@ export interface AppControllerDependencies {
   readonly scenarioRandom?: RandomSource;
 }
 
+export interface LearningAnswer {
+  readonly runId: string;
+  readonly scenarioId: string;
+  readonly correct: boolean;
+}
+
 function addCounts(target: OutcomeCounts, source: Readonly<OutcomeCounts>): void {
   for (const [outcome, count] of Object.entries(source) as [OutcomeId, number][]) {
     target[outcome] = (target[outcome] ?? 0) + count;
@@ -51,6 +62,7 @@ function countTotal(counts: OutcomeCounts): number {
 export class AppController {
   private readonly listeners = new Set<() => void>();
   private readonly lastScenarioByOutcome = new Map<OutcomeId, string>();
+  private readonly answeredRunIds = new Set<string>();
   private readonly now: () => Date;
   private readonly createId: () => string;
   private readonly scenarioRandom: RandomSource;
@@ -69,6 +81,7 @@ export class AppController {
   };
 
   private inFlightRun?: Promise<SimulationRunSummary>;
+  private learningWriteQueue: Promise<void> = Promise.resolve();
   private settingsUpdateQueue: Promise<void> = Promise.resolve();
 
   constructor(private readonly dependencies: AppControllerDependencies) {
@@ -126,9 +139,12 @@ export class AppController {
     random: RandomSource = Math.random,
   ): Promise<SimulationRunSummary> {
     if (this.inFlightRun) return this.inFlightRun;
-    this.inFlightRun = this.executeRun(iterations, random).finally(() => {
-      this.inFlightRun = undefined;
-    });
+    this.updateState({ running: true });
+    this.inFlightRun = this.learningWriteQueue
+      .then(() => this.executeRun(iterations, random))
+      .finally(() => {
+        this.inFlightRun = undefined;
+      });
     return this.inFlightRun;
   }
 
@@ -234,6 +250,41 @@ export class AppController {
       selectedScenario: null,
     });
     return true;
+  }
+
+  async recordLearningAnswer(answer: LearningAnswer): Promise<boolean> {
+    if (
+      this.state.running ||
+      answer.runId !== this.state.latestRun?.id ||
+      answer.scenarioId !== this.state.selectedScenario?.id ||
+      this.answeredRunIds.has(answer.runId)
+    ) {
+      return false;
+    }
+    this.answeredRunIds.add(answer.runId);
+    const progress = updateLearningProgress(this.state.progress, {
+      scenarioId: answer.scenarioId,
+      correct: answer.correct,
+    });
+    this.updateState({ progress });
+    let persistenceDegraded = this.state.persistenceDegraded;
+    let persisted = true;
+    const persist = async () => {
+      try {
+        await this.dependencies.history.saveSnapshot({
+          totals: this.state.totals,
+          progress: this.state.progress,
+        });
+      } catch {
+        persistenceDegraded = true;
+        persisted = false;
+      }
+      this.updateState({ persistenceDegraded });
+    };
+    const write = this.learningWriteQueue.then(persist, persist);
+    this.learningWriteQueue = write.then(() => undefined);
+    await write;
+    return persisted;
   }
 
   private pickScenario(outcome: OutcomeId): Scenario | null {

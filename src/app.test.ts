@@ -1,4 +1,11 @@
-import { fireEvent, getByLabelText, getByRole, getByText, queryByRole } from "@testing-library/dom";
+import {
+  fireEvent,
+  getByLabelText,
+  getByRole,
+  getByText,
+  queryByRole,
+  queryByText,
+} from "@testing-library/dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AppController } from "./app-controller";
@@ -179,6 +186,10 @@ describe("bird-app", () => {
 
   it("closes modals with Escape and restores focus to the opener", async () => {
     const app = await renderApp();
+    expect(queryByRole(app, "button", { name: /abrir desafío/i })).toBeNull();
+    fireEvent.click(getByRole(app, "button", { name: /estadísticas/i }));
+    await app.updateComplete;
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     const opener = getByRole(app, "button", { name: /abrir desafío/i });
     opener.focus();
     fireEvent.click(opener);
@@ -245,7 +256,7 @@ describe("bird-app", () => {
     vi.useRealTimers();
   });
 
-  it("runs a batch and announces its result with a preventive scenario", async () => {
+  it("asks the learner to identify the hazard before revealing preventive actions", async () => {
     const app = await renderApp();
 
     fireEvent.click(getByRole(app, "button", { name: "Simular 100 eventos" }));
@@ -256,7 +267,19 @@ describe("bird-app", () => {
     const status = getByRole(app, "status");
     expect(status.textContent).toContain("100 eventos simulados");
     expect(getByRole(app, "heading", { name: "Caso preventivo" })).toBeTruthy();
+    expect(getByRole(app, "group", { name: "¿Cuál es el peligro principal?" })).toBeTruthy();
+    expect(queryByText(app, "Qué habría que hacer")).toBeNull();
+
+    const hazard = app.controller?.state.selectedScenario?.hazard;
+    if (!hazard) throw new Error("Expected a preventive scenario hazard");
+    fireEvent.click(getByRole(app, "button", { name: hazard }));
+    await vi.waitFor(() => expect(app.controller?.state.progress.questionsAnswered).toBe(1));
+    await app.updateComplete;
+
+    expect(getByText(app, "Correcto: has identificado el peligro.")).toBeTruthy();
     expect(getByText(app, "Qué habría que hacer")).toBeTruthy();
+    expect(app.controller?.state.progress.correctAnswers).toBe(1);
+    expect(app.controller?.state.progress.unlocked).toContain("hazard-spotter");
   });
 
   it("shares the latest run through the injected native adapter", async () => {
@@ -275,6 +298,9 @@ describe("bird-app", () => {
   it("evaluates the statistical challenge and presents the target", async () => {
     const app = await renderApp();
 
+    expect(queryByRole(app, "button", { name: /abrir desafío/i })).toBeNull();
+    fireEvent.click(getByRole(app, "button", { name: /estadísticas/i }));
+    await app.updateComplete;
     fireEvent.click(getByRole(app, "button", { name: /abrir desafío/i }));
     await app.updateComplete;
     const input = getByLabelText(app, /número de simulaciones/i);

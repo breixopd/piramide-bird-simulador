@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
-import type { AppController } from "./app-controller";
+import type { AppController, LearningAnswer } from "./app-controller";
 import "./components/bottom-nav";
 import type { AppTab } from "./components/bottom-nav";
 import { icon } from "./components/app-icon";
@@ -101,6 +101,7 @@ export class BirdApp extends LitElement {
         @setting-change=${this.onSettingChange}
         @reset-request=${this.openReset}
         @share-request=${this.onShareRequest}
+        @learning-answer=${this.onLearningAnswer}
       >
         ${this.renderActiveView()}
       </main>
@@ -503,6 +504,15 @@ export class BirdApp extends LitElement {
     } catch (error) {
       this.announcement = "No se pudo compartir la tarjeta de resultado.";
       await this.telemetry?.recordError(error);
+    }
+  }
+
+  private async onLearningAnswer(event: CustomEvent<LearningAnswer>): Promise<void> {
+    const recorded = (await this.controller?.recordLearningAnswer(event.detail)) ?? false;
+    if (recorded) {
+      this.announcement = event.detail.correct
+        ? "Respuesta correcta guardada en tu progreso."
+        : "Respuesta guardada. Revisa la explicación del peligro.";
     }
   }
 }

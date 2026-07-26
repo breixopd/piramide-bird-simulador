@@ -3,7 +3,7 @@ import { customElement, property } from "lit/decorators.js";
 
 import type { AppState } from "../app-controller";
 import { icon, type AppIconName } from "../components/app-icon";
-import { ACHIEVEMENTS } from "../domain/progress";
+import { ACHIEVEMENTS, achievementMetricValue } from "../domain/progress";
 
 const achievementIcons: Record<string, AppIconName> = {
   play: "play",
@@ -11,6 +11,7 @@ const achievementIcons: Record<string, AppIconName> = {
   target: "target",
   streak: "bars",
   bulk: "bulk",
+  bars: "bars",
 };
 
 @customElement("achievements-view")
@@ -38,6 +39,14 @@ export class AchievementsView extends LitElement {
       <div class="achievement-list">
         ${ACHIEVEMENTS.map((achievement) => {
           const isUnlocked = unlocked.has(achievement.id);
+          const metricValue =
+            achievement.metric && this.state
+              ? achievementMetricValue(this.state.progress, achievement.metric)
+              : null;
+          const goal =
+            metricValue !== null && achievement.target
+              ? `${Math.min(metricValue, achievement.target)} de ${achievement.target}`
+              : null;
           return html`<article class="achievement ${isUnlocked ? "is-unlocked" : "is-locked"}">
             <div class="achievement__icon">
               ${icon(achievementIcons[achievement.icon] ?? "trophy")}
@@ -46,8 +55,18 @@ export class AchievementsView extends LitElement {
               <h2>${achievement.name}</h2>
               <p>${achievement.description}</p>
               <span class="achievement__badge ${isUnlocked ? "is-unlocked" : "is-locked"}">
-                ${isUnlocked ? icon("check") : nothing} ${isUnlocked ? "Desbloqueado" : "Pendiente"}
+                ${isUnlocked ? icon("check") : nothing}
+                ${isUnlocked ? "Desbloqueado" : (goal ?? "Pendiente")}
               </span>
+              ${
+                goal
+                  ? html`<span
+                      class="achievement__goal"
+                      aria-label="Progreso: ${goal}"
+                      style=${`--achievement-goal:${Math.min((metricValue! / achievement.target!) * 100, 100)}%`}
+                    ></span>`
+                  : nothing
+              }
             </div>
           </article>`;
         })}

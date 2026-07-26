@@ -154,10 +154,7 @@
 .result-card__body .sector-label,
 .result-card__body h2,
 .result-card__body > p,
-.scenario-details > div:nth-child(1),
-.scenario-details > div:nth-child(2),
-.result-card__body h3,
-.result-card ul {
+.learning-check {
   animation: bird-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -170,17 +167,8 @@
 .result-card__body > p {
   animation-delay: 280ms;
 }
-.scenario-details > div:nth-child(1) {
+.learning-check {
   animation-delay: 360ms;
-}
-.scenario-details > div:nth-child(2) {
-  animation-delay: 440ms;
-}
-.result-card__body h3 {
-  animation-delay: 520ms;
-}
-.result-card ul {
-  animation-delay: 600ms;
 }
 
 @keyframes bird-fade-up {
