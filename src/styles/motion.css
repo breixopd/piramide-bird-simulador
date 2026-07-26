@@ -62,13 +62,13 @@
 @keyframes bird-attention-pulse {
   0%,
   100% {
-    box-shadow: var(--shadow-accent);
+    box-shadow: var(--shadow-card);
   }
 
   50% {
     box-shadow:
-      var(--shadow-accent),
-      0 0 0 6px var(--accent-soft);
+      var(--shadow-float),
+      0 0 0 4px color-mix(in srgb, var(--ink) 8%, transparent);
   }
 }
 

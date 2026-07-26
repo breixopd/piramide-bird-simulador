@@ -21,3 +21,4 @@ keystore.properties
 playwright-report/
 test-results/
 *.tsbuildinfo
+MAINTAINER-NOTES.local.md

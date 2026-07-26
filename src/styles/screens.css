@@ -285,7 +285,7 @@ bird-pyramid {
   background: var(--outcome-color);
   background-image: var(--outcome-grad);
   color: #ffffff;
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--outcome-color) 30%, transparent);
+  box-shadow: var(--shadow-card);
 }
 
 .simulation-controls .primary-action.is-cycling:disabled {
