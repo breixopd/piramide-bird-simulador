@@ -12,9 +12,9 @@ La aplicación está pensada como apoyo para formación y sensibilización en pr
       <sub>Pirámide interactiva y simulación</sub>
     </td>
     <td align="center">
-      <img src="docs/screenshots/result.png" width="320" alt="Resultado de una simulación con un caso preventivo y sus medidas" />
+      <img src="docs/screenshots/result.png" width="320" alt="Resultado de una simulación con una pregunta guiada sobre el peligro principal" />
       <br />
-      <sub>Resultado y medidas preventivas</sub>
+      <sub>Identificación guiada del peligro</sub>
     </td>
   </tr>
 </table>
@@ -23,7 +23,8 @@ La aplicación está pensada como apoyo para formación y sensibilización en pr
 
 - Lanzamiento visual que recorre los símbolos y colores de los posibles sucesos antes de detenerse en el resultado.
 - Pirámide interactiva, simulaciones de 1, 100 o 1000 eventos y comparación entre resultados teóricos y observados.
-- 80 casos preventivos de ocho sectores, con peligro, causa inmediata y medidas recomendadas.
+- 80 casos preventivos de ocho sectores, con una pregunta guiada antes de revelar el peligro, la causa inmediata y las medidas recomendadas.
+- Vista de escritorio y tableta en dos columnas para comparar la simulación con el caso preventivo sin perder contexto.
 - Historial, estadísticas, desafío probabilístico y logros guardados en el dispositivo.
 - Funcionamiento sin conexión, tema claro/oscuro, movimiento reducido y navegación accesible por teclado o lector de pantalla.
 - Aplicación web instalable dentro del proyecto Android mediante Capacitor, sin cuentas, publicidad ni compras.
@@ -59,6 +60,19 @@ Ejecuta las pruebas:
 
 ```bash
 npm run test
+```
+
+Instala Chromium una vez y ejecuta las regresiones visuales compactas y de escritorio:
+
+```bash
+npx playwright install chromium
+npm run test:visual
+```
+
+Cuando un cambio visual sea intencionado, revisa las imágenes generadas antes de actualizar las referencias:
+
+```bash
+npm run test:visual:update
 ```
 
 Genera la compilación web de producción:
