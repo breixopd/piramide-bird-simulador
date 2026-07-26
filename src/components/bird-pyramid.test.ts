@@ -20,6 +20,8 @@ describe("bird pyramid interaction", () => {
     expect(paths).toHaveLength(4);
     expect(paths[0]?.getAttribute("d")).toBe("M150,20 L150,20 L190,95 L110,95 Z");
     expect(paths.at(-1)?.getAttribute("d")).toBe("M54,200 L246,200 L278,260 L22,260 Z");
+    expect(pyramid.querySelector(".pyramid__weight")?.getAttribute("y")).toBe("70");
+    expect(pyramid.querySelector(".pyramid__label")?.getAttribute("y")).toBe("88");
   });
 
   it("opens a level once when the SVG band is activated by keyboard", async () => {

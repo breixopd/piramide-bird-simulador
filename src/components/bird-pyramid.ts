@@ -45,7 +45,8 @@ function bandGeometry(index: number, count: number): BandGeometry {
   const d = `M${APEX_X - hw0},${y0} L${APEX_X + hw0},${y0} L${APEX_X + hw1},${y1} L${APEX_X - hw1},${y1} Z`;
   const midY = (y0 + y1) / 2;
   const labelY = index === 0 ? y1 - 7 : midY + 16;
-  return { d, cx: APEX_X, weightY: midY - 2, labelY };
+  const weightY = index === 0 ? labelY - 18 : midY - 2;
+  return { d, cx: APEX_X, weightY, labelY };
 }
 
 @customElement("bird-pyramid")
