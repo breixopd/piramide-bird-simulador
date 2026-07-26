@@ -48,6 +48,11 @@ bird-app {
     calc(var(--nav-height) + var(--nav-margin) + var(--nav-inset));
 }
 
+.view:not(.home-view) {
+  max-width: 52rem;
+  margin-inline: auto;
+}
+
 .page-header {
   margin-bottom: var(--space-5);
 }

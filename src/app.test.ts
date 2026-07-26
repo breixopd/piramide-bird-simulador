@@ -1,4 +1,11 @@
-import { fireEvent, getByLabelText, getByRole, getByText, queryByRole } from "@testing-library/dom";
+import {
+  fireEvent,
+  getByLabelText,
+  getByRole,
+  getByText,
+  queryByRole,
+  queryByText,
+} from "@testing-library/dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AppController } from "./app-controller";
@@ -245,7 +252,7 @@ describe("bird-app", () => {
     vi.useRealTimers();
   });
 
-  it("runs a batch and announces its result with a preventive scenario", async () => {
+  it("asks the learner to identify the hazard before revealing preventive actions", async () => {
     const app = await renderApp();
 
     fireEvent.click(getByRole(app, "button", { name: "Simular 100 eventos" }));
@@ -256,6 +263,15 @@ describe("bird-app", () => {
     const status = getByRole(app, "status");
     expect(status.textContent).toContain("100 eventos simulados");
     expect(getByRole(app, "heading", { name: "Caso preventivo" })).toBeTruthy();
+    expect(getByRole(app, "group", { name: "¿Cuál es el peligro principal?" })).toBeTruthy();
+    expect(queryByText(app, "Qué habría que hacer")).toBeNull();
+
+    const hazard = app.controller?.state.selectedScenario?.hazard;
+    if (!hazard) throw new Error("Expected a preventive scenario hazard");
+    fireEvent.click(getByRole(app, "button", { name: hazard }));
+    await app.updateComplete;
+
+    expect(getByText(app, "Correcto: has identificado el peligro.")).toBeTruthy();
     expect(getByText(app, "Qué habría que hacer")).toBeTruthy();
   });
 
