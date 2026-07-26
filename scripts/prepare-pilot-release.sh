@@ -15,7 +15,7 @@ fi
 apk_path=$1
 public_name=${2:-"piramide-bird-piloto.apk"}
 expected_application_id=${EXPECTED_APPLICATION_ID:-"com.breixopd.piramidebird"}
-expected_version_name=${EXPECTED_VERSION_NAME:-"1.0.0-alpha.4"}
+expected_version_name=${EXPECTED_VERSION_NAME:-"1.0.0-alpha.6"}
 expected_version_code=${EXPECTED_VERSION_CODE:-}
 expected_signer=${EXPECTED_SIGNER_SHA256:-}
 

@@ -4,20 +4,20 @@ import { customElement, property } from "lit/decorators.js";
 import type { OutcomeDefinition, OutcomeId, SimulationModel } from "../domain/models";
 import { distance, type GesturePoint } from "../domain/gestures";
 
-// SVG triangle geometry. Equal-height bands that share exact vertices (zero gaps).
-// Flat-top (truncated) pyramid so the apex band has room for label text.
-// viewBox 300 × 280; top edge at y=20 with half-width 42; base corners (22,260)/(278,260).
+// SVG triangle geometry. The apex band gets extra height for legible text,
+// while every outside vertex follows the same line from the apex to the base.
+// viewBox 300 × 280; apex at (150,20); base corners at (22,260)/(278,260).
 const VIEW_W = 300;
 const APEX_X = 150;
 const TOP_Y = 20;
 const BOTTOM_Y = 260;
 const HALF_BASE = 128;
-const HALF_TOP = 42;
+const FOUR_BAND_OFFSETS = [0, 75, 135, 180, 240] as const;
 
-/** Half-width of the trapezoid silhouette at a given y (linear taper). */
+/** Half-width of the triangular silhouette at a given y (linear taper). */
 function halfWidthAt(y: number): number {
   const t = (y - TOP_Y) / (BOTTOM_Y - TOP_Y);
-  return HALF_TOP + (HALF_BASE - HALF_TOP) * t;
+  return HALF_BASE * t;
 }
 
 interface BandGeometry {
@@ -32,15 +32,21 @@ interface BandGeometry {
 }
 
 function bandGeometry(index: number, count: number): BandGeometry {
-  const bandHeight = (BOTTOM_Y - TOP_Y) / count;
-  const y0 = TOP_Y + index * bandHeight;
-  const y1 = y0 + bandHeight;
+  const totalHeight = BOTTOM_Y - TOP_Y;
+  const y0 =
+    count === 4 ? TOP_Y + FOUR_BAND_OFFSETS[index]! : TOP_Y + (index * totalHeight) / count;
+  const y1 =
+    count === 4
+      ? TOP_Y + FOUR_BAND_OFFSETS[index + 1]!
+      : TOP_Y + ((index + 1) * totalHeight) / count;
   const hw0 = halfWidthAt(y0);
   const hw1 = halfWidthAt(y1);
   // Top-left, top-right, bottom-right, bottom-left.
   const d = `M${APEX_X - hw0},${y0} L${APEX_X + hw0},${y0} L${APEX_X + hw1},${y1} L${APEX_X - hw1},${y1} Z`;
   const midY = (y0 + y1) / 2;
-  return { d, cx: APEX_X, weightY: midY - 2, labelY: midY + 16 };
+  const labelY = index === 0 ? y1 - 7 : midY + 16;
+  const weightY = index === 0 ? labelY - 18 : midY - 2;
+  return { d, cx: APEX_X, weightY, labelY };
 }
 
 @customElement("bird-pyramid")
@@ -90,7 +96,12 @@ export class BirdPyramid extends LitElement {
       <title>Ver detalle de ${outcome.label}</title>
       <path d=${g.d} />
       <text x=${g.cx} y=${g.weightY} text-anchor="middle" class="pyramid__weight">${outcome.weight}</text>
-      <text x=${g.cx} y=${g.labelY} text-anchor="middle" class="pyramid__label">${outcome.label}</text>
+      <text
+        x=${g.cx}
+        y=${g.labelY}
+        text-anchor="middle"
+        class="pyramid__label"
+      >${outcome.label}</text>
     </g>`;
   }
 

@@ -52,6 +52,24 @@ test("places the statistical challenge in Statistics", async ({ page }) => {
   await expect(page.getByRole("dialog", { name: "Desafío estadístico" })).toBeVisible();
 });
 
+test("keeps the level-detail action separated from its guidance", async ({ page }) => {
+  await page.getByRole("button", { name: "Ver detalle de Daño material" }).click();
+  const dialog = page.getByRole("dialog", { name: "Daño material" });
+  await expect(dialog).toBeVisible();
+  await dialog.evaluate(async (element) => {
+    await Promise.all(element.getAnimations().map((animation) => animation.finished));
+  });
+
+  const guidanceBox = await dialog.locator(".level-detail-guidance").boundingBox();
+  const actionBox = await dialog.getByRole("button", { name: "Entendido" }).boundingBox();
+  expect(guidanceBox).not.toBeNull();
+  expect(actionBox).not.toBeNull();
+  const actionGap = actionBox!.y - (guidanceBox!.y + guidanceBox!.height);
+  expect(actionGap).toBeGreaterThanOrEqual(15);
+
+  await expect(dialog).toHaveScreenshot("level-detail.png");
+});
+
 test("keeps the guided question visually stable after a result", async ({ page }) => {
   await page.getByRole("button", { name: "Simular 100 eventos" }).click();
   await expect(page.getByRole("group", { name: "¿Cuál es el peligro principal?" })).toBeVisible();
