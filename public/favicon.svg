@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Pirámide de Bird">
-  <rect width="64" height="64" rx="14" fill="#f7f5f0" />
-  <path d="M32 9 43 23H21L32 9Z" fill="#cf3328" />
-  <path d="M19 26H45L51 38H13L19 26Z" fill="#db9a16" />
-  <path d="M11 41H53L59 55H5L11 41Z" fill="#4f8c49" />
+  <rect width="64" height="64" rx="14" fill="#07111d" />
+  <path d="M32 9 37 18H27L32 9Z" fill="#e11d48" />
+  <path d="M25 20H39L44 29H20L25 20Z" fill="#ea580c" />
+  <path d="M19 31H45L50 40H14L19 31Z" fill="#15803d" />
+  <path d="M13 42H51L57 52H7L13 42Z" fill="#0284c7" />
 </svg>

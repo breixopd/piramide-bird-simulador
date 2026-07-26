@@ -1,12 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2732 2732">
   <rect width="2732" height="2732" fill="#07111d"/>
-  <g transform="translate(854 620)">
-    <path d="M512 0 332 216h360L512 0Z" fill="#ff7663"/>
-    <path d="M296 248 192 400h640L728 248H296Z" fill="#f3bb54"/>
-    <path d="M176 432 80 576h864l-96-144H176Z" fill="#69d39d"/>
-    <rect x="444" y="74" width="136" height="136" rx="32" fill="#f5efe4"/>
-    <path d="M492 102h40v80h-40zM472 122h80v40h-80z" fill="#e56673"/>
+  <g transform="translate(854 520)">
+    <path d="M512 40 602 180H422L512 40Z" fill="#e11d48"/>
+    <path d="M409 200H615L692 320H332L409 200Z" fill="#ea580c"/>
+    <path d="M319 340H705L788 470H236L319 340Z" fill="#15803d"/>
+    <path d="M223 490H801L904 650H120L223 490Z" fill="#0284c7"/>
   </g>
   <text x="1366" y="1480" text-anchor="middle" fill="#f5efe4" font-family="DejaVu Sans, sans-serif" font-size="112" font-weight="700">PIRÁMIDE DE BIRD</text>
-  <text x="1366" y="1628" text-anchor="middle" fill="#ff7663" font-family="DejaVu Sans, sans-serif" font-size="58" font-weight="700">SIMULADOR PRL</text>
+  <text x="1366" y="1628" text-anchor="middle" fill="#fb7185" font-family="DejaVu Sans, sans-serif" font-size="58" font-weight="700">SIMULADOR PRL</text>
 </svg>

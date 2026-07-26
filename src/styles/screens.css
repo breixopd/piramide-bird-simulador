@@ -1070,6 +1070,10 @@ convergence-chart,
   font-size: var(--font-size-sm);
 }
 
+.level-detail-modal > .modal__action {
+  margin-top: var(--space-4);
+}
+
 /* ===== Responsive ===== */
 @media (min-width: 48rem) {
   .view {
