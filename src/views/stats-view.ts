@@ -49,6 +49,20 @@ export class StatsView extends LitElement {
         )}
       </div>
 
+      <button
+        type="button"
+        class="challenge-entry"
+        aria-label="Abrir desafío estadístico"
+        @click=${this.openChallenge}
+      >
+        ${icon("target")}
+        <span
+          ><strong>Desafío estadístico</strong
+          ><small>Estima cuándo aparecerá el evento de la cúspide.</small></span
+        >
+        <span aria-hidden="true">→</span>
+      </button>
+
       ${
         totalEvents === 0
           ? html`<div class="empty-state">
@@ -177,6 +191,10 @@ export class StatsView extends LitElement {
 
   private selectModel(modelId: ModelId): void {
     this.dispatchEvent(new CustomEvent("model-select", { detail: modelId, bubbles: true }));
+  }
+
+  private openChallenge(): void {
+    this.dispatchEvent(new CustomEvent("challenge-open", { bubbles: true }));
   }
 }
 

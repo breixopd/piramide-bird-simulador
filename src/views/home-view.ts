@@ -185,20 +185,6 @@ export class HomeView extends LitElement {
               <strong>×1000</strong><small>eventos</small>
             </button>
           </div>
-
-          <button
-            type="button"
-            class="challenge-entry"
-            aria-label="Abrir desafío estadístico"
-            @click=${this.openChallenge}
-          >
-            ${icon("target")}
-            <span
-              ><strong>Desafío estadístico</strong
-              ><small>¿Cuándo aparecerá el evento de la cúspide?</small></span
-            >
-            <span aria-hidden="true">→</span>
-          </button>
         </div>
         <div class="home-workspace__result">${this.renderResult()}</div>
       </div>
@@ -381,10 +367,6 @@ export class HomeView extends LitElement {
       clearInterval(this.cycleTimer);
       this.isAnimating = false;
     }, duration);
-  }
-
-  private openChallenge(): void {
-    this.dispatchEvent(new CustomEvent("challenge-open", { bubbles: true }));
   }
 
   private shareResult(): void {

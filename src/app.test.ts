@@ -186,6 +186,10 @@ describe("bird-app", () => {
 
   it("closes modals with Escape and restores focus to the opener", async () => {
     const app = await renderApp();
+    expect(queryByRole(app, "button", { name: /abrir desafío/i })).toBeNull();
+    fireEvent.click(getByRole(app, "button", { name: /estadísticas/i }));
+    await app.updateComplete;
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     const opener = getByRole(app, "button", { name: /abrir desafío/i });
     opener.focus();
     fireEvent.click(opener);
@@ -294,6 +298,9 @@ describe("bird-app", () => {
   it("evaluates the statistical challenge and presents the target", async () => {
     const app = await renderApp();
 
+    expect(queryByRole(app, "button", { name: /abrir desafío/i })).toBeNull();
+    fireEvent.click(getByRole(app, "button", { name: /estadísticas/i }));
+    await app.updateComplete;
     fireEvent.click(getByRole(app, "button", { name: /abrir desafío/i }));
     await app.updateComplete;
     const input = getByLabelText(app, /número de simulaciones/i);

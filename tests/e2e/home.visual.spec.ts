@@ -30,7 +30,17 @@ test.afterEach(async ({ page }) => {
 });
 
 test("keeps the responsive home composition visually stable", async ({ page }) => {
+  await expect(page.getByRole("button", { name: "Abrir desafío estadístico" })).toHaveCount(0);
   await expect(page).toHaveScreenshot("home.png");
+});
+
+test("places the statistical challenge in Statistics", async ({ page }) => {
+  await expect(page.getByRole("button", { name: "Abrir desafío estadístico" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Estadísticas" }).click();
+  const challenge = page.getByRole("button", { name: "Abrir desafío estadístico" });
+  await expect(challenge).toBeVisible();
+  await challenge.click();
+  await expect(page.getByRole("dialog", { name: "Desafío estadístico" })).toBeVisible();
 });
 
 test("keeps the guided question visually stable after a result", async ({ page }) => {
