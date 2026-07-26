@@ -251,6 +251,10 @@ bird-pyramid {
   font-size: 10px;
 }
 
+.pyramid__level:nth-child(1) .pyramid__label {
+  font-size: 9px;
+}
+
 /* Event rain — decorative outcome symbols falling through the stage. */
 .event-rain {
   position: absolute;

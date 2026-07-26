@@ -56,6 +56,9 @@ test("keeps the level-detail action separated from its guidance", async ({ page 
   await page.getByRole("button", { name: "Ver detalle de Daño material" }).click();
   const dialog = page.getByRole("dialog", { name: "Daño material" });
   await expect(dialog).toBeVisible();
+  await dialog.evaluate(async (element) => {
+    await Promise.all(element.getAnimations().map((animation) => animation.finished));
+  });
 
   const guidanceBox = await dialog.locator(".level-detail-guidance").boundingBox();
   const actionBox = await dialog.getByRole("button", { name: "Entendido" }).boundingBox();
