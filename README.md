@@ -81,4 +81,17 @@ incluye publicidad, compras, cuentas, sonidos ni notificaciones.
 Si encuentras un problema, tienes una sugerencia o quieres proponer una corrección de
 contenido preventivo, [abre una incidencia](https://github.com/breixopd/piramide-bird-simulador/issues).
 
+## Licencia
+
+El código fuente está disponible bajo la
+[PolyForm Shield License 1.0.0](LICENSE): puedes estudiarlo, modificarlo y utilizarlo
+en usos permitidos, pero no ofrecer un producto que compita con esta aplicación sin
+permiso por escrito.
+
+El nombre, la identidad visual, los recursos gráficos y el contenido educativo
+original tienen [derechos reservados](BRANDING.md). Si quieres integrar el proyecto
+en un producto comercial, distribuir una adaptación que pueda competir con él o
+proponer código, consulta primero las
+[condiciones de contribución](CONTRIBUTING.md) y contacta con el mantenedor.
+
 Proyecto mantenido por [breixopd](https://github.com/breixopd).

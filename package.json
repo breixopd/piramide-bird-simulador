@@ -3,7 +3,7 @@
   "version": "1.0.0-alpha.6",
   "private": true,
   "type": "module",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "description": "Simulador educativo móvil de la pirámide de Bird para formación en PRL.",
   "engines": {
     "node": ">=22.13.0",
