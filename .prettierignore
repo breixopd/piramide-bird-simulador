@@ -4,3 +4,7 @@ coverage/
 android/
 playwright-report/
 test-results/
+# Local-only working artifacts, never committed (see .git/info/exclude).
+mockups/
+.zcode/
+.handoff/

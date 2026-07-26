@@ -17,7 +17,8 @@ Pirámide de Bird Simulador es una aplicación web local empaquetada para Androi
 2. El controlador elige el modelo activo y ejecuta el motor ponderado.
 3. Se calculan los acumulados, la convergencia y los logros.
 4. El resumen, los acumulados y el progreso se confirman juntos en una única transacción IndexedDB; un fallo revierte el conjunto completo.
-5. La interfaz recibe el nuevo estado y actualiza pirámide, dado, escenario, historial y gráfico.
+5. La interfaz recibe el nuevo estado; el control de lanzamiento recorre símbolos y colores hasta
+   detenerse en el resultado, y después actualiza pirámide, escenario, historial y gráfico.
 
 El historial conserva como máximo las 500 ejecuciones más recientes, mientras el mismo registro transaccional mantiene los acumulados históricos. Los relatos consultados nunca salen del dispositivo.
 

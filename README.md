@@ -4,6 +4,30 @@ Aplicación móvil educativa, gratuita y en español para explorar de forma visu
 
 La aplicación está pensada como apoyo para formación y sensibilización en prevención de riesgos laborales (PRL). No sustituye una evaluación de riesgos, una investigación de accidentes, una norma técnica ni el criterio de un profesional competente.
 
+<table>
+  <tr>
+    <td align="center">
+      <img src="docs/screenshots/home.png" width="320" alt="Pantalla principal con la pirámide de Bird y el control Lanzar" />
+      <br />
+      <sub>Pirámide interactiva y simulación</sub>
+    </td>
+    <td align="center">
+      <img src="docs/screenshots/result.png" width="320" alt="Resultado de una simulación con un caso preventivo y sus medidas" />
+      <br />
+      <sub>Resultado y medidas preventivas</sub>
+    </td>
+  </tr>
+</table>
+
+## Qué incluye
+
+- Lanzamiento visual que recorre los símbolos y colores de los posibles sucesos antes de detenerse en el resultado.
+- Pirámide interactiva, simulaciones de 1, 100 o 1000 eventos y comparación entre resultados teóricos y observados.
+- 80 casos preventivos de ocho sectores, con peligro, causa inmediata y medidas recomendadas.
+- Historial, estadísticas, desafío probabilístico y logros guardados en el dispositivo.
+- Funcionamiento sin conexión, tema claro/oscuro, movimiento reducido y navegación accesible por teclado o lector de pantalla.
+- Aplicación web instalable dentro del proyecto Android mediante Capacitor, sin cuentas, publicidad ni compras.
+
 ## Modelos educativos
 
 - **Bird clásico:** 600 cuasi accidentes, 30 daños materiales, 10 lesiones menores y 1 lesión grave o incapacitante.

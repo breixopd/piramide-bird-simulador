@@ -1,4 +1,4 @@
-import { LitElement, html } from "lit";
+import { LitElement, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 import type { AppState } from "../app-controller";
@@ -36,21 +36,19 @@ export class AchievementsView extends LitElement {
         <span style=${`width:${(unlocked.size / ACHIEVEMENTS.length) * 100}%`}></span>
       </div>
       <div class="achievement-list">
-        ${ACHIEVEMENTS.map((achievement, index) => {
+        ${ACHIEVEMENTS.map((achievement) => {
           const isUnlocked = unlocked.has(achievement.id);
           return html`<article class="achievement ${isUnlocked ? "is-unlocked" : "is-locked"}">
-            <div class="achievement__number">${String(index + 1).padStart(2, "0")}</div>
             <div class="achievement__icon">
               ${icon(achievementIcons[achievement.icon] ?? "trophy")}
             </div>
-            <div>
-              <p class="achievement__status">${isUnlocked ? "Desbloqueado" : "Pendiente"}</p>
+            <div class="achievement__body">
               <h2>${achievement.name}</h2>
               <p>${achievement.description}</p>
+              <span class="achievement__badge ${isUnlocked ? "is-unlocked" : "is-locked"}">
+                ${isUnlocked ? icon("check") : nothing} ${isUnlocked ? "Desbloqueado" : "Pendiente"}
+              </span>
             </div>
-            <span class="achievement__mark"
-              >${isUnlocked ? icon("check", "Desbloqueado") : "—"}</span
-            >
           </article>`;
         })}
       </div>

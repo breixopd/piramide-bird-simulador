@@ -1,0 +1,235 @@
+/*
+ * Pirámide de Bird — Sistema de diseño "Slate Interactivo"
+ * Lienzo gris-pizarra, acento coral, tarjetas flotantes. Claro/oscuro/sistema.
+ */
+
+:root {
+  color-scheme: light dark;
+  --font-sans:
+    "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  /* ---- Superficies (light) ---- */
+  --canvas: #eceef2;
+  --canvas-soft: #f4f5f8;
+  --surface: #ffffff;
+  --surface-muted: #f3f4f7;
+  --surface-tint: #f9fafb;
+  --overlay: rgba(26, 29, 36, 0.62);
+
+  /* ---- Tinta ---- */
+  --ink: #1a1d24;
+  --ink-soft: #4b5563;
+  --ink-faint: #9ca3af;
+  --ink-on-accent: #ffffff;
+
+  /* ---- Líneas ---- */
+  --line: #e3e6ec;
+  --line-strong: #d1d5db;
+
+  /* ---- Acentos ---- */
+  --accent: #e11d48;
+  --accent-strong: #be123c;
+  --accent-soft: rgba(225, 29, 72, 0.12);
+  --accent-softer: #fff1f4;
+  --ink-bar: #1a1d24;
+  --ink-bar-soft: rgba(255, 255, 255, 0.12);
+
+  --focus: #2563eb;
+  --danger: #be123c;
+  --danger-soft: #fff1f4;
+  --success: #15803d;
+  --success-soft: #ecfdf5;
+  --warning: #b45309;
+  --warning-soft: #fffbeb;
+
+  /* ---- Espaciado ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* ---- Radios ---- */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.125rem;
+  --radius-2xl: 1.375rem;
+  --radius-pill: 100px;
+
+  /* ---- Sombras ---- */
+  --shadow-card: 0 1px 2px rgba(26, 29, 36, 0.04), 0 8px 24px -12px rgba(26, 29, 36, 0.18);
+  --shadow-float: 0 8px 28px -10px rgba(26, 29, 36, 0.28);
+  --shadow-accent: 0 8px 18px -6px rgba(225, 29, 72, 0.5);
+  --shadow-fab: 0 8px 16px -4px rgba(225, 29, 72, 0.7);
+
+  /* ---- Geometría ---- */
+  --content-width: 52rem;
+  --nav-height: 4.5rem;
+  --nav-margin: 0.75rem;
+  --nav-inset: env(safe-area-inset-bottom, 0px);
+
+  /* ---- Tipografía ---- */
+  --font-size-2xs: 0.6875rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.375rem;
+  --font-size-2xl: 1.75rem;
+
+  /* ---- Sistema semántico de resultados ---- */
+  /* near-miss: sky, base ancha */
+  --outcome-near-miss: #0284c7;
+  --outcome-near-miss-grad: linear-gradient(135deg, #0ea5e9, #0284c7);
+  /* property-damage: green */
+  --outcome-property-damage: #15803d;
+  --outcome-property-damage-grad: linear-gradient(135deg, #16a34a, #15803d);
+  /* minor-injury: amber */
+  --outcome-minor-injury: #c2410c;
+  --outcome-minor-injury-grad: linear-gradient(135deg, #ea580c, #c2410c);
+  /* serious-injury: crimson */
+  --outcome-serious-injury: #9f1239;
+  --outcome-serious-injury-grad: linear-gradient(135deg, #be123c, #9f1239);
+  /* fatality: slate-grey, desaturado a propósito — nunca color de premio */
+  --outcome-fatality: #4b5563;
+  --outcome-fatality-grad: linear-gradient(135deg, #6b7280, #4b5563);
+  --outcome-text: #ffffff;
+  --outcome-dark-text: #1a1d24;
+}
+
+/* ===== Tema oscuro (explícito o sistema) ===== */
+bird-app[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #16181d;
+  --canvas-soft: #1c1f26;
+  --surface: #20242c;
+  --surface-muted: #272b34;
+  --surface-tint: #2b303a;
+  --overlay: rgba(0, 0, 0, 0.7);
+
+  --ink: #e6e8ee;
+  --ink-soft: #aeb4c0;
+  --ink-faint: #6b7280;
+
+  --line: #2f343f;
+  --line-strong: #3c4250;
+
+  --accent: #fb7185;
+  --accent-strong: #ff8fa3;
+  --accent-soft: rgba(251, 113, 133, 0.18);
+  --accent-softer: #2d1a20;
+  --ink-bar: #0e1014;
+  --ink-bar-soft: rgba(255, 255, 255, 0.1);
+
+  --focus: #60a5fa;
+  --danger: #fb7185;
+  --danger-soft: #2a1f24;
+  --success: #34d399;
+  --success-soft: #16251f;
+  --warning: #fbbf24;
+  --warning-soft: #2a2410;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 28px -14px rgba(0, 0, 0, 0.6);
+  --shadow-float: 0 10px 32px -12px rgba(0, 0, 0, 0.6);
+  --shadow-accent: 0 8px 18px -6px rgba(244, 63, 94, 0.45);
+  --shadow-fab: 0 8px 16px -4px rgba(244, 63, 94, 0.55);
+
+  --outcome-near-miss: #38bdf8;
+  --outcome-near-miss-grad: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  --outcome-property-damage: #4ade80;
+  --outcome-property-damage-grad: linear-gradient(135deg, #4ade80, #22c55e);
+  --outcome-minor-injury: #fb923c;
+  --outcome-minor-injury-grad: linear-gradient(135deg, #fb923c, #f97316);
+  --outcome-serious-injury: #fb7185;
+  --outcome-serious-injury-grad: linear-gradient(135deg, #fb7185, #e11d48);
+  --outcome-fatality: #94a3b8;
+  --outcome-fatality-grad: linear-gradient(135deg, #94a3b8, #64748b);
+}
+
+@media (prefers-color-scheme: dark) {
+  bird-app[data-theme="system"] {
+    color-scheme: dark;
+    --canvas: #16181d;
+    --canvas-soft: #1c1f26;
+    --surface: #20242c;
+    --surface-muted: #272b34;
+    --surface-tint: #2b303a;
+    --overlay: rgba(0, 0, 0, 0.7);
+
+    --ink: #e6e8ee;
+    --ink-soft: #aeb4c0;
+    --ink-faint: #6b7280;
+
+    --line: #2f343f;
+    --line-strong: #3c4250;
+
+    --accent: #fb7185;
+    --accent-strong: #ff8fa3;
+    --accent-soft: rgba(251, 113, 133, 0.18);
+    --accent-softer: #2d1a20;
+    --ink-bar: #0e1014;
+    --ink-bar-soft: rgba(255, 255, 255, 0.1);
+
+    --focus: #60a5fa;
+    --danger: #fb7185;
+    --danger-soft: #2a1f24;
+    --success: #34d399;
+    --success-soft: #16251f;
+    --warning: #fbbf24;
+    --warning-soft: #2a2410;
+
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 28px -14px rgba(0, 0, 0, 0.6);
+    --shadow-float: 0 10px 32px -12px rgba(0, 0, 0, 0.6);
+    --shadow-accent: 0 8px 18px -6px rgba(244, 63, 94, 0.45);
+    --shadow-fab: 0 8px 16px -4px rgba(244, 63, 94, 0.55);
+
+    --outcome-near-miss: #38bdf8;
+    --outcome-near-miss-grad: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    --outcome-property-damage: #4ade80;
+    --outcome-property-damage-grad: linear-gradient(135deg, #4ade80, #22c55e);
+    --outcome-minor-injury: #fb923c;
+    --outcome-minor-injury-grad: linear-gradient(135deg, #fb923c, #f97316);
+    --outcome-serious-injury: #fb7185;
+    --outcome-serious-injury-grad: linear-gradient(135deg, #fb7185, #e11d48);
+    --outcome-fatality: #94a3b8;
+    --outcome-fatality-grad: linear-gradient(135deg, #94a3b8, #64748b);
+  }
+}
+
+/* ===== Identidad de resultado: color + icono + texto, siempre ===== */
+.outcome-near-miss {
+  --outcome-color: var(--outcome-near-miss);
+  --outcome-grad: var(--outcome-near-miss-grad);
+  --outcome-foreground: var(--outcome-text);
+}
+
+.outcome-property-damage {
+  --outcome-color: var(--outcome-property-damage);
+  --outcome-grad: var(--outcome-property-damage-grad);
+  --outcome-foreground: var(--outcome-text);
+}
+
+.outcome-minor-injury {
+  --outcome-color: var(--outcome-minor-injury);
+  --outcome-grad: var(--outcome-minor-injury-grad);
+  --outcome-foreground: var(--outcome-text);
+}
+
+.outcome-serious-injury {
+  --outcome-color: var(--outcome-serious-injury);
+  --outcome-grad: var(--outcome-serious-injury-grad);
+  --outcome-foreground: var(--outcome-text);
+}
+
+.outcome-fatality {
+  --outcome-color: var(--outcome-fatality);
+  --outcome-grad: var(--outcome-fatality-grad);
+  --outcome-foreground: var(--outcome-text);
+}

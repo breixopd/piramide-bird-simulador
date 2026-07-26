@@ -57,7 +57,7 @@ describe("stats view data windows", () => {
     const view = await renderStats();
     const overview = view.querySelector(".stats-overview")?.textContent?.replace(/\s+/g, " ");
 
-    expect(overview).toContain("Eventos (total histórico)");
+    expect(overview).toContain("Eventos totales");
     expect(overview).toContain("1000");
     expect(overview).toContain("Última convergencia");
     expect(overview).toContain("Lotes retenidos");

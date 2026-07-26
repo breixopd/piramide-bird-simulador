@@ -23,7 +23,7 @@ export const ANALYTICS_CONSENT_STORAGE_KEY = "bird-pyramid.analytics-consent";
 
 export const DEFAULT_SETTINGS: Readonly<SettingsState> = Object.freeze({
   version: 1,
-  theme: "dark",
+  theme: "system",
   reducedMotion: false,
   haptics: true,
   shakeToReset: true,

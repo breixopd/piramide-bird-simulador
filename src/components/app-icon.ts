@@ -21,18 +21,15 @@ export type AppIconName =
 
 const paths: Record<AppIconName, TemplateResult> = {
   alert: svg`<path d="M12 3 2.8 20h18.4L12 3Z"></path><path d="M12 8v5.5M12 17h.01"></path>`,
-  bandage: svg`<path
-      d="m7.1 17.6 10.5-10.5a3.2 3.2 0 0 0-4.6-4.6L2.5 13a3.2 3.2 0 0 0 4.6 4.6Zm-1.6-7.5 8.4 8.4"
-    ></path
-    ><path d="M9.2 9.2h.01m2.3-2.3h.01m.9 5.5h.01m2.3-2.3h.01"></path>`,
+  bandage: svg`<rect x="2" y="9" width="20" height="6" rx="3"></rect
+    ><path d="M10 10v4M8 12h4"></path>`,
   bars: svg`<path d="M4 20V10h4v10M10 20V4h4v16M16 20v-7h4v7M2 20h20"></path>`,
   bulk: svg`<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"></path>`,
   check: svg`<path d="m5 12 4 4L19 6"></path>`,
   close: svg`<path d="m6 6 12 12M18 6 6 18"></path>`,
   cube: svg`<path d="m12 2 9 5-9 5-9-5 9-5Z"></path
     ><path d="m3 7 9 5v10l-9-5V7Zm18 0-9 5v10l9-5V7Z"></path>`,
-  damage: svg`<path d="M4 9.5 12 5l8 4.5v9L12 23l-8-4.5v-9Z"></path
-    ><path d="m4 9.5 8 4.5 8-4.5M12 14v9M14 2l-2 3-2-3m6 3-2 3 3 1"></path>`,
+  damage: svg`<path d="M4 8 12 4l8 4v10l-8 4-8-4V8Z"></path><path d="M12 4v8M8 10l4 2 4-2"></path>`,
   fatality: svg`<circle cx="12" cy="7" r="3.5"></circle
     ><path d="M5.5 21v-2.5a6.5 6.5 0 0 1 13 0V21M8.5 12.5l7 7m0-7-7 7"></path>`,
   home: svg`<path d="m3 11 9-8 9 8M5.5 9.5V21h13V9.5M9 21v-6h6v6"></path>`,

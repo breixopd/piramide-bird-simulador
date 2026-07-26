@@ -7,7 +7,7 @@ export type AppTab = "home" | "stats" | "achievements" | "info";
 
 const tabs = [
   { id: "home", label: "Inicio", accessibleLabel: "Inicio", icon: "home" },
-  { id: "stats", label: "Stats", accessibleLabel: "Estadísticas", icon: "bars" },
+  { id: "stats", label: "Datos", accessibleLabel: "Estadísticas", icon: "bars" },
   { id: "achievements", label: "Logros", accessibleLabel: "Logros", icon: "trophy" },
   { id: "info", label: "Info", accessibleLabel: "Información y ajustes", icon: "info" },
 ] as const;
@@ -15,6 +15,7 @@ const tabs = [
 @customElement("bottom-nav")
 export class BottomNav extends LitElement {
   @property({ type: String }) active: AppTab = "home";
+  /** Kept for API compatibility; no longer renders a launch button. */
   @property({ type: Boolean }) running = false;
 
   protected createRenderRoot(): HTMLElement | DocumentFragment {
@@ -23,17 +24,7 @@ export class BottomNav extends LitElement {
 
   protected render() {
     return html`<nav class="bottom-nav" aria-label="Navegación principal">
-      ${tabs.slice(0, 2).map((tab) => this.renderTab(tab))}
-      <button
-        type="button"
-        class="bottom-nav__launch"
-        aria-label="Lanzar un evento rápido"
-        ?disabled=${this.running}
-        @click=${this.quickLaunch}
-      >
-        <span>${icon("cube")}</span><small>Lanzar</small>
-      </button>
-      ${tabs.slice(2).map((tab) => this.renderTab(tab))}
+      ${tabs.map((tab) => this.renderTab(tab))}
     </nav>`;
   }
 
@@ -51,10 +42,6 @@ export class BottomNav extends LitElement {
 
   private selectTab(tab: AppTab): void {
     this.dispatchEvent(new CustomEvent<AppTab>("tab-select", { detail: tab, bubbles: true }));
-  }
-
-  private quickLaunch(): void {
-    this.dispatchEvent(new CustomEvent("simulate", { detail: 1, bubbles: true, composed: true }));
   }
 }
 

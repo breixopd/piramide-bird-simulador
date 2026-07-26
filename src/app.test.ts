@@ -87,9 +87,11 @@ describe("bird-app", () => {
     expect(getByRole(app, "heading", { name: "Pirámide de Bird" })).toBeTruthy();
     expect(getByText(app, "Cuasi-accidente")).toBeTruthy();
     expect(getByText(app, "600")).toBeTruthy();
-    const levels = [...app.querySelectorAll<HTMLElement>(".pyramid__level")];
-    expect(levels[0]?.style.getPropertyValue("--level-width")).toBe("42%");
-    expect(levels.at(-1)?.style.getPropertyValue("--level-width")).toBe("100%");
+    const levels = [...app.querySelectorAll<SVGGElement>(".pyramid__level")];
+    expect(levels).toHaveLength(4);
+    // Apex (first) shows weight 1; base (last) shows weight 600.
+    expect(levels[0]?.querySelector(".pyramid__weight")?.textContent).toBe("1");
+    expect(levels.at(-1)?.querySelector(".pyramid__weight")?.textContent).toBe("600");
 
     fireEvent.click(getByRole(app, "button", { name: /estadísticas/i }));
     await app.updateComplete;
@@ -98,17 +100,45 @@ describe("bird-app", () => {
     expect(getByText(app, "Aún no hay simulaciones")).toBeTruthy();
   });
 
-  it("keeps a one-event launch action available in the bottom dock", async () => {
+  it("runs a single-event simulation from the Home launch action", async () => {
     const app = await renderApp();
 
-    fireEvent.click(getByRole(app, "button", { name: "Lanzar un evento rápido" }));
+    fireEvent.click(getByRole(app, "button", { name: "Simular 1 evento" }));
 
     await vi.waitFor(() => expect(app.controller?.state.latestRun?.iterations).toBe(1));
     await app.updateComplete;
     expect(getByRole(app, "status").textContent).toContain("1 evento simulado");
   });
 
-  it("ignores repeated dock launches while a simulation is running", async () => {
+  it("cycles the launch symbol and colour before settling on the simulated outcome", async () => {
+    const app = await renderApp();
+    expect(app.querySelector("symbolic-die")).toBeNull();
+
+    const launch = getByRole(app, "button", { name: "Simular 1 evento" });
+    fireEvent.click(launch);
+    await vi.waitFor(() => expect(app.controller?.state.latestRun).not.toBeNull());
+    await app.updateComplete;
+
+    const home = app.querySelector("home-view");
+    await home?.updateComplete;
+    const animatedLaunch = getByRole(app, "button", { name: "Simular 1 evento" });
+    expect(animatedLaunch.classList.contains("is-cycling")).toBe(true);
+    expect(animatedLaunch.textContent).toContain("Lanzando");
+
+    await new Promise((resolve) => setTimeout(resolve, 180));
+    await home?.updateComplete;
+    expect(animatedLaunch.getAttribute("data-outcome")).not.toBe("near-miss");
+
+    await vi.waitFor(() => expect(animatedLaunch.classList.contains("is-cycling")).toBe(false), {
+      timeout: 4_000,
+    });
+    expect(animatedLaunch.getAttribute("data-outcome")).toBe(
+      app.controller?.state.selectedScenario?.outcome,
+    );
+    expect(animatedLaunch.textContent).toContain("Lanzar");
+  });
+
+  it("ignores repeated launches while a simulation is running", async () => {
     const app = await renderApp();
     const log = vi.fn(async () => undefined);
     const hapticFeedback = vi.fn(async () => undefined);
@@ -120,7 +150,7 @@ describe("bird-app", () => {
     app.hapticFeedback = hapticFeedback;
     await app.updateComplete;
 
-    const launch = getByRole(app, "button", { name: "Lanzar un evento rápido" });
+    const launch = getByRole(app, "button", { name: "Simular 1 evento" });
     fireEvent.click(launch);
     fireEvent.click(launch);
 
@@ -162,24 +192,6 @@ describe("bird-app", () => {
     expect(document.activeElement).toBe(opener);
   });
 
-  it("offers visible, labelled controls to zoom and reset the pyramid", async () => {
-    const app = await renderApp();
-    const pyramid = app.querySelector<HTMLElement>("bird-pyramid");
-
-    expect(pyramid?.style.getPropertyValue("--pyramid-zoom")).toBe("1");
-
-    fireEvent.click(getByRole(app, "button", { name: "Ampliar pirámide" }));
-    await app.updateComplete;
-    expect(pyramid?.style.getPropertyValue("--pyramid-zoom")).toBe("1.25");
-    expect(
-      getByRole(app, "button", { name: "Restablecer zoom de la pirámide" }).textContent,
-    ).toContain("125 %");
-
-    fireEvent.click(getByRole(app, "button", { name: "Restablecer zoom de la pirámide" }));
-    await app.updateComplete;
-    expect(pyramid?.style.getPropertyValue("--pyramid-zoom")).toBe("1");
-  });
-
   it("opens an accessible level detail with theoretical and observed statistics", async () => {
     const app = await renderApp();
     await app.controller?.run(1, () => 0);
@@ -212,31 +224,6 @@ describe("bird-app", () => {
 
     expect(getByRole(app, "dialog", { name: "Modelo extendido" })).toBeTruthy();
     expect(app.controller?.state.activeModelId).toBe("bird-classic");
-  });
-
-  it("zooms the pyramid with a two-finger pinch", async () => {
-    const app = await renderApp();
-    const surface = app.querySelector<HTMLElement>("[data-gesture-surface='pyramid']");
-    if (!surface) throw new Error("Missing pyramid gesture surface");
-
-    fireEvent.touchStart(surface, {
-      touches: [
-        { identifier: 1, clientX: 100, clientY: 100 },
-        { identifier: 2, clientX: 200, clientY: 100 },
-      ],
-    });
-    fireEvent.touchMove(surface, {
-      touches: [
-        { identifier: 1, clientX: 50, clientY: 100 },
-        { identifier: 2, clientX: 250, clientY: 100 },
-      ],
-    });
-
-    await vi.waitFor(() =>
-      expect(
-        app.querySelector<HTMLElement>("bird-pyramid")?.style.getPropertyValue("--pyramid-zoom"),
-      ).toBe("2"),
-    );
   });
 
   it("opens level detail after a 500 ms long press", async () => {

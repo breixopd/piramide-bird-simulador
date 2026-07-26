@@ -1,17 +1,47 @@
-import { LitElement, html } from "lit";
+import { LitElement, html, svg, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 import type { OutcomeDefinition, OutcomeId, SimulationModel } from "../domain/models";
 import { distance, type GesturePoint } from "../domain/gestures";
-import { icon } from "./app-icon";
 
-const iconNames = {
-  warning: "alert",
-  damage: "damage",
-  bandage: "bandage",
-  medical: "medical",
-  fatality: "fatality",
-} as const;
+// SVG triangle geometry. Equal-height bands that share exact vertices (zero gaps).
+// Flat-top (truncated) pyramid so the apex band has room for label text.
+// viewBox 300 × 280; top edge at y=20 with half-width 42; base corners (22,260)/(278,260).
+const VIEW_W = 300;
+const APEX_X = 150;
+const TOP_Y = 20;
+const BOTTOM_Y = 260;
+const HALF_BASE = 128;
+const HALF_TOP = 42;
+
+/** Half-width of the trapezoid silhouette at a given y (linear taper). */
+function halfWidthAt(y: number): number {
+  const t = (y - TOP_Y) / (BOTTOM_Y - TOP_Y);
+  return HALF_TOP + (HALF_BASE - HALF_TOP) * t;
+}
+
+interface BandGeometry {
+  /** SVG path "d" for the trapezoid band. */
+  readonly d: string;
+  /** Horizontal center (always apex X). */
+  readonly cx: number;
+  /** Y for the weight numeral. */
+  readonly weightY: number;
+  /** Y for the label text. */
+  readonly labelY: number;
+}
+
+function bandGeometry(index: number, count: number): BandGeometry {
+  const bandHeight = (BOTTOM_Y - TOP_Y) / count;
+  const y0 = TOP_Y + index * bandHeight;
+  const y1 = y0 + bandHeight;
+  const hw0 = halfWidthAt(y0);
+  const hw1 = halfWidthAt(y1);
+  // Top-left, top-right, bottom-right, bottom-left.
+  const d = `M${APEX_X - hw0},${y0} L${APEX_X + hw0},${y0} L${APEX_X + hw1},${y1} L${APEX_X - hw1},${y1} Z`;
+  const midY = (y0 + y1) / 2;
+  return { d, cx: APEX_X, weightY: midY - 2, labelY: midY + 16 };
+}
 
 @customElement("bird-pyramid")
 export class BirdPyramid extends LitElement {
@@ -27,44 +57,54 @@ export class BirdPyramid extends LitElement {
   }
 
   protected render() {
-    if (!this.model) return null;
-    return html`<ol class="pyramid" aria-label="Proporciones del modelo ${this.model.label}">
-      ${[...this.model.outcomes]
-        .reverse()
-        .map((outcome, index, outcomes) => this.renderLevel(outcome, index, outcomes.length))}
-    </ol>`;
+    if (!this.model) return nothing;
+    // Render apex-first (reversed) so index 0 is the narrow top.
+    const bands = [...this.model.outcomes].reverse();
+    return html`<svg
+      class="pyramid"
+      viewBox="0 0 ${VIEW_W} 280"
+      preserveAspectRatio="xMidYMid meet"
+      role="group"
+      aria-label="Proporciones del modelo ${this.model.label}"
+    >
+      ${bands.map((outcome, index) => this.renderBand(outcome, index, bands.length))}
+    </svg>`;
   }
 
-  private renderLevel(outcome: OutcomeDefinition, index: number, length: number) {
-    const width = 42 + (index / Math.max(length - 1, 1)) * 58;
-    return html`<li class="pyramid__item">
-      <button
-        type="button"
-        class="pyramid__level outcome-${outcome.colorToken} ${
-          this.highlighted === outcome.id ? "is-highlighted" : ""
-        }"
-        style=${`--level-width:${width}%`}
-        aria-label="Ver detalle de ${outcome.label}"
-        title="Mantén pulsado o toca para ver el detalle de ${outcome.label}"
-        @click=${() => this.onLevelClick(outcome.id)}
-        @pointerdown=${(event: PointerEvent) => this.startLongPress(event, outcome.id)}
-        @pointermove=${this.onPointerMove}
-        @pointerup=${this.cancelLongPress}
-        @pointercancel=${this.cancelLongPress}
-        @pointerleave=${this.cancelLongPress}
-      >
-        <span class="pyramid__icon">${icon(iconNames[outcome.icon])}</span>
-        <span class="pyramid__label">${outcome.label}</span>
-        <strong class="pyramid__weight">${outcome.weight}</strong>
-      </button>
-    </li>`;
+  private renderBand(outcome: OutcomeDefinition, index: number, count: number) {
+    const g = bandGeometry(index, count);
+    const isHighlighted = this.highlighted === outcome.id;
+    return svg`<g
+      class="pyramid__level outcome-${outcome.colorToken} ${isHighlighted ? "is-highlighted" : ""}"
+      role="button"
+      tabindex="0"
+      aria-label="Ver detalle de ${outcome.label}"
+      @click=${() => this.onBandClick(outcome.id)}
+      @keydown=${(e: KeyboardEvent) => this.onBandKeyDown(e, outcome.id)}
+      @pointerdown=${(e: PointerEvent) => this.startLongPress(e, outcome.id)}
+      @pointermove=${this.onPointerMove}
+      @pointerup=${this.cancelLongPress}
+      @pointercancel=${this.cancelLongPress}
+      @pointerleave=${this.cancelLongPress}
+    >
+      <title>Ver detalle de ${outcome.label}</title>
+      <path d=${g.d} />
+      <text x=${g.cx} y=${g.weightY} text-anchor="middle" class="pyramid__weight">${outcome.weight}</text>
+      <text x=${g.cx} y=${g.labelY} text-anchor="middle" class="pyramid__label">${outcome.label}</text>
+    </g>`;
   }
 
-  private onLevelClick(outcomeId: OutcomeId): void {
+  private onBandClick(outcomeId: OutcomeId): void {
     if (Date.now() <= this.suppressClickUntil) {
       this.suppressClickUntil = 0;
       return;
     }
+    this.openDetail(outcomeId);
+  }
+
+  private onBandKeyDown(event: KeyboardEvent, outcomeId: OutcomeId): void {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
     this.openDetail(outcomeId);
   }
 

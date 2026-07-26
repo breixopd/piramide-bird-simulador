@@ -60,6 +60,32 @@ export class EventRain extends LitElement {
     return this;
   }
 
+  protected updated(): void {
+    if (this.reducedMotion) return;
+    const particles = this.querySelectorAll<HTMLElement>(".event-rain__particle");
+    const reduced =
+      this.closest("bird-app")?.getAttribute("data-motion") === "reduced" ||
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    particles.forEach((particle, index) => {
+      if (reduced || typeof particle.animate !== "function") return;
+      const drift = Number(particle.dataset.drift ?? ((index % 5) - 2) * 0.4);
+      const duration = 900 + ((index * 53) % 700);
+      const delay = (index % 12) * 45;
+      particle.animate(
+        [
+          { transform: "translate(0, -1.5rem) rotate(0deg)", opacity: 0 },
+          {
+            transform: `translate(${drift * 0.5}rem, 4rem) rotate(${drift * 40}deg)`,
+            opacity: 1,
+            offset: 0.18,
+          },
+          { transform: `translate(${drift}rem, 16rem) rotate(${drift * 90}deg)`, opacity: 0 },
+        ],
+        { duration, delay, easing: "cubic-bezier(0.4, 0.1, 0.6, 1)", fill: "forwards" },
+      );
+    });
+  }
+
   protected render() {
     if (!this.run || this.run.iterations === 1 || this.reducedMotion) return nothing;
     const visible = selectVisibleOutcomes(this.run.counts);
@@ -68,7 +94,8 @@ export class EventRain extends LitElement {
         (outcome, index) =>
           html`<span
             class="event-rain__particle outcome-${outcome}"
-            style=${`--particle-x:${(index * 37) % 100}%;--particle-delay:${(index % 10) * 35}ms;--particle-turn:${(index % 7) * 17 - 45}deg`}
+            data-drift=${((index * 37) % 9) / 10 - 0.4}
+            style=${`left:${(index * 37) % 100}%`}
             >${icon(names[outcome])}</span
           >`,
       )}

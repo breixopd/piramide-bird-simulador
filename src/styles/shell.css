@@ -1,0 +1,173 @@
+/*
+ * Shell — viewport, app scroller, floating navigation.
+ * The nav element reserves real layout height so it never covers content;
+ * the visible pill floats above it for the modern app look.
+ */
+
+html,
+body,
+bird-app {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+bird-app {
+  display: block;
+  min-height: 0;
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+.app-shell {
+  width: min(100%, var(--content-width));
+  height: 100%;
+  min-height: 0;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-main {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  background: var(--canvas);
+}
+
+/* Espacio superior para notch/safe-area; inferior para la navegación. */
+.view {
+  width: 100%;
+  min-height: 100%;
+  padding: calc(var(--space-5) + env(safe-area-inset-top, 0px)) var(--space-4)
+    calc(var(--nav-height) + var(--nav-margin) + var(--nav-inset));
+}
+
+.page-header {
+  margin-bottom: var(--space-5);
+}
+
+.page-header h1 {
+  margin: var(--space-2) 0;
+}
+
+.page-header > p:last-child {
+  max-width: 42rem;
+  color: var(--ink-soft);
+  font-size: var(--font-size-sm);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-1);
+  color: var(--ink-soft);
+  font-size: var(--font-size-2xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ===== Navegación inferior =====
+ * bottom-nav está en el flujo y reserva altura.
+ * El .bottom-nav interno es la píldora flotante visible.
+ */
+bottom-nav {
+  display: block;
+  flex: 0 0 auto;
+  height: calc(var(--nav-height) + var(--nav-inset));
+  position: relative;
+}
+
+.bottom-nav {
+  position: absolute;
+  left: var(--nav-margin);
+  right: var(--nav-margin);
+  bottom: calc(var(--nav-margin) + var(--nav-inset));
+  min-height: var(--nav-height);
+  padding: var(--space-2);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  gap: var(--space-1);
+  border-radius: var(--radius-2xl);
+  background: var(--ink-bar);
+  color: var(--ink);
+  box-shadow: var(--shadow-float);
+}
+
+.bottom-nav__item {
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-1);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--ink-faint);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: var(--font-size-2xs);
+  font-weight: 600;
+  position: relative;
+}
+
+.bottom-nav__item .app-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.bottom-nav__item.is-active {
+  color: #ffffff;
+  background: var(--ink-bar-soft);
+}
+
+.bottom-nav__item.is-active .app-icon {
+  color: var(--accent);
+}
+
+/* ===== Avisos y estados de carga ===== */
+.storage-warning {
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-bottom: 1px solid var(--line);
+}
+
+.storage-warning .app-icon {
+  color: var(--danger);
+  flex: 0 0 auto;
+}
+
+.loading-screen {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--space-3);
+  color: var(--ink-soft);
+}
+
+.loading-mark {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  background-image: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: var(--ink-on-accent);
+}
+
+.loading-mark .app-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
