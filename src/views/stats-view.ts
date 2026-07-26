@@ -3,6 +3,7 @@ import { customElement, property } from "lit/decorators.js";
 
 import type { AppState } from "../app-controller";
 import "../components/convergence-chart";
+import "../components/count-up";
 import { icon } from "../components/app-icon";
 import { MODELS, type ModelId } from "../domain/models";
 
@@ -52,15 +53,25 @@ export class StatsView extends LitElement {
             </div>`
           : html`<div class="stats-overview">
                 <article>
-                  <span>Eventos (total histórico)</span
-                  ><strong>${totalEvents.toLocaleString("es-ES")}</strong>
+                  <span>Eventos totales</span>
+                  <strong><count-up .value=${totalEvents} duration=${1500}></count-up></strong>
                 </article>
                 <article>
-                  <span>Última convergencia</span
-                  ><strong>${(latestConvergence * 100).toFixed(1)} %</strong>
+                  <span>Última convergencia</span>
+                  <strong
+                    ><count-up
+                      .value=${Math.round(latestConvergence * 1000) / 10}
+                      .decimals=${1}
+                      .suffix=${" %"}
+                      duration=${1500}
+                    ></count-up
+                  ></strong>
                 </article>
                 <article>
-                  <span>Lotes retenidos</span><strong>${modelHistory.length}</strong>
+                  <span>Lotes retenidos</span>
+                  <strong
+                    ><count-up .value=${modelHistory.length} duration=${800}></count-up
+                  ></strong>
                 </article>
               </div>
 

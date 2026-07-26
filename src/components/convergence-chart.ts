@@ -16,11 +16,11 @@ import type { SimulationRunSummary } from "../platform/history";
 Chart.register(LineController, LineElement, LinearScale, PointElement, Tooltip, Legend);
 
 const outcomeColors: Readonly<Record<OutcomeId, string>> = {
-  "near-miss": "#69d39d",
-  "property-damage": "#d5d46e",
-  "minor-injury": "#f3bb54",
-  "serious-injury": "#ff875b",
-  fatality: "#e56673",
+  "near-miss": "#3b82f6", // blue
+  "property-damage": "#22c55e", // green
+  "minor-injury": "#eab308", // yellow
+  "serious-injury": "#ef4444", // red
+  fatality: "#8b5cf6", // purple
 };
 
 interface ConvergenceLine {
@@ -161,48 +161,84 @@ export class ConvergenceChart extends LitElement {
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
+        layout: { padding: { top: 4, right: 8, bottom: 0, left: 4 } },
+        interaction: { mode: "index", intersect: false },
         plugins: {
           legend: {
             position: "bottom",
             labels: {
               color: inkSoft,
-              boxWidth: 18,
-              boxHeight: 2,
-              padding: 12,
+              boxWidth: 10,
+              boxHeight: 10,
+              padding: 10,
+              usePointStyle: true,
+              pointStyle: "circle",
+              font: { size: 11, weight: 600 },
               filter: (item) => !item.text.endsWith("· teórico"),
             },
           },
           tooltip: {
             enabled: true,
+            mode: "index",
+            intersect: false,
             backgroundColor: surface,
             titleColor: ink,
             bodyColor: inkSoft,
             borderColor: lineStrong,
             borderWidth: 1,
+            cornerRadius: 8,
+            padding: 10,
+            boxPadding: 4,
+            titleFont: { size: 12, weight: 700 },
+            bodyFont: { size: 11 },
+            callbacks: {
+              label: (ctx) => ` ${ctx.dataset.label}: ${(ctx.parsed.y ?? 0).toFixed(1)} %`,
+            },
           },
         },
         scales: {
           x: {
             type: "linear",
             min: 0,
-            ticks: { color: inkSoft },
-            grid: { color: line },
+            ticks: {
+              color: inkSoft,
+              font: { size: 10 },
+              maxRotation: 0,
+              autoSkip: true,
+              maxTicksLimit: 6,
+            },
+            grid: { color: line, tickLength: 4 },
             border: { color: lineStrong },
-            title: { display: true, text: "Eventos acumulados", color: inkSoft },
+            title: {
+              display: true,
+              text: "Eventos acumulados",
+              color: inkSoft,
+              font: { size: 10 },
+            },
           },
           y: {
             type: "linear",
             min: 0,
             max: 100,
-            ticks: { color: inkSoft },
+            ticks: {
+              color: inkSoft,
+              font: { size: 11 },
+              callback: (v) => `${v} %`,
+              maxTicksLimit: 6,
+            },
             grid: { color: line },
             border: { color: lineStrong },
             title: {
               display: true,
               text: "Proporción observada (%)",
               color: inkSoft,
+              font: { size: 10 },
             },
           },
+        },
+        elements: {
+          point: { radius: 2, hitRadius: 16, hoverRadius: 5 },
+          line: { borderWidth: 2 },
         },
       },
     });

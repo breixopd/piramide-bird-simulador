@@ -1,0 +1,21 @@
+/*
+ * Self-hosted Inter (SIL Open Font License 1.1).
+ * Variable font covering weights 400–800; no external network request.
+ * Bundled locally so the font is identical across web and Android, offline-capable.
+ */
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/Inter-Variable.woff2") format("woff2-variations");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/Inter-Italic.woff2") format("woff2-variations");
+}

@@ -1,4 +1,4 @@
-import "./styles.css";
+import "./styles/index.css";
 import "./app";
 
 import { Haptics, ImpactStyle } from "@capacitor/haptics";

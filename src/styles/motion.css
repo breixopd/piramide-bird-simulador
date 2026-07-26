@@ -1,0 +1,353 @@
+/*
+ * Motion — supporting CSS for WAAPI-driven event rain and launch feedback,
+ * plus entrance, press, and reveal micro-interactions.
+ * Reduced-motion enforcement neutralizes all of it while keeping content visible.
+ */
+
+/* ===== Press feedback on interactive surfaces ===== */
+.primary-action,
+.modal__action,
+.batch-action,
+.secondary-action,
+.danger-action,
+.model-switch button,
+.compact-model-switch button,
+.bottom-nav__item,
+.bottom-nav__launch,
+.pyramid__level,
+.icon-button,
+.share-action,
+.challenge-entry,
+.zoom-controls button,
+.settings-link,
+.consent-options label {
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background-color 0.12s ease,
+    border-color 0.12s ease,
+    opacity 0.12s ease;
+}
+
+.primary-action:not(:disabled):hover,
+.modal__action:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow:
+    var(--shadow-accent),
+    0 4px 12px -2px rgba(225, 29, 72, 0.3);
+}
+
+.primary-action:not(:disabled):active,
+.modal__action:not(:disabled):active,
+.batch-action:not(:disabled):active,
+.secondary-action:not(:disabled):active,
+.challenge-entry:not(:disabled):active {
+  transform: scale(0.96);
+}
+
+.bottom-nav__item:active,
+.zoom-controls button:active {
+  transform: scale(0.9);
+}
+
+.pyramid__level:active path {
+  fill: color-mix(in srgb, var(--outcome-color) 78%, black 22%);
+}
+
+/* Gentle attention pulse on the primary roll action when idle. */
+.primary-action:not(:disabled):not(:hover) {
+  animation: bird-attention-pulse 3s ease-in-out infinite;
+}
+
+@keyframes bird-attention-pulse {
+  0%,
+  100% {
+    box-shadow: var(--shadow-accent);
+  }
+
+  50% {
+    box-shadow:
+      var(--shadow-accent),
+      0 0 0 6px var(--accent-soft);
+  }
+}
+
+/* ===== Launch reel ===== */
+.primary-action.is-cycling .launch-symbol {
+  animation: bird-launch-symbol-cycle 120ms ease-in-out infinite alternate;
+}
+
+@keyframes bird-launch-symbol-cycle {
+  from {
+    transform: scale(0.82) rotate(-8deg);
+  }
+
+  to {
+    transform: scale(1.12) rotate(8deg);
+  }
+}
+
+/* ===== Event rain particles (GPU-ready; WAAPI animates fall) ===== */
+.event-rain__particle {
+  top: 0;
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+.event-rain__particle .app-icon {
+  display: block;
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--outcome-color);
+}
+
+/* ===== Entrances ===== */
+.modal {
+  animation: bird-modal-in 350ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes bird-modal-in {
+  from {
+    transform: translateY(10px) scale(0.97);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Result card rises in on first appearance. */
+.result-card {
+  animation: bird-rise-in 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Summary pulses subtly when a new run lands (not a full re-entrance). */
+.result-card__summary.is-updated {
+  animation: bird-summary-pulse 600ms ease-out;
+}
+
+@keyframes bird-rise-in {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bird-summary-pulse {
+  0% {
+    background: var(--accent-softer);
+  }
+
+  100% {
+    background: var(--surface);
+  }
+}
+
+/* Scenario details stagger in behind the summary. */
+.result-card__body .sector-label,
+.result-card__body h2,
+.result-card__body > p,
+.scenario-details > div:nth-child(1),
+.scenario-details > div:nth-child(2),
+.result-card__body h3,
+.result-card ul {
+  animation: bird-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.result-card__body .sector-label {
+  animation-delay: 120ms;
+}
+.result-card__body h2 {
+  animation-delay: 200ms;
+}
+.result-card__body > p {
+  animation-delay: 280ms;
+}
+.scenario-details > div:nth-child(1) {
+  animation-delay: 360ms;
+}
+.scenario-details > div:nth-child(2) {
+  animation-delay: 440ms;
+}
+.result-card__body h3 {
+  animation-delay: 520ms;
+}
+.result-card ul {
+  animation-delay: 600ms;
+}
+
+@keyframes bird-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Distribution bars fill from the left. */
+.distribution-track span {
+  transform-origin: left center;
+  animation: bird-bar-fill 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes bird-bar-fill {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Achievement progress bar fills on entry. */
+.achievement-progress span {
+  transform-origin: left center;
+  animation: bird-bar-fill 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Pyramid SVG bands stagger in from the apex down. */
+.pyramid__level {
+  animation: bird-band-in 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: 150px 140px;
+}
+
+.pyramid__level:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.pyramid__level:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.pyramid__level:nth-child(3) {
+  animation-delay: 160ms;
+}
+
+.pyramid__level:nth-child(4) {
+  animation-delay: 240ms;
+}
+
+@keyframes bird-band-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* View transition — screens fade+rise in on tab change. */
+.view {
+  animation: bird-view-in 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes bird-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Staggered card entrances for stats/achievements/info screens. */
+.stats-overview article,
+.achievement,
+.theory-card,
+.settings-section {
+  animation: bird-card-in 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.stats-overview article:nth-child(1),
+.achievement:nth-child(1) {
+  animation-delay: 40ms;
+}
+
+.stats-overview article:nth-child(2),
+.achievement:nth-child(2) {
+  animation-delay: 100ms;
+}
+
+.stats-overview article:nth-child(3),
+.achievement:nth-child(3) {
+  animation-delay: 160ms;
+}
+
+.achievement:nth-child(4) {
+  animation-delay: 220ms;
+}
+
+.achievement:nth-child(5) {
+  animation-delay: 280ms;
+}
+
+@keyframes bird-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Switch thumb slides. */
+.toggle-setting button[role="switch"] span {
+  transition:
+    margin-left 0.15s ease,
+    background-color 0.15s ease;
+}
+
+/* Cards settle gently on hover. */
+.stats-overview article,
+.stats-section,
+.theory-card,
+.settings-section,
+.achievement,
+.result-card {
+  transition:
+    box-shadow 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+/* ===== Reduced motion ===== */
+bird-app[data-motion="reduced"] *,
+bird-app[data-motion="reduced"] *::before,
+bird-app[data-motion="reduced"] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -316,6 +316,11 @@ export class BirdApp extends LitElement {
   private onTabSelect(event: CustomEvent<AppTab>): void {
     this.activeTab = event.detail;
     void this.telemetry?.log("screen_view", { screen: event.detail });
+    // Scroll the main content to top on tab change so each screen starts fresh.
+    const main = this.querySelector<HTMLElement>(".app-main");
+    if (typeof main?.scrollTo === "function") {
+      main.scrollTo({ top: 0, behavior: "smooth" });
+    }
     requestAnimationFrame(() => this.querySelector("h1")?.focus({ preventScroll: true }));
   }
 

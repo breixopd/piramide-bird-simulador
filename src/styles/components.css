@@ -1,0 +1,394 @@
+/*
+ * Components — shared primitives: buttons, switches, model selector,
+ * notices, modals, inputs. Reused across all screens.
+ */
+
+/* ===== Botones ===== */
+.primary-action,
+.batch-action,
+.secondary-action,
+.danger-action,
+.modal__action,
+.challenge-entry,
+.share-action,
+.icon-button {
+  min-height: 2.75rem;
+  border-radius: var(--radius-lg);
+  font-family: inherit;
+  font-weight: 700;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.primary-action,
+.modal__action {
+  background: var(--accent);
+  background-image: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: var(--ink-on-accent);
+  border: 0;
+  box-shadow: var(--shadow-accent);
+}
+
+.primary-action,
+.modal__action,
+.secondary-action,
+.batch-action,
+.danger-action {
+  padding: var(--space-3) var(--space-4);
+}
+
+.primary-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.primary-action:not(:disabled):hover,
+.modal__action:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.primary-action:not(:disabled):active,
+.modal__action:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.secondary-action {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+}
+
+.batch-action {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  line-height: 1.1;
+}
+
+.batch-action strong {
+  font-size: var(--font-size-base);
+}
+
+.batch-action small {
+  display: block;
+  font-weight: 500;
+  color: var(--ink-soft);
+  font-size: var(--font-size-2xs);
+}
+
+.danger-action {
+  background: var(--surface);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.danger-action:not(:disabled):hover {
+  background: var(--danger-soft);
+}
+
+.icon-button {
+  width: 2.75rem;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+}
+
+.icon-button:hover {
+  background: var(--surface-muted);
+}
+
+.share-action {
+  width: 2.75rem;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: var(--surface-muted);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+/* ===== Selector de modelo ===== */
+.model-switch,
+.compact-model-switch {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.model-switch button,
+.compact-model-switch button {
+  flex: 1 1 auto;
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.model-switch button .app-icon,
+.compact-model-switch button .app-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.model-switch button.is-active,
+.compact-model-switch button.is-active {
+  background: var(--ink-bar);
+  color: #ffffff;
+  border-color: var(--ink-bar);
+}
+
+/* ===== Notas y avisos ===== */
+.educational-note,
+.empty-prompt,
+.empty-state,
+.learning-note,
+.chart-legend-note {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--accent-softer);
+  color: var(--ink-soft);
+  font-size: var(--font-size-sm);
+}
+
+.educational-note {
+  background: var(--warning-soft);
+  border: 1px solid var(--line);
+}
+
+.educational-note strong {
+  color: var(--ink);
+}
+
+.educational-note,
+.empty-prompt,
+.learning-note {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.educational-note .app-icon,
+.empty-prompt .app-icon,
+.learning-note .app-icon {
+  color: var(--accent);
+  flex: 0 0 auto;
+}
+
+.learning-note {
+  margin-top: var(--space-4);
+  background: var(--warning-soft);
+  border: 1px solid var(--warning);
+  color: var(--ink);
+}
+
+.learning-note p {
+  color: var(--ink);
+}
+
+.learning-note .app-icon {
+  color: var(--warning);
+}
+
+.empty-state {
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.empty-state .app-icon {
+  width: 2rem;
+  height: 2rem;
+  color: var(--ink-faint);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state h2 {
+  margin-bottom: var(--space-1);
+}
+
+.empty-state p {
+  color: var(--ink-soft);
+}
+
+.chart-legend-note {
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+}
+
+.section-heading {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.section-heading .app-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--accent);
+}
+
+.section-heading h2 {
+  margin-bottom: var(--space-1);
+}
+
+/* ===== Modal ===== */
+.modal-backdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  padding: var(--space-4);
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  background: var(--overlay);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.modal {
+  position: relative;
+  width: min(100%, 34rem);
+  max-height: calc(100dvh - 2rem);
+  padding: var(--space-5);
+  overflow-y: auto;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-float);
+}
+
+.modal > .eyebrow {
+  margin-top: var(--space-4);
+}
+
+.modal__symbol {
+  margin-bottom: var(--space-2);
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-lg);
+  background: var(--outcome-grad, var(--surface-muted));
+  color: var(--outcome-foreground, var(--ink));
+  box-shadow: var(--shadow-card);
+}
+
+.modal__close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  border-color: transparent;
+}
+
+.modal__actions {
+  margin-top: var(--space-5);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.modal__symbol .app-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* ===== Inputs ===== */
+.challenge-input {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+}
+
+.challenge-input span {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.challenge-input input,
+.select-setting select {
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  color: var(--ink);
+  font-family: inherit;
+}
+
+.challenge-input input:focus,
+.select-setting select:focus {
+  border-color: var(--accent);
+  outline: 3px solid var(--accent-soft);
+}
+
+.form-error {
+  color: var(--danger);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+/* ===== Resultado del desafío ===== */
+.challenge-result {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  border: 1px solid var(--line);
+}
+
+.challenge-result.result-excellent {
+  background: var(--success-soft);
+}
+
+.challenge-result.result-excellent .app-icon {
+  color: var(--success);
+}
+
+.challenge-result.result-close {
+  background: var(--accent-softer);
+}
+
+.challenge-result.result-close .app-icon {
+  color: var(--accent);
+}
+
+.challenge-result.result-learning {
+  background: var(--warning-soft);
+}
+
+.challenge-result.result-learning .app-icon {
+  color: var(--warning);
+}
+
+.challenge-hint {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  color: var(--ink-soft);
+  font-size: var(--font-size-sm);
+}

@@ -1,18 +1,13 @@
-import { LitElement, html, nothing } from "lit";
+import { LitElement, html, nothing, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
 import type { AppState } from "../app-controller";
 import "../components/bird-pyramid";
+import "../components/count-up";
 import "../components/event-rain";
-import { icon } from "../components/app-icon";
-import "../components/symbolic-die";
-import {
-  clampZoom,
-  classifyHorizontalSwipe,
-  distance,
-  type GesturePoint,
-} from "../domain/gestures";
-import { MODELS, type ModelId } from "../domain/models";
+import { icon, type AppIconName } from "../components/app-icon";
+import { classifyHorizontalSwipe, type GesturePoint } from "../domain/gestures";
+import { MODELS, type ModelId, type OutcomeId } from "../domain/models";
 import type { SimulationBatchSize } from "../platform/history";
 
 const sectorNames = {
@@ -26,46 +21,85 @@ const sectorNames = {
   agriculture: "Sector agrario",
 } as const;
 
+const outcomeCycle: ReadonlyArray<{ id: OutcomeId; icon: AppIconName }> = [
+  { id: "near-miss", icon: "alert" },
+  { id: "property-damage", icon: "damage" },
+  { id: "minor-injury", icon: "bandage" },
+  { id: "serious-injury", icon: "medical" },
+  { id: "fatality", icon: "fatality" },
+];
+const defaultOutcomeEntry = outcomeCycle[0]!;
+
 @customElement("home-view")
 export class HomeView extends LitElement {
   @property({ attribute: false }) state?: AppState;
 
-  @state() private pyramidZoom = 1;
+  /** True while the launch/rain animation should play. Held independently of the
+   * near-instant controller `running` flag so motion actually has time to run. */
+  @state() private isAnimating = false;
+  @state() private cycleIndex = 0;
+
+  private readonly animationDurations: Record<SimulationBatchSize, number> = {
+    1: 1400,
+    100: 1800,
+    1000: 2200,
+  };
+  private animationTimer?: ReturnType<typeof setTimeout>;
+  private cycleTimer?: ReturnType<typeof setInterval>;
+  private lastRunId?: string;
 
   private swipeStart?: GesturePoint;
-  private pinchStartDistance = 0;
-  private pinchStartZoom = 1;
-  private gestureHadPinch = false;
 
   protected createRenderRoot(): HTMLElement | DocumentFragment {
     return this;
+  }
+
+  disconnectedCallback(): void {
+    clearTimeout(this.animationTimer);
+    clearInterval(this.cycleTimer);
+    super.disconnectedCallback();
+  }
+
+  protected updated(changed: PropertyValues): void {
+    // Flash the result summary when a new run lands (not on every render).
+    const runId = this.state?.latestRun?.id;
+    if (changed.has("state") && runId && runId !== this.lastRunId) {
+      this.lastRunId = runId;
+      const summary = this.querySelector<HTMLElement>(".result-card__summary");
+      if (summary) {
+        summary.classList.remove("is-updated");
+        // Force reflow so the animation can replay.
+        void summary.offsetWidth;
+        summary.classList.add("is-updated");
+      }
+    }
   }
 
   protected render() {
     if (!this.state) return nothing;
     const model = MODELS[this.state.activeModelId];
     const latestOutcome = this.state.selectedScenario?.outcome ?? "near-miss";
+    const launchOutcome = this.isAnimating
+      ? (outcomeCycle[this.cycleIndex] ?? defaultOutcomeEntry)
+      : (outcomeCycle.find((entry) => entry.id === latestOutcome) ?? defaultOutcomeEntry);
     return html`<section class="view home-view" aria-labelledby="home-title">
       <header class="page-header page-header--home">
-        <div class="home-identity">
-          <span class="home-identity__mark">${icon("target")}</span>
-          <span>PRL / CONTROL ROOM</span>
-          <span class="home-identity__status"><i></i> MODO LOCAL</span>
-        </div>
-        <div class="home-title-row">
-          <div>
-            <p class="eyebrow">Simulador educativo</p>
-            <h1 id="home-title" tabindex="-1">Pirámide de Bird</h1>
-            <p>
-              Los incidentes pequeños también cuentan. Explora la proporción detrás de la
-              prevención.
-            </p>
+        <div class="brand-row">
+          <span class="brand-mark" aria-hidden="true">${icon("target")}</span>
+          <div class="brand-text">
+            <span>Simulador educativo</span>
           </div>
           <div class="home-ratio" aria-label="Proporción clásica de Bird">
             <span>RATIO BIRD</span>
-            <strong>600<span>:</span>30<span>:</span>10<span>:</span>1</strong>
+            <strong>600:30:10:1</strong>
           </div>
         </div>
+        <h1 id="home-title" tabindex="-1">Pirámide de Bird</h1>
+        <p class="home-tagline">Prevención en <em>proporción</em>.</p>
+        <p class="home-lede">
+          Los incidentes pequeños también cuentan. Lanza eventos y descubre cuántos cuasi-accidentes
+          hay detrás de cada suceso grave.
+        </p>
       </header>
 
       <div class="model-switch" role="group" aria-label="Modelo de simulación">
@@ -92,71 +126,45 @@ export class HomeView extends LitElement {
           : nothing
       }
 
-      <div class="simulation-stage">
-        <div class="stage-meta" aria-hidden="true">
-          <span><i></i> ${model.label}</span>
-          <span>TOCA UN NIVEL PARA EXPLORAR</span>
-        </div>
-        <div
-          class="pyramid-viewport"
-          data-gesture-surface="pyramid"
-          @touchstart=${this.onTouchStart}
-          @touchmove=${this.onTouchMove}
-          @touchend=${this.onTouchEnd}
-          @touchcancel=${this.resetTouchGesture}
-        >
-          <div class="pyramid-zoom-canvas" style=${`--pyramid-zoom:${this.pyramidZoom}`}>
-            <bird-pyramid
-              style=${`--pyramid-zoom:${this.pyramidZoom}`}
-              .model=${model}
-              .highlighted=${latestOutcome}
-            ></bird-pyramid>
+      <div class="simulation-area">
+        <div class="simulation-stage">
+          <div class="stage-meta" aria-hidden="true">
+            <span class="stage-meta__model"><i></i> ${model.label}</span>
+            <span class="stage-meta__hint">Toca un nivel para explorar</span>
           </div>
+          <div
+            class="pyramid-viewport"
+            data-gesture-surface="pyramid"
+            @touchstart=${this.onTouchStart}
+            @touchend=${this.onTouchEnd}
+            @touchcancel=${this.resetTouchGesture}
+          >
+            <bird-pyramid .model=${model} .highlighted=${latestOutcome}></bird-pyramid>
+          </div>
+          <event-rain
+            .run=${this.state.latestRun}
+            .reducedMotion=${this.state.settings.reducedMotion}
+          ></event-rain>
         </div>
-        <symbolic-die .outcome=${latestOutcome} .rolling=${this.state.running}></symbolic-die>
-        <event-rain
-          .run=${this.state.latestRun}
-          .reducedMotion=${this.state.settings.reducedMotion}
-        ></event-rain>
-      </div>
-
-      <div class="zoom-controls" role="group" aria-label="Zoom de la pirámide">
-        <button
-          type="button"
-          aria-label="Reducir pirámide"
-          ?disabled=${this.pyramidZoom <= 1}
-          @click=${() => this.changeZoom(-0.25)}
-        >
-          <span aria-hidden="true">−</span>
-        </button>
-        <button type="button" aria-label="Restablecer zoom de la pirámide" @click=${this.resetZoom}>
-          ${Math.round(this.pyramidZoom * 100)} %
-        </button>
-        <button
-          type="button"
-          aria-label="Ampliar pirámide"
-          ?disabled=${this.pyramidZoom >= 2.5}
-          @click=${() => this.changeZoom(0.25)}
-        >
-          <span aria-hidden="true">+</span>
-        </button>
       </div>
 
       <div class="simulation-controls" aria-label="Controles de simulación">
         <button
           type="button"
-          class="primary-action"
+          class="primary-action outcome-${launchOutcome.id} ${this.isAnimating ? "is-cycling" : ""}"
+          data-outcome=${launchOutcome.id}
           aria-label="Simular 1 evento"
-          ?disabled=${this.state.running}
+          ?disabled=${this.state.running || this.isAnimating}
           @click=${() => this.simulate(1)}
         >
-          ${icon("cube")}<span>Lanzar dado</span>
+          <span class="launch-symbol" aria-hidden="true">${icon(launchOutcome.icon)}</span>
+          <span>${this.isAnimating ? "Lanzando…" : "Lanzar"}</span>
         </button>
         <button
           type="button"
           class="batch-action"
           aria-label="Simular 100 eventos"
-          ?disabled=${this.state.running}
+          ?disabled=${this.state.running || this.isAnimating}
           @click=${() => this.simulate(100)}
         >
           <strong>×100</strong><small>eventos</small>
@@ -165,7 +173,7 @@ export class HomeView extends LitElement {
           type="button"
           class="batch-action"
           aria-label="Simular 1000 eventos"
-          ?disabled=${this.state.running}
+          ?disabled=${this.state.running || this.isAnimating}
           @click=${() => this.simulate(1000)}
         >
           <strong>×1000</strong><small>eventos</small>
@@ -193,8 +201,8 @@ export class HomeView extends LitElement {
   private renderResult() {
     if (!this.state?.latestRun) {
       return html`<aside class="empty-prompt">
-        ${icon("cube")}
-        <p>Lanza el dado para descubrir un caso y sus medidas preventivas.</p>
+        ${icon("target")}
+        <p>Lanza un evento para descubrir un caso y sus medidas preventivas.</p>
       </aside>`;
     }
     const scenario = this.state.selectedScenario;
@@ -203,8 +211,14 @@ export class HomeView extends LitElement {
         <span class="result-card__count">${this.state.latestRun.iterations}</span>
         <p>
           <strong
-            >${this.state.latestRun.iterations === 1 ? "evento simulado" : "eventos simulados"}</strong
-          ><br />Convergencia ${Math.round(this.state.latestRun.convergenceScore * 1000) / 10} %
+            >${this.state.latestRun.iterations === 1 ? "Evento simulado" : "Eventos simulados"}</strong
+          ><br />Convergencia
+          <count-up
+            .value=${Math.round(this.state.latestRun.convergenceScore * 1000) / 10}
+            .decimals=${1}
+            .suffix=${" %"}
+            duration=${900}
+          ></count-up>
         </p>
         <button
           type="button"
@@ -245,42 +259,14 @@ export class HomeView extends LitElement {
     this.dispatchEvent(new CustomEvent("model-select", { detail: modelId, bubbles: true }));
   }
 
-  private changeZoom(delta: number): void {
-    this.pyramidZoom = clampZoom(this.pyramidZoom + delta);
-  }
-
-  private resetZoom(): void {
-    this.pyramidZoom = 1;
-  }
-
   private onTouchStart(event: TouchEvent): void {
     if (event.touches.length === 1) {
       this.swipeStart = this.touchPoint(event.touches[0]);
-      this.gestureHadPinch = false;
-      return;
     }
-    if (event.touches.length === 2) {
-      this.beginPinch(event.touches);
-    }
-  }
-
-  private onTouchMove(event: TouchEvent): void {
-    if (event.touches.length !== 2) return;
-    if (!this.gestureHadPinch) this.beginPinch(event.touches);
-    const currentDistance = distance(
-      this.touchPoint(event.touches[0]),
-      this.touchPoint(event.touches[1]),
-    );
-    if (this.pinchStartDistance > 0) {
-      this.pyramidZoom = clampZoom(
-        this.pinchStartZoom * (currentDistance / this.pinchStartDistance),
-      );
-    }
-    if (event.cancelable) event.preventDefault();
   }
 
   private onTouchEnd(event: TouchEvent): void {
-    if (!this.gestureHadPinch && this.swipeStart && event.changedTouches.length > 0) {
+    if (this.swipeStart && event.changedTouches.length > 0) {
       const direction = classifyHorizontalSwipe(
         this.swipeStart,
         this.touchPoint(event.changedTouches[0]),
@@ -290,20 +276,11 @@ export class HomeView extends LitElement {
         this.selectModel(direction === "left" ? "didactic-extended" : "bird-classic");
       }
     }
-    if (event.touches.length === 0) this.resetTouchGesture();
-  }
-
-  private beginPinch(touches: TouchList): void {
-    this.gestureHadPinch = true;
-    this.swipeStart = undefined;
-    this.pinchStartZoom = this.pyramidZoom;
-    this.pinchStartDistance = distance(this.touchPoint(touches[0]), this.touchPoint(touches[1]));
+    this.resetTouchGesture();
   }
 
   private resetTouchGesture(): void {
     this.swipeStart = undefined;
-    this.pinchStartDistance = 0;
-    this.gestureHadPinch = false;
   }
 
   private touchPoint(touch: Touch | undefined): GesturePoint {
@@ -311,7 +288,29 @@ export class HomeView extends LitElement {
   }
 
   private simulate(iterations: SimulationBatchSize): void {
+    // Hold the animation window open long enough for the launch reel and rain to
+    // play, regardless of how fast the controller resolves the run.
+    this.startAnimationWindow(iterations);
     this.dispatchEvent(new CustomEvent("simulate", { detail: iterations, bubbles: true }));
+  }
+
+  private startAnimationWindow(iterations: SimulationBatchSize): void {
+    clearTimeout(this.animationTimer);
+    clearInterval(this.cycleTimer);
+    this.cycleIndex = 0;
+    this.isAnimating = true;
+    const duration = this.state?.settings.reducedMotion ? 0 : this.animationDurations[iterations];
+    if (duration <= 0) {
+      this.isAnimating = false;
+      return;
+    }
+    this.cycleTimer = setInterval(() => {
+      this.cycleIndex = (this.cycleIndex + 1) % outcomeCycle.length;
+    }, 120);
+    this.animationTimer = setTimeout(() => {
+      clearInterval(this.cycleTimer);
+      this.isAnimating = false;
+    }, duration);
   }
 
   private openChallenge(): void {
