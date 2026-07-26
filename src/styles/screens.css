@@ -308,7 +308,7 @@ bird-pyramid {
 /* Challenge entry. */
 .challenge-entry {
   width: 100%;
-  margin-top: var(--space-4);
+  margin: var(--space-4) 0;
   padding: var(--space-3) var(--space-4);
   display: grid;
   grid-template-columns: auto 1fr auto;
