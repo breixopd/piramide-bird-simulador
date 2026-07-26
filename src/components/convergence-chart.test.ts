@@ -2,7 +2,9 @@ import { Chart } from "chart.js";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("chart.js", () => {
-  const ChartMock = vi.fn(() => ({ destroy: vi.fn() }));
+  const ChartMock = vi.fn(function ChartMock() {
+    return { destroy: vi.fn() };
+  });
   Object.assign(ChartMock, { register: vi.fn() });
   return {
     Chart: ChartMock,
