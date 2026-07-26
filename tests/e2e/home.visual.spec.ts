@@ -67,7 +67,7 @@ test("keeps the level-detail action separated from its guidance", async ({ page 
   const actionGap = actionBox!.y - (guidanceBox!.y + guidanceBox!.height);
   expect(actionGap).toBeGreaterThanOrEqual(15);
 
-  await expect(page).toHaveScreenshot("level-detail.png");
+  await expect(dialog).toHaveScreenshot("level-detail.png");
 });
 
 test("keeps the guided question visually stable after a result", async ({ page }) => {
