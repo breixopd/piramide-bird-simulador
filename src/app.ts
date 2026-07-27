@@ -42,6 +42,7 @@ export class BirdApp extends LitElement {
   private pendingModel: ModelId | null = null;
   private selectedOutcomeId: OutcomeId | null = null;
   private modalReturnFocus?: HTMLElement;
+  private consentPromptFocused = false;
 
   protected createRenderRoot(): HTMLElement | DocumentFragment {
     return this;
@@ -59,6 +60,15 @@ export class BirdApp extends LitElement {
     }
     if (changed.has("modal") && this.modal) {
       requestAnimationFrame(() => this.querySelector<HTMLElement>(".modal")?.focus());
+    }
+    const consentPromptVisible =
+      this.controller?.state.initialized &&
+      this.controller.state.settings.analyticsConsent === "unknown";
+    if (consentPromptVisible && !this.consentPromptFocused) {
+      this.consentPromptFocused = true;
+      requestAnimationFrame(() => this.querySelector<HTMLElement>(".telemetry-consent")?.focus());
+    } else if (!consentPromptVisible) {
+      this.consentPromptFocused = false;
     }
   }
 
@@ -112,7 +122,11 @@ export class BirdApp extends LitElement {
         @tab-select=${this.onTabSelect}
         @simulate=${this.onSimulate}
       ></bottom-nav>
-      ${this.renderModal()}
+      ${
+        state.settings.analyticsConsent === "unknown"
+          ? this.renderTelemetryConsent()
+          : this.renderModal()
+      }
     </div>`;
   }
 
@@ -145,6 +159,49 @@ export class BirdApp extends LitElement {
       @keydown=${this.onModalKeyDown}
     >
       ${content}
+    </div>`;
+  }
+
+  private renderTelemetryConsent() {
+    return html`<div class="modal-backdrop" @keydown=${this.onConsentKeyDown}>
+      <section
+        class="modal telemetry-consent"
+        tabindex="-1"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="telemetry-consent-title"
+        aria-describedby="telemetry-consent-description"
+      >
+        <p class="eyebrow">Tu privacidad, tu decisión</p>
+        <h2 id="telemetry-consent-title">¿Compartir datos técnicos?</h2>
+        <p id="telemetry-consent-description">
+          Puedes permitir Firebase Analytics y Crashlytics para ayudarnos a entender el uso general
+          y corregir fallos. No se envían tus respuestas, casos consultados ni historial.
+        </p>
+        <p class="telemetry-consent__note">
+          La aplicación funciona igual si no lo permites. Podrás cambiar esta decisión en
+          Información.
+        </p>
+        <a class="settings-link" href="./privacy.html" target="_blank" rel="noreferrer">
+          Leer la política de privacidad <span aria-hidden="true">→</span>
+        </a>
+        <div class="telemetry-consent__actions">
+          <button
+            type="button"
+            class="secondary-action"
+            @click=${() => this.setInitialConsent("denied")}
+          >
+            No permitir
+          </button>
+          <button
+            type="button"
+            class="secondary-action"
+            @click=${() => this.setInitialConsent("granted")}
+          >
+            Permitir
+          </button>
+        </div>
+      </section>
     </div>`;
   }
 
@@ -393,6 +450,18 @@ export class BirdApp extends LitElement {
       this.closeModal();
       return;
     }
+    this.trapModalFocus(event);
+  }
+
+  private onConsentKeyDown(event: KeyboardEvent): void {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      return;
+    }
+    this.trapModalFocus(event);
+  }
+
+  private trapModalFocus(event: KeyboardEvent): void {
     if (event.key !== "Tab") return;
     const modal = this.querySelector<HTMLElement>(".modal");
     if (!modal) return;
@@ -468,12 +537,21 @@ export class BirdApp extends LitElement {
   private async onSettingChange(
     event: CustomEvent<Partial<Omit<SettingsState, "version">>>,
   ): Promise<void> {
-    const persisted = (await this.controller?.updateSettings(event.detail)) ?? false;
+    await this.applySettings(event.detail);
+  }
+
+  private async setInitialConsent(
+    analyticsConsent: Exclude<SettingsState["analyticsConsent"], "unknown">,
+  ): Promise<void> {
+    await this.applySettings({ analyticsConsent });
+  }
+
+  private async applySettings(patch: Partial<Omit<SettingsState, "version">>): Promise<void> {
+    const persisted = (await this.controller?.updateSettings(patch)) ?? false;
     let restartRequired = false;
-    if (event.detail.analyticsConsent && event.detail.analyticsConsent !== "unknown") {
+    if (patch.analyticsConsent && patch.analyticsConsent !== "unknown") {
       restartRequired =
-        (await this.telemetry?.applyConsent(event.detail.analyticsConsent))?.restartRequired ??
-        false;
+        (await this.telemetry?.applyConsent(patch.analyticsConsent))?.restartRequired ?? false;
     }
     this.announcement = persisted
       ? restartRequired

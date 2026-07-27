@@ -51,7 +51,7 @@ Crashlytics conserva durante **90 días** las trazas de fallos, los datos extra�
 
 ## Derechos y contacto
 
-El responsable del proyecto y del tratamiento se identifica públicamente como **breixopd**, España. La aplicación no gestiona cuentas ni una base de datos propia de personas usuarias. Los datos legales definitivos del responsable deberán confirmarse antes de distribuir la aplicación fuera del piloto técnico.
+El responsable del proyecto y del tratamiento se identifica públicamente como **breixopd**, España. La aplicación no gestiona cuentas ni una base de datos propia de personas usuarias. Los datos legales definitivos del responsable deberán confirmarse antes de la publicación general en Google Play.
 
 Para consultas no sensibles sobre esta política, cuestiones generales de privacidad o ayuda para ejercer derechos relacionados con datos enviados por la aplicación, abre una incidencia en [GitHub Issues](https://github.com/breixopd/piramide-bird-simulador/issues). No incluyas información personal, sanitaria, laboral ni cualquier otro dato confidencial en una incidencia pública.
 
@@ -61,4 +61,4 @@ Para comunicaciones confidenciales, utiliza la función de [reporte privado de v
 
 Los cambios relevantes se publicarán en este documento y, cuando sea necesario, se comunicarán en la aplicación antes de solicitar un nuevo consentimiento.
 
-**Última actualización:** 10 de julio de 2026.
+**Última actualización:** 27 de julio de 2026.

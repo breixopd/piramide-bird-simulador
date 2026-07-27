@@ -23,6 +23,11 @@ test.beforeEach(async ({ page }) => {
   });
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Pirámide de Bird" })).toBeVisible();
+  const consentDialog = page.getByRole("dialog", { name: "¿Compartir datos técnicos?" });
+  if (await consentDialog.isVisible()) {
+    await consentDialog.getByRole("button", { name: "No permitir" }).click();
+    await expect(consentDialog).toBeHidden();
+  }
 });
 
 test.afterEach(async ({ page }) => {
@@ -41,6 +46,21 @@ test("keeps the responsive home composition visually stable", async ({ page }) =
   }
 
   await expect(page).toHaveScreenshot("home.png");
+});
+
+test("asks for optional telemetry consent on first launch", async ({ page }) => {
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+
+  const dialog = page.getByRole("dialog", { name: "¿Compartir datos técnicos?" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("La aplicación funciona igual si no lo permites");
+  await expect(dialog.getByRole("button", { name: "No permitir" })).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Permitir" })).toBeVisible();
+  await expect(
+    dialog.getByRole("link", { name: "Leer la política de privacidad" }),
+  ).toHaveAttribute("href", "./privacy.html");
+  await expect(dialog).toHaveScreenshot("telemetry-consent.png");
 });
 
 test("places the statistical challenge in Statistics", async ({ page }) => {

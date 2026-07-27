@@ -314,6 +314,36 @@
   height: 1.5rem;
 }
 
+.telemetry-consent > .eyebrow {
+  margin-top: 0;
+}
+
+.telemetry-consent__note {
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--ink-soft);
+  background: var(--surface-muted);
+  font-size: var(--font-size-sm);
+}
+
+.telemetry-consent__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.telemetry-consent__actions .secondary-action {
+  width: 100%;
+}
+
+@media (max-width: 22rem) {
+  .telemetry-consent__actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ===== Inputs ===== */
 .challenge-input {
   display: grid;

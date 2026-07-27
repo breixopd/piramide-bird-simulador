@@ -20,7 +20,7 @@ import type {
 import { DEFAULT_SETTINGS } from "./platform/settings";
 import { emptyModelTotals } from "./platform/totals-storage";
 
-function createController() {
+function createController(analyticsConsent: "unknown" | "granted" | "denied" = "denied") {
   let history: SimulationRunSummary[] = [];
   let snapshot: SimulationSnapshot = {
     totals: emptyModelTotals(),
@@ -49,7 +49,7 @@ function createController() {
 
   return new AppController({
     history: repository,
-    loadSettings: async () => ({ ...DEFAULT_SETTINGS }),
+    loadSettings: async () => ({ ...DEFAULT_SETTINGS, analyticsConsent }),
     saveSettings: async () => undefined,
     createId: () => "run-1",
     now: () => new Date("2026-07-10T10:30:00.000Z"),
@@ -86,6 +86,38 @@ describe("bird-app", () => {
     await app.updateComplete;
 
     expect(getByRole(app, "heading", { name: "Pirámide de Bird" })).toBeTruthy();
+  });
+
+  it("asks for telemetry consent on first launch before enabling Firebase", async () => {
+    const controller = createController("unknown");
+    await controller.initialize();
+    const app = document.createElement("bird-app") as BirdApp;
+    const applyConsent = vi.fn(async () => ({ restartRequired: true }));
+    app.controller = controller;
+    app.telemetry = {
+      applyConsent,
+      log: async () => undefined,
+      recordError: async () => undefined,
+    };
+    document.body.append(app);
+    await app.updateComplete;
+
+    const dialog = getByRole(app, "dialog", { name: "¿Compartir datos técnicos?" });
+    expect(dialog.textContent).toContain("La aplicación funciona igual si no lo permites");
+    expect(getByRole(dialog, "button", { name: "No permitir" })).toBeTruthy();
+    expect(getByRole(dialog, "button", { name: "Permitir" })).toBeTruthy();
+    expect(applyConsent).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(dialog, { key: "Escape" });
+    await app.updateComplete;
+    expect(getByRole(app, "dialog", { name: "¿Compartir datos técnicos?" })).toBeTruthy();
+
+    fireEvent.click(getByRole(dialog, "button", { name: "Permitir" }));
+    await vi.waitFor(() => expect(controller.state.settings.analyticsConsent).toBe("granted"));
+    await vi.waitFor(() => expect(applyConsent).toHaveBeenCalledWith("granted"));
+    await app.updateComplete;
+
+    expect(queryByRole(app, "dialog", { name: "¿Compartir datos técnicos?" })).toBeNull();
   });
 
   it("renders the classic model and navigates with labelled bottom tabs", async () => {
