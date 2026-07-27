@@ -4,7 +4,19 @@ import wc from "eslint-plugin-wc";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", "coverage", "android", "node_modules"] },
+  {
+    ignores: [
+      ".gradle-home",
+      ".pages-dist",
+      ".vscode",
+      "playwright-report",
+      "test-results",
+      "dist",
+      "coverage",
+      "android",
+      "node_modules",
+    ],
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {

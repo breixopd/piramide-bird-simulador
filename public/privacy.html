@@ -92,6 +92,23 @@
         font-size: clamp(1.05rem, 3vw, 1.25rem);
       }
 
+      .quick-facts {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin: 1.5rem 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .quick-facts li {
+        padding: 0.85rem 1rem;
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        background: var(--surface);
+        font-weight: 700;
+      }
+
       .notice {
         margin-block: 1.5rem 2.5rem;
         padding: 1.1rem 1.25rem;
@@ -154,6 +171,12 @@
           --accent-soft: #342321;
         }
       }
+
+      @media (max-width: 34rem) {
+        .quick-facts {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
   <body>
@@ -161,17 +184,21 @@
       <p class="eyebrow">Privacidad · Información clara</p>
       <h1>Política de privacidad</h1>
       <p class="summary">
-        Pirámide de Bird Simulador funciona sin cuenta y conserva el núcleo de tus datos en el
-        dispositivo. Firebase solo se activa con tu permiso.
+        Pirámide de Bird funciona sin cuenta. Tus simulaciones y tu progreso permanecen en el
+        dispositivo; Firebase solo se activa si tú lo permites.
       </p>
+      <ul class="quick-facts" aria-label="Resumen de privacidad">
+        <li>Sin registro ni cuenta</li>
+        <li>Progreso guardado localmente</li>
+        <li>Analítica opcional</li>
+        <li>Permiso revocable</li>
+      </ul>
     </header>
 
     <main>
       <p class="notice">
-        Esta política corresponde a
-        <a href="https://github.com/breixopd/piramide-bird-simulador">Pirámide de Bird Simulador</a
-        >, una aplicación educativa de prevención de riesgos laborales mantenida por
-        <a href="https://github.com/breixopd">breixopd</a>.
+        Esta política corresponde a Pirámide de Bird Simulador, una herramienta educativa de
+        prevención laboral mantenida por <strong>Breixo Paz</strong>, España.
       </p>
 
       <article>
@@ -215,6 +242,7 @@
           <ul>
             <li>identificador de instancia, de instalación de Firebase o de Crashlytics;</li>
             <li>modelo del dispositivo, sistema operativo y versión de la aplicación;</li>
+            <li>ubicación aproximada derivada por Google de una dirección IP enmascarada;</li>
             <li>estado de la aplicación, trazas de fallos y metadatos de diagnóstico.</li>
           </ul>
           <p>
@@ -227,7 +255,8 @@
           <p>
             La aplicación no envía a Firebase el historial de simulaciones, los textos de
             escenarios, la estimación numérica del desafío, identificadores personalizados ni datos
-            personales introducidos por la persona usuaria.
+            personales introducidos por la persona usuaria. Tampoco solicita el permiso
+            <code>AD_ID</code> ni utiliza el identificador publicitario de Android.
           </p>
         </section>
 
@@ -253,8 +282,10 @@
           </p>
           <p>
             Con consentimiento, la telemetría permite conocer el uso general, mejorar la experiencia
-            y corregir fallos. La retención de datos de usuario y eventos de Analytics se
-            configurará en <strong>2 meses</strong>. Consulta la
+            y corregir fallos. Google Analytics puede conservar datos de usuario y eventos durante
+            un máximo de <strong>14 meses</strong> en una propiedad estándar; el proyecto utilizará
+            el plazo mínimo disponible de <strong>2 meses</strong> antes de la publicación general.
+            Consulta la
             <a href="https://support.google.com/analytics/answer/7667196?hl=es"
               >información de Google sobre retención de Analytics</a
             >.
@@ -271,14 +302,13 @@
         <section>
           <h2>Derechos y contacto</h2>
           <p>
-            El responsable del proyecto y del tratamiento se identifica públicamente como
-            <strong>breixopd</strong>, España. La aplicación no gestiona cuentas ni una base de
-            datos propia de personas usuarias. Los datos legales definitivos del responsable deberán
-            confirmarse antes de la publicación general en Google Play.
+            El responsable del proyecto y del tratamiento es <strong>Breixo Paz</strong>, España. La
+            aplicación no gestiona cuentas ni una base de datos propia de personas usuarias.
           </p>
           <p>
-            Para consultas no sensibles, privacidad o ayuda para ejercer derechos, abre una
-            incidencia en
+            Para consultas sobre privacidad o para ejercer tus derechos, utiliza el correo de
+            contacto que aparece en la ficha de la aplicación en Google Play. Para errores generales
+            que no contengan información personal puedes abrir una incidencia en
             <a href="https://github.com/breixopd/piramide-bird-simulador/issues">GitHub Issues</a>.
             No incluyas información personal, sanitaria, laboral ni confidencial en una incidencia
             pública.

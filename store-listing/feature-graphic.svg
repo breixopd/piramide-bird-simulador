@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07111d"/>
+      <stop offset="1" stop-color="#111d2b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#e11d48" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#e11d48" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="500" fill="url(#background)"/>
+  <circle cx="238" cy="246" r="240" fill="url(#glow)"/>
+  <g transform="translate(95 82)">
+    <path d="M170 0 218 78H122L170 0Z" fill="#e11d48"/>
+    <path d="M115 90H225L267 158H73L115 90Z" fill="#ea580c"/>
+    <path d="M67 170H273L318 243H22L67 170Z" fill="#15803d"/>
+    <path d="M16 255H324L375 338H-35L16 255Z" fill="#0284c7"/>
+  </g>
+  <g fill="#f8fafc" font-family="Noto Sans, Arial, sans-serif">
+    <text x="500" y="202" font-size="62" font-weight="800" letter-spacing="-2">
+      Pirámide de Bird
+    </text>
+    <text x="503" y="257" fill="#cbd5e1" font-size="25" font-weight="500">
+      Comprende los incidentes.
+    </text>
+    <text x="503" y="294" fill="#cbd5e1" font-size="25" font-weight="500">
+      Practica la prevención.
+    </text>
+    <g transform="translate(503 342)" font-size="18" font-weight="700">
+      <rect width="150" height="42" rx="21" fill="#e11d48"/>
+      <text x="75" y="27" text-anchor="middle">Simula</text>
+      <rect x="162" width="150" height="42" rx="21" fill="#ffffff" fill-opacity=".1"/>
+      <text x="237" y="27" text-anchor="middle">Explora</text>
+      <rect x="324" width="150" height="42" rx="21" fill="#ffffff" fill-opacity=".1"/>
+      <text x="399" y="27" text-anchor="middle">Aprende</text>
+    </g>
+  </g>
+</svg>

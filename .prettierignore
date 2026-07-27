@@ -2,6 +2,9 @@ node_modules/
 dist/
 coverage/
 android/
+.gradle-home/
+.pages-dist/
+.vscode/
 playwright-report/
 test-results/
 # Local-only working artifacts, never committed (see .git/info/exclude).

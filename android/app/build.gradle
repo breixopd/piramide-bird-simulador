@@ -9,6 +9,22 @@ def keystoreProperties = new Properties()
 if (keystorePropertiesFile.exists()) {
     keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
 }
+def releaseTaskRequested = gradle.startParameter.taskNames.any {
+    it.toLowerCase().contains('release')
+}
+def requiredSigningProperties = ['storeFile', 'storePassword', 'keyAlias', 'keyPassword']
+def missingSigningProperties = requiredSigningProperties.findAll {
+    !keystoreProperties.getProperty(it)?.trim()
+}
+if (releaseTaskRequested && (!keystorePropertiesFile.exists() || !missingSigningProperties.isEmpty())) {
+    throw new GradleException(
+        "A release build requires a complete external signing properties file. " +
+        "Set KEYSTORE_PROPERTIES_FILE or create ${keystorePropertiesFile}."
+    )
+}
+if (!keystoreProperties.isEmpty() && !file(keystoreProperties['storeFile']).isFile()) {
+    throw new GradleException('The configured Android upload keystore does not exist.')
+}
 
 android {
     namespace = "com.breixopd.piramidebird"

@@ -56,7 +56,7 @@ test("asks for optional telemetry consent on first launch", async ({ page }) => 
   await expect(dialog).toBeVisible();
   await expect(dialog).toContainText("La aplicación funciona igual si no lo permites");
   await expect(dialog.getByRole("button", { name: "No permitir" })).toBeVisible();
-  await expect(dialog.getByRole("button", { name: "Permitir" })).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Permitir", exact: true })).toBeVisible();
   await expect(
     dialog.getByRole("link", { name: "Leer la política de privacidad" }),
   ).toHaveAttribute("href", "./privacy.html");
