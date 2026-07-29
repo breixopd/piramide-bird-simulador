@@ -89,6 +89,7 @@ bottom-nav {
 
 .bottom-nav {
   position: absolute;
+  z-index: 10;
   left: var(--nav-margin);
   right: var(--nav-margin);
   bottom: calc(var(--nav-bottom-margin) + var(--nav-inset));

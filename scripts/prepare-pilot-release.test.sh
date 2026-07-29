@@ -21,8 +21,8 @@ apksigner() {
 apkanalyzer() {
   case "$2" in
     application-id) printf '%s\n' 'com.breixopd.piramidebird' ;;
-    version-name) printf '%s\n' '1.0.0' ;;
-    version-code) printf '%s\n' '1000007' ;;
+    version-name) printf '%s\n' '1.0.1' ;;
+    version-code) printf '%s\n' '1000100' ;;
     *) return 64 ;;
   esac
 }
@@ -63,7 +63,7 @@ if [[ "$output" != *'versionCode inesperado'* ]]; then
 fi
 
 EXPECTED_SIGNER_SHA256='aa:bb:cc:dd' \
-  EXPECTED_VERSION_CODE='1000007' \
+  EXPECTED_VERSION_CODE='1000100' \
   "$release_script" "$apk_path" piramide-bird-correct-version.apk >/dev/null
 
 if [[ ! -f "$fixture_dir/piramide-bird-correct-version.apk.sha256" ]]; then
@@ -75,7 +75,7 @@ set +e
 debug_output=$(
   FAKE_SIGNER_DN='C=US, O=Android, CN=Android Debug' \
     EXPECTED_SIGNER_SHA256='aa:bb:cc:dd' \
-    EXPECTED_VERSION_CODE='1000007' \
+    EXPECTED_VERSION_CODE='1000100' \
     "$release_script" "$apk_path" piramide-bird-debug-rejected.apk 2>&1
 )
 debug_status=$?
@@ -88,7 +88,7 @@ fi
 
 FAKE_SIGNER_DN='C=US, O=Android, CN=Android Debug' \
   ALLOW_DEBUG_SIGNER='1' \
-  EXPECTED_VERSION_CODE='1000007' \
+  EXPECTED_VERSION_CODE='1000100' \
   "$release_script" "$apk_path" piramide-bird-debug-device-test.apk >/dev/null
 
 if [[ ! -f "$fixture_dir/piramide-bird-debug-device-test.apk.sha256" ]]; then

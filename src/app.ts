@@ -172,17 +172,21 @@ export class BirdApp extends LitElement {
         aria-labelledby="telemetry-consent-title"
         aria-describedby="telemetry-consent-description"
       >
-        <p class="eyebrow">Tu privacidad, tu decisión</p>
-        <h2 id="telemetry-consent-title">¿Compartir datos técnicos?</h2>
-        <p id="telemetry-consent-description">
-          Puedes permitir Firebase Analytics y Crashlytics para ayudarnos a entender el uso general
-          y corregir fallos. No se envían tus respuestas, casos consultados ni historial.
-        </p>
-        <p class="telemetry-consent__note">
-          La aplicación funciona igual si no lo permites. Podrás cambiar esta decisión en
-          Información.
-        </p>
-        <a class="settings-link" href="./privacy.html" target="_blank" rel="noreferrer">
+        <header class="telemetry-consent__header">
+          <p class="eyebrow">Tu privacidad, tu decisión</p>
+          <h2 id="telemetry-consent-title">¿Compartir datos técnicos?</h2>
+        </header>
+        <div class="telemetry-consent__copy">
+          <p id="telemetry-consent-description">
+            Puedes permitir Firebase Analytics y Crashlytics para ayudarnos a entender el uso
+            general y corregir fallos. No se envían tus respuestas, casos consultados ni historial.
+          </p>
+          <p class="telemetry-consent__note">
+            La aplicación funciona igual si no lo permites. Podrás cambiar esta decisión en
+            Información.
+          </p>
+        </div>
+        <a class="settings-link" href="./privacy.html">
           Leer la política de privacidad <span aria-hidden="true">→</span>
         </a>
         <div class="telemetry-consent__actions">

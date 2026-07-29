@@ -6,9 +6,10 @@ import "../components/bird-pyramid";
 import "../components/count-up";
 import "../components/event-rain";
 import { icon, type AppIconName } from "../components/app-icon";
+import { selectScenarioQuestion, type Scenario, type ScenarioQuestion } from "../data/scenarios";
 import { classifyHorizontalSwipe, type GesturePoint } from "../domain/gestures";
 import { MODELS, type ModelId, type OutcomeId } from "../domain/models";
-import type { SimulationBatchSize } from "../platform/history";
+import type { SimulationBatchSize, SimulationRunSummary } from "../platform/history";
 
 const sectorNames = {
   construction: "Construcción",
@@ -29,7 +30,6 @@ const outcomeCycle: ReadonlyArray<{ id: OutcomeId; icon: AppIconName }> = [
   { id: "fatality", icon: "fatality" },
 ];
 const defaultOutcomeEntry = outcomeCycle[0]!;
-type LearningChoice = "hazard" | "cause" | "action";
 
 @customElement("home-view")
 export class HomeView extends LitElement {
@@ -39,12 +39,13 @@ export class HomeView extends LitElement {
    * near-instant controller `running` flag so motion actually has time to run. */
   @state() private isAnimating = false;
   @state() private cycleIndex = 0;
-  @state() private learningAnswer?: { runId: string; choice: LearningChoice };
+  @state() private learningAnswer?: { runId: string; optionId: string };
+  @state() private expandedBatchRunId?: string;
 
   private readonly animationDurations: Record<SimulationBatchSize, number> = {
     1: 1400,
-    100: 1800,
-    1000: 2200,
+    100: 1200,
+    1000: 1500,
   };
   private animationTimer?: ReturnType<typeof setTimeout>;
   private cycleTimer?: ReturnType<typeof setInterval>;
@@ -148,6 +149,7 @@ export class HomeView extends LitElement {
               <event-rain
                 .run=${this.state.latestRun}
                 .reducedMotion=${this.state.settings.reducedMotion}
+                .active=${this.isAnimating}
               ></event-rain>
             </div>
           </div>
@@ -198,20 +200,16 @@ export class HomeView extends LitElement {
         <p>Lanza un evento para descubrir un caso y sus medidas preventivas.</p>
       </aside>`;
     }
-    const scenario = this.state.selectedScenario;
-    const answer =
-      this.learningAnswer?.runId === this.state.latestRun.id
-        ? this.learningAnswer.choice
-        : undefined;
+    const run = this.state.latestRun;
+    if (run.iterations > 1) return this.renderBatchResult(run, this.state.selectedScenario);
+
     return html`<section class="result-card" aria-labelledby="case-title">
       <div class="result-card__summary">
-        <span class="result-card__count">${this.state.latestRun.iterations}</span>
+        <span class="result-card__count">${run.iterations}</span>
         <p>
-          <strong
-            >${this.state.latestRun.iterations === 1 ? "Evento simulado" : "Eventos simulados"}</strong
-          ><br />Convergencia
+          <strong>Evento simulado</strong><br />Convergencia
           <count-up
-            .value=${Math.round(this.state.latestRun.convergenceScore * 1000) / 10}
+            .value=${Math.round(run.convergenceScore * 1000) / 10}
             .decimals=${1}
             .suffix=${" %"}
             duration=${900}
@@ -227,92 +225,251 @@ export class HomeView extends LitElement {
         </button>
       </div>
       ${
-        scenario
-          ? html`<div class="result-card__body">
-              <p class="sector-label">${sectorNames[scenario.sector]}</p>
-              <h2 id="case-title">Caso preventivo</h2>
-              <p>${scenario.narrative}</p>
-              <fieldset class="learning-check">
-                <legend>¿Cuál es el peligro principal?</legend>
-                <p>Elige la fuente o situación con potencial de causar daño.</p>
-                <div class="learning-check__options">
-                  ${[
-                    { choice: "cause" as const, label: scenario.immediateCause },
-                    { choice: "action" as const, label: scenario.preventiveActions[0] },
-                    { choice: "hazard" as const, label: scenario.hazard },
-                  ].map(
-                    ({ choice, label }) =>
-                      html`<button
-                        type="button"
-                        class=${answer === choice ? "is-selected" : ""}
-                        ?disabled=${Boolean(answer)}
-                        @click=${() => this.answerLearningCheck(choice)}
-                      >
-                        ${answer && choice === "hazard" ? icon("check") : nothing}
-                        <span>${label}</span>
-                      </button>`,
-                  )}
-                </div>
-              </fieldset>
-              ${
-                answer
-                  ? html`<p
-                        class="learning-feedback ${
-                          answer === "hazard" ? "is-correct" : "is-learning"
-                        }"
-                        role="status"
-                        aria-live="polite"
-                      >
-                        ${icon(answer === "hazard" ? "check" : "info")}
-                        <span
-                          >${
-                            answer === "hazard"
-                              ? "Correcto: has identificado el peligro."
-                              : "Sigue aprendiendo: el peligro es la fuente o situación con potencial de causar daño."
-                          }</span
-                        >
-                      </p>
-                      <div class="learning-reveal">
-                        <dl class="scenario-details">
-                          <div>
-                            <dt>Peligro</dt>
-                            <dd>${scenario.hazard}</dd>
-                          </div>
-                          <div>
-                            <dt>Causa inmediata</dt>
-                            <dd>${scenario.immediateCause}</dd>
-                          </div>
-                        </dl>
-                        <h3>Qué habría que hacer</h3>
-                        <ul>
-                          ${scenario.preventiveActions.map(
-                            (action) => html`<li>${icon("check")}<span>${action}</span></li>`,
-                          )}
-                        </ul>
-                      </div>`
-                  : nothing
-              }
-            </div>`
+        this.state.selectedScenario
+          ? this.renderScenarioCase(this.state.selectedScenario, run, "Caso preventivo")
           : nothing
       }
     </section>`;
+  }
+
+  private renderBatchResult(run: SimulationRunSummary, scenario: Scenario | null) {
+    const model = MODELS[run.modelId];
+    const weightTotal = model.outcomes.reduce((total, outcome) => total + outcome.weight, 0);
+    const rows = model.outcomes.map((outcome) => {
+      const observed = run.counts[outcome.id] ?? 0;
+      const expected = (outcome.weight / weightTotal) * run.iterations;
+      const observedPercent = (observed / run.iterations) * 100;
+      const expectedPercent = (outcome.weight / weightTotal) * 100;
+      return { outcome, observed, expected, delta: observedPercent - expectedPercent };
+    });
+    const notable = rows.reduce((current, candidate) =>
+      Math.abs(candidate.delta) > Math.abs(current.delta) ? candidate : current,
+    );
+    const batchScore = run.batchConvergenceScore ?? run.convergenceScore;
+    const isReport = run.iterations === 1000;
+    const caseExpanded = this.expandedBatchRunId === run.id;
+    const decimal = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 1 });
+
+    const learningInvite = scenario
+      ? html`<section class="batch-learning-invite">
+          <span class="batch-learning-invite__icon" aria-hidden="true">${icon("target")}</span>
+          <div>
+            <p class="eyebrow">Pregunta opcional · 1 minuto</p>
+            <h3>Pon a prueba tu mirada preventiva</h3>
+            <p>Analiza un caso breve de esta tanda y elige una sola respuesta.</p>
+          </div>
+          <button
+            type="button"
+            class="secondary-action batch-case-toggle"
+            aria-expanded=${caseExpanded ? "true" : "false"}
+            @click=${() => this.toggleBatchCase(run.id)}
+          >
+            ${icon(caseExpanded ? "close" : "play")}
+            ${caseExpanded ? "Ocultar pregunta" : "Responder pregunta"}
+          </button>
+        </section>`
+      : nothing;
+
+    return html`<section
+      class="result-card batch-result ${isReport ? "batch-result--report" : "batch-result--shift"}"
+      aria-label="${run.iterations} eventos"
+    >
+      <header class="batch-result__header">
+        <div>
+          <p class="eyebrow">${isReport ? "Informe de convergencia" : "Turno de 100 eventos"}</p>
+          <h2 id="batch-result-title">
+            ${isReport ? "1.000 eventos analizados" : "Así se repartió el turno"}
+          </h2>
+          <p>
+            ${
+              isReport
+                ? "Compara una muestra amplia con la proporción teórica del modelo."
+                : "Una lectura práctica de lo ocurrido en esta tanda, sin predecir el siguiente evento."
+            }
+          </p>
+        </div>
+        <button
+          type="button"
+          class="share-action"
+          aria-label="Compartir tarjeta de resultado"
+          @click=${this.shareResult}
+        >
+          ${icon("share")}
+        </button>
+      </header>
+
+      ${
+        isReport
+          ? html`<section class="batch-report-score" aria-label="Convergencia de la simulación">
+              <span class="batch-report-score__number">${(batchScore * 100).toFixed(1)} %</span>
+              <div>
+                <strong>Ajuste de esta muestra</strong>
+                <p>100 % sería una coincidencia exacta con la proporción teórica.</p>
+              </div>
+              <dl>
+                <div>
+                  <dt>Muestra</dt>
+                  <dd>1.000</dd>
+                </div>
+                <div>
+                  <dt>Histórico</dt>
+                  <dd>${(run.convergenceScore * 100).toFixed(1)} %</dd>
+                </div>
+              </dl>
+            </section>`
+          : html`<section class="batch-shift-reading" aria-label="Lectura práctica del turno">
+              <span class="batch-shift-reading__number"
+                >${(run.counts["near-miss"] ?? 0).toLocaleString("es-ES")}</span
+              >
+              <div>
+                <strong>cuasi accidentes en este turno</strong>
+                <p>
+                  Son avisos sin lesión que permiten revisar barreras antes de que el daño ocurra.
+                </p>
+              </div>
+            </section>`
+      }
+
+      <div class="batch-distribution">
+        <div class="batch-distribution__heading">
+          <h3>Distribución observada</h3>
+          <span>Real · esperado</span>
+        </div>
+        <ul>
+          ${rows.map(
+            ({ outcome, observed, expected, delta }) =>
+              html`<li>
+                <i class="batch-distribution__dot outcome-${outcome.id}" aria-hidden="true"></i>
+                <span>
+                  <strong>${outcome.label}</strong>
+                  <small
+                    >${observed.toLocaleString("es-ES")} · ${decimal.format(expected)}
+                    esperados</small
+                  >
+                </span>
+                <em class=${Math.abs(delta) < 0.05 ? "is-neutral" : ""}
+                  >${delta > 0 ? "+" : ""}${delta.toFixed(1)} pp</em
+                >
+              </li>`,
+          )}
+        </ul>
+      </div>
+
+      ${!isReport ? learningInvite : nothing}
+
+      <p class="batch-insight">
+        ${icon("info")}
+        <span>
+          ${
+            isReport
+              ? html`La mayor diferencia aparece en <strong>${notable.outcome.label}</strong>:
+                  ${Math.abs(notable.delta).toFixed(1)} puntos porcentuales
+                  ${notable.delta >= 0 ? "por encima" : "por debajo"} de la proporción teórica.`
+              : html`En tandas de 100 es normal ver variación. Aquí
+                  <strong>${notable.outcome.label}</strong> se separó
+                  ${Math.abs(notable.delta).toFixed(1)} puntos de lo esperado.`
+          }
+        </span>
+      </p>
+
+      ${isReport ? learningInvite : nothing}
+      ${
+        caseExpanded && scenario
+          ? this.renderScenarioCase(scenario, run, "Caso para reflexionar")
+          : nothing
+      }
+    </section>`;
+  }
+
+  private renderScenarioCase(scenario: Scenario, run: SimulationRunSummary, title: string) {
+    const question = selectScenarioQuestion(scenario, run.id);
+    const answer =
+      this.learningAnswer?.runId === run.id
+        ? question.options.find(({ id }) => id === this.learningAnswer?.optionId)
+        : undefined;
+    return html`<div class="result-card__body">
+      <p class="sector-label">${sectorNames[scenario.sector]}</p>
+      <h2 id="case-title">${title}</h2>
+      <p>${scenario.narrative}</p>
+      <fieldset class="learning-check">
+        <legend>${question.prompt}</legend>
+        <p>${question.instruction}</p>
+        <div class="learning-check__options">
+          ${question.options.map(
+            (option) =>
+              html`<button
+                type="button"
+                class=${answer?.id === option.id ? "is-selected" : ""}
+                data-correct=${option.correct ? "true" : "false"}
+                ?disabled=${Boolean(answer)}
+                @click=${() => this.answerLearningCheck(question, option.id)}
+              >
+                ${answer && option.correct ? icon("check") : nothing}
+                <span>${option.label}</span>
+              </button>`,
+          )}
+        </div>
+      </fieldset>
+      ${
+        answer
+          ? html`<p
+                class="learning-feedback ${answer.correct ? "is-correct" : "is-learning"}"
+                role="status"
+                aria-live="polite"
+              >
+                ${icon(answer.correct ? "check" : "info")}
+                <span
+                  >${
+                    answer.correct
+                      ? question.correctFeedback
+                      : `Sigue aprendiendo: ${question.incorrectFeedback}`
+                  }</span
+                >
+              </p>
+              <div class="learning-reveal">
+                <dl class="scenario-details">
+                  <div>
+                    <dt>Peligro</dt>
+                    <dd>${scenario.hazard}</dd>
+                  </div>
+                  <div>
+                    <dt>Causa inmediata</dt>
+                    <dd>${scenario.immediateCause}</dd>
+                  </div>
+                </dl>
+                <h3>Qué habría que hacer</h3>
+                <ul>
+                  ${scenario.preventiveActions.map(
+                    (action) => html`<li>${icon("check")}<span>${action}</span></li>`,
+                  )}
+                </ul>
+              </div>`
+          : nothing
+      }
+    </div>`;
   }
 
   private selectModel(modelId: ModelId): void {
     this.dispatchEvent(new CustomEvent("model-select", { detail: modelId, bubbles: true }));
   }
 
-  private answerLearningCheck(choice: LearningChoice): void {
+  private answerLearningCheck(question: ScenarioQuestion, optionId: string): void {
     const runId = this.state?.latestRun?.id;
     const scenarioId = this.state?.selectedScenario?.id;
     if (!runId || !scenarioId || this.learningAnswer?.runId === runId) return;
-    this.learningAnswer = { runId, choice };
+    const option = question.options.find(({ id }) => id === optionId);
+    if (!option) return;
+    this.learningAnswer = { runId, optionId };
     this.dispatchEvent(
       new CustomEvent("learning-answer", {
-        detail: { runId, scenarioId, correct: choice === "hazard" },
+        detail: { runId, scenarioId, correct: option.correct },
         bubbles: true,
       }),
     );
+  }
+
+  private toggleBatchCase(runId: string): void {
+    this.expandedBatchRunId = this.expandedBatchRunId === runId ? undefined : runId;
   }
 
   private onTouchStart(event: TouchEvent): void {

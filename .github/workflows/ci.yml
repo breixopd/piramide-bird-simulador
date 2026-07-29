@@ -99,7 +99,10 @@ jobs:
         run: npm test
 
       - name: Test release tooling
-        run: bash scripts/prepare-pilot-release.test.sh
+        run: |
+          bash scripts/prepare-pilot-release.test.sh
+          npm run play:test
+          npm run play:check
 
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high

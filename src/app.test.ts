@@ -288,30 +288,68 @@ describe("bird-app", () => {
     vi.useRealTimers();
   });
 
-  it("asks the learner to identify the hazard before revealing preventive actions", async () => {
+  it("asks one question from the scenario bank before revealing preventive actions", async () => {
     const app = await renderApp();
 
-    fireEvent.click(getByRole(app, "button", { name: "Simular 100 eventos" }));
+    fireEvent.click(getByRole(app, "button", { name: "Simular 1 evento" }));
 
-    await vi.waitFor(() => expect(app.controller?.state.latestRun?.iterations).toBe(100));
+    await vi.waitFor(() => expect(app.controller?.state.latestRun?.iterations).toBe(1));
     await app.updateComplete;
 
     const status = getByRole(app, "status");
-    expect(status.textContent).toContain("100 eventos simulados");
+    expect(status.textContent).toContain("1 evento simulado");
     expect(getByRole(app, "heading", { name: "Caso preventivo" })).toBeTruthy();
-    expect(getByRole(app, "group", { name: "¿Cuál es el peligro principal?" })).toBeTruthy();
+    expect(app.querySelectorAll(".learning-check")).toHaveLength(1);
+    expect(app.querySelectorAll(".learning-check__options button")).toHaveLength(3);
     expect(queryByText(app, "Qué habría que hacer")).toBeNull();
 
-    const hazard = app.controller?.state.selectedScenario?.hazard;
-    if (!hazard) throw new Error("Expected a preventive scenario hazard");
-    fireEvent.click(getByRole(app, "button", { name: hazard }));
+    const correctOption = app.querySelector<HTMLButtonElement>(
+      '.learning-check__options button[data-correct="true"]',
+    );
+    if (!correctOption) throw new Error("Expected one correct scenario answer");
+    fireEvent.click(correctOption);
     await vi.waitFor(() => expect(app.controller?.state.progress.questionsAnswered).toBe(1));
     await app.updateComplete;
 
-    expect(getByText(app, "Correcto: has identificado el peligro.")).toBeTruthy();
+    expect(app.querySelector(".learning-feedback.is-correct")).toBeTruthy();
     expect(getByText(app, "Qué habría que hacer")).toBeTruthy();
     expect(app.controller?.state.progress.correctAnswers).toBe(1);
     expect(app.controller?.state.progress.unlocked).toContain("hazard-spotter");
+  });
+
+  it("summarizes batch runs before offering one optional scenario question", async () => {
+    const app = await renderApp();
+
+    fireEvent.click(getByRole(app, "button", { name: "Simular 100 eventos" }));
+    await vi.waitFor(() => expect(app.controller?.state.latestRun?.iterations).toBe(100));
+    await app.updateComplete;
+
+    expect(getByRole(app, "heading", { name: "Así se repartió el turno" })).toBeTruthy();
+    expect(getByRole(app, "heading", { name: "Distribución observada" })).toBeTruthy();
+    expect(app.querySelectorAll(".batch-distribution li")).toHaveLength(4);
+    expect(app.querySelector(".learning-check")).toBeNull();
+
+    fireEvent.click(getByRole(app, "button", { name: "Responder pregunta" }));
+    await app.updateComplete;
+
+    expect(app.querySelectorAll(".learning-check")).toHaveLength(1);
+    expect(app.querySelectorAll(".learning-check__options button")).toHaveLength(3);
+  });
+
+  it("does not replay batch rain after returning to the home tab", async () => {
+    const app = await renderApp();
+
+    fireEvent.click(getByRole(app, "button", { name: "Simular 1000 eventos" }));
+    await vi.waitFor(() => expect(app.controller?.state.latestRun?.iterations).toBe(1000));
+    fireEvent.click(getByRole(app, "button", { name: "Estadísticas" }));
+    await app.updateComplete;
+    fireEvent.click(getByRole(app, "button", { name: "Inicio" }));
+    await app.updateComplete;
+
+    expect(app.querySelectorAll(".event-rain__particle")).toHaveLength(0);
+    expect(getByRole(app, "button", { name: "Simular 1 evento" }).textContent).not.toContain(
+      "Lanzando",
+    );
   });
 
   it("shares the latest run through the injected native adapter", async () => {
@@ -369,7 +407,7 @@ describe("bird-app", () => {
 
     const link = getByRole(app, "link", { name: "Leer la política de privacidad" });
     expect(link.getAttribute("href")).toBe("./privacy.html");
-    expect(link.getAttribute("target")).toBe("_blank");
+    expect(link.hasAttribute("target")).toBe(false);
   });
 
   it("warns visibly when local persistence is unavailable", async () => {

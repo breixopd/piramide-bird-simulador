@@ -37,8 +37,10 @@ Esta lista cubre la APK local de prueba y el AAB para Google Play. La firma es d
 3. Verifica el paquete, versión, firma y hash antes de instalarla:
 
    ```bash
-   ALLOW_DEBUG_SIGNER="1" EXPECTED_VERSION_CODE="1000007" \
-     scripts/prepare-pilot-release.sh android/app/build/outputs/apk/debug/app-debug.apk piramide-bird-1.0.0-device-test.apk
+   APP_VERSION="$(npm run --silent version:name)"
+   APP_VERSION_CODE="$(npm run --silent version:code)"
+   ALLOW_DEBUG_SIGNER="1" EXPECTED_VERSION_CODE="$APP_VERSION_CODE" \
+     scripts/prepare-pilot-release.sh android/app/build/outputs/apk/debug/app-debug.apk "piramide-bird-$APP_VERSION-device-test.apk"
    ```
 
 4. Instala la APK con `adb install --replace RUTA_APK` y ejecuta `docs/pilot-testing.md`, incluida la prueba sin conexión, segundo plano, reinicio, exportación y consentimiento.
@@ -56,6 +58,31 @@ Esta lista cubre la APK local de prueba y el AAB para Google Play. La firma es d
 - [ ] Data safety declara los datos técnicos de Analytics/Crashlytics condicionados al consentimiento.
 - [ ] Se realiza primero una publicación de prueba interna o cerrada y se revisan los informes pre-lanzamiento.
 - [ ] El despliegue de producción es gradual y tiene una persona responsable de vigilar crash rate y ANR.
+
+## Automatización protegida de Google Play
+
+El workflow `.github/workflows/play-release.yml` deriva `versionName` y `versionCode`
+de una etiqueta `vX.Y.Z`. Publicar una etiqueta que coincida con la versión de
+`package.json` compila, firma y sube automáticamente esa versión a la pista cerrada
+`alpha`. El resto de operaciones son manuales, exigen una confirmación literal y
+están protegidas mediante entornos de GitHub.
+
+- `check-access`: solo comprueba acceso de lectura.
+- `upload-internal`: exige `UPLOAD_INTERNAL`, compila un AAB firmado y lo publica
+  únicamente en pruebas internas.
+- `upload-closed`: exige `UPLOAD_CLOSED`, compila un AAB firmado y actualiza la
+  pista cerrada `alpha`. Una etiqueta `vX.Y.Z` realiza esta operación
+  automáticamente después de ejecutar todas las comprobaciones.
+- `sync-testers`: exige `SYNC_TESTERS` y admite correos de Google Groups. La API de
+  Google Play no permite automatizar listas de correos individuales.
+- `sync-listing`: exige `SYNC_LISTING` y sincroniza la ficha española, el icono, el
+  gráfico destacado y las capturas.
+- `promote-production`: exige `PROMOTE_VERSION_<versionCode>` y la aprobación del
+  entorno `play-production`.
+
+La primera publicación a producción debe usar fracción `1`. Para actualizaciones se
+recomienda empezar por `0.1` y aumentar manualmente después de revisar Android
+Vitals, Crashlytics y los comentarios de las personas probadoras.
 
 ## Retirada o reversión
 

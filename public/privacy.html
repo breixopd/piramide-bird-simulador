@@ -59,9 +59,35 @@
 
       header,
       main,
-      footer {
+      footer,
+      .return-nav__inner {
         width: min(100% - 2rem, 48rem);
         margin-inline: auto;
+      }
+
+      .return-nav {
+        position: sticky;
+        z-index: 10;
+        top: 0;
+        border-bottom: 1px solid var(--line);
+        background: color-mix(in srgb, var(--background) 92%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .return-nav__inner {
+        padding-block: 0.75rem;
+      }
+
+      .return-link {
+        display: inline-flex;
+        min-height: 2.75rem;
+        align-items: center;
+        padding-inline: 1rem;
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        background: var(--surface);
+        text-decoration: none;
       }
 
       header {
@@ -180,6 +206,11 @@
     </style>
   </head>
   <body>
+    <nav class="return-nav" aria-label="Navegación de regreso">
+      <div class="return-nav__inner">
+        <a class="return-link" href="./"><span aria-hidden="true">←</span>&nbsp; Volver</a>
+      </div>
+    </nav>
     <header>
       <p class="eyebrow">Privacidad · Información clara</p>
       <h1>Política de privacidad</h1>

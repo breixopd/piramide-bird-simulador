@@ -103,6 +103,7 @@ describe("convergence chart series", () => {
     chart.modelId = "bird-classic";
     chart.style.setProperty("--ink-soft", "#123456");
     chart.style.setProperty("--surface", "#fefefe");
+    chart.style.setProperty("--outcome-near-miss", "#112233");
     document.body.append(chart);
     await chart.updateComplete;
 
@@ -131,6 +132,7 @@ describe("convergence chart series", () => {
     expect(config?.options?.plugins?.legend?.labels?.color).toBe("#123456");
     expect(config?.options?.scales?.x?.ticks?.color).toBe("#123456");
     expect(config?.options?.plugins?.tooltip?.backgroundColor).toBe("#fefefe");
+    expect(config?.data.datasets[0]?.borderColor).toBe("#112233");
     contextSpy.mockRestore();
   });
 });

@@ -99,7 +99,7 @@ describe("stats view data windows", () => {
     expect(view.querySelector(".history-list")?.textContent).not.toContain("1 eventos");
   });
 
-  it("summarizes hazard-question learning separately from simulation totals", async () => {
+  it("summarizes preventive-question learning separately from simulation totals", async () => {
     const view = await renderStats();
     const learning = view.querySelector('[aria-labelledby="learning-stats-title"]');
     const text = learning?.textContent?.replace(/\s+/g, " ");

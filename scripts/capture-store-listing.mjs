@@ -69,7 +69,16 @@ try {
   page.on("pageerror", (error) => browserProblems.push(`page error: ${error.message}`));
 
   await page.addInitScript(() => {
-    Math.random = () => 0;
+    let randomState = 100;
+    Math.random = () => {
+      randomState = (Math.imul(randomState, 1_664_525) + 1_013_904_223) >>> 0;
+      return randomState / 4_294_967_296;
+    };
+    let runNumber = 0;
+    Object.defineProperty(globalThis.crypto, "randomUUID", {
+      configurable: true,
+      value: () => `00000000-0000-4000-8000-${String(++runNumber).padStart(12, "0")}`,
+    });
   });
   await page.goto(baseUrl);
   await page.getByRole("heading", { name: "Pirámide de Bird" }).waitFor();
@@ -107,11 +116,17 @@ try {
   }
   await page.getByRole("button", { name: "Simular 100 eventos" }).click();
   await page.locator('[aria-label="Simular 1 evento"]:not([disabled])').waitFor();
-  await capture("02-simulacion.png");
+  const batchResult = page.getByRole("region", { name: "100 eventos" });
+  await batchResult.getByRole("heading", { name: "Distribución observada" }).waitFor();
+  await batchResult.evaluate((element) => element.scrollIntoView({ block: "start" }));
+  await capture("02-simulacion.png", false);
 
-  const question = page.getByRole("group", { name: "¿Cuál es el peligro principal?" });
+  await batchResult.getByRole("button", { name: "Explorar un caso de esta tanda" }).click();
+  const question = page.locator(".learning-check");
   await question.waitFor();
-  await question.scrollIntoViewIfNeeded();
+  await question.evaluate((element) =>
+    element.closest(".result-card__body")?.scrollIntoView({ block: "start" }),
+  );
   await capture("03-caso-preventivo.png", false);
   await question.locator(".learning-check__options button").nth(2).click();
 

@@ -24,8 +24,8 @@ export interface AchievementDefinition {
 export const ACHIEVEMENTS: readonly AchievementDefinition[] = [
   {
     id: "hazard-spotter",
-    name: "Detector de peligros",
-    description: "Identificaste correctamente el peligro principal de un caso.",
+    name: "Primer análisis",
+    description: "Respondiste correctamente una pregunta preventiva.",
     icon: "target",
     target: 1,
     metric: "correctAnswers",
@@ -33,7 +33,7 @@ export const ACHIEVEMENTS: readonly AchievementDefinition[] = [
   {
     id: "hazard-streak-5",
     name: "Racha preventiva",
-    description: "Identificaste correctamente cinco peligros consecutivos.",
+    description: "Respondiste correctamente cinco preguntas consecutivas.",
     icon: "streak",
     target: 5,
     metric: "bestCorrectStreak",

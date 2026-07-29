@@ -55,13 +55,14 @@ export function selectVisibleOutcomes(
 export class EventRain extends LitElement {
   @property({ attribute: false }) run: SimulationRunSummary | null = null;
   @property({ type: Boolean }) reducedMotion = false;
+  @property({ type: Boolean }) active = false;
 
   protected createRenderRoot(): HTMLElement | DocumentFragment {
     return this;
   }
 
   protected updated(): void {
-    if (this.reducedMotion) return;
+    if (this.reducedMotion || !this.active) return;
     const particles = this.querySelectorAll<HTMLElement>(".event-rain__particle");
     const reduced =
       this.closest("bird-app")?.getAttribute("data-motion") === "reduced" ||
@@ -87,7 +88,8 @@ export class EventRain extends LitElement {
   }
 
   protected render() {
-    if (!this.run || this.run.iterations === 1 || this.reducedMotion) return nothing;
+    if (!this.active || !this.run || this.run.iterations === 1 || this.reducedMotion)
+      return nothing;
     const visible = selectVisibleOutcomes(this.run.counts);
     return html`<div class="event-rain" aria-hidden="true">
       ${visible.map(
