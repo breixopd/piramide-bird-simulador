@@ -36,7 +36,7 @@ describe("achievements view learning progress", () => {
     await view.updateComplete;
 
     const text = view.textContent?.replace(/\s+/g, " ");
-    expect(text).toContain("Detector de peligros");
+    expect(text).toContain("Primer análisis");
     expect(text).toContain("Racha preventiva");
     expect(text).toContain("3 de 5");
     expect(text).toContain("Explorador de casos");

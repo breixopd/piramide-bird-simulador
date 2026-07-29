@@ -15,12 +15,12 @@ import type { SimulationRunSummary } from "../platform/history";
 
 Chart.register(LineController, LineElement, LinearScale, PointElement, Tooltip, Legend);
 
-const outcomeColors: Readonly<Record<OutcomeId, string>> = {
-  "near-miss": "#3b82f6", // blue
-  "property-damage": "#22c55e", // green
-  "minor-injury": "#eab308", // yellow
-  "serious-injury": "#ef4444", // red
-  fatality: "#8b5cf6", // purple
+const fallbackOutcomeColors: Readonly<Record<OutcomeId, string>> = {
+  "near-miss": "#0284c7",
+  "property-damage": "#15803d",
+  "minor-injury": "#c2410c",
+  "serious-injury": "#9f1239",
+  fatality: "#4b5563",
 };
 
 interface ConvergenceLine {
@@ -42,6 +42,7 @@ export interface ConvergenceSeries {
 export function buildConvergenceSeries(
   history: readonly SimulationRunSummary[],
   model: SimulationModel,
+  colors: Readonly<Record<OutcomeId, string>> = fallbackOutcomeColors,
 ): ConvergenceSeries {
   const runs = history
     .filter(({ modelId }) => modelId === model.id)
@@ -63,7 +64,7 @@ export function buildConvergenceSeries(
 
   const theoreticalTotal = model.outcomes.reduce((sum, { weight }) => sum + weight, 0);
   const datasets = model.outcomes.flatMap((outcome): ConvergenceLine[] => {
-    const color = outcomeColors[outcome.id];
+    const color = colors[outcome.id];
     return [
       {
         label: `${outcome.label} · observado`,
@@ -147,7 +148,13 @@ export class ConvergenceChart extends LitElement {
     const context = this.canvas?.getContext("2d");
     if (!context) return;
     const model = MODELS[this.modelId];
-    const series = buildConvergenceSeries(this.history, model);
+    const colors = Object.fromEntries(
+      (Object.keys(fallbackOutcomeColors) as OutcomeId[]).map((outcome) => [
+        outcome,
+        this.readThemeColor(`--outcome-${outcome}`, fallbackOutcomeColors[outcome]),
+      ]),
+    ) as Record<OutcomeId, string>;
+    const series = buildConvergenceSeries(this.history, model, colors);
     const inkSoft = this.readThemeColor("--ink-soft", "#91a6b9");
     const ink = this.readThemeColor("--ink", "#c4d1dc");
     const surface = this.readThemeColor("--surface", "#07111d");

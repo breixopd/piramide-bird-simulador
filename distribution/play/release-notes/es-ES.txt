@@ -1,0 +1,1 @@
+Ahora ×100 y ×1000 comparten un diseño más claro y coherente con el tema. Las preguntas opcionales son más visibles, con 8 tipos y 86 escenarios preventivos. También corregimos la lluvia de colores al cambiar de pestaña y mejoramos privacidad, estadísticas, logros y layouts móviles.

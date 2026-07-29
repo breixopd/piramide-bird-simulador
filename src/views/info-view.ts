@@ -4,6 +4,9 @@ import { customElement, property } from "lit/decorators.js";
 import type { AppState } from "../app-controller";
 import { icon } from "../components/app-icon";
 import type { AnalyticsConsent, SettingsState, ThemePreference } from "../platform/settings";
+import packageMetadata from "../../package.json";
+
+const appVersion = import.meta.env.VITE_APP_VERSION || packageMetadata.version;
 
 @customElement("info-view")
 export class InfoView extends LitElement {
@@ -80,7 +83,7 @@ export class InfoView extends LitElement {
           La preferencia se aplica de inmediato. Reinicia la aplicación para confirmar el estado
           completo de los SDK.
         </p>
-        <a class="settings-link" href="./privacy.html" target="_blank" rel="noreferrer">
+        <a class="settings-link" href="./privacy.html">
           Leer la política de privacidad <span aria-hidden="true">→</span>
         </a>
       </section>
@@ -99,7 +102,7 @@ export class InfoView extends LitElement {
       <footer class="app-footer">
         <strong>Pirámide de Bird Simulador</strong>
         <span
-          >v1.0.0 · Desarrollado por
+          >v${appVersion} · Desarrollado por
           <a
             class="app-footer__link"
             href="https://github.com/breixopd"

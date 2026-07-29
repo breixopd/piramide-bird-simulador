@@ -1,0 +1,365 @@
+name: Google Play
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Operación explícita de Google Play
+        required: true
+        type: choice
+        options:
+          - check-access
+          - upload-internal
+          - upload-closed
+          - sync-testers
+          - sync-listing
+          - promote-production
+      confirmation:
+        description: Confirmación exigida por la operación
+        required: false
+        type: string
+      version_code:
+        description: versionCode que se promoverá a producción
+        required: false
+        type: string
+      rollout_fraction:
+        description: Fracción de producción; 1 para publicación completa
+        required: false
+        default: "0.1"
+        type: string
+      tester_groups:
+        description: Correos de Google Groups separados por comas
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: google-play-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  check-access:
+    if: inputs.operation == 'check-access'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: play-internal
+
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.PLAY_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/androidpublisher
+
+      - name: Confirm Google Play access
+        env:
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+          PLAY_PACKAGE_NAME: ${{ vars.PLAY_PACKAGE_NAME }}
+        run: node scripts/play-publisher.mjs access
+
+  upload-testing:
+    if: >-
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+      inputs.operation == 'upload-internal' ||
+      inputs.operation == 'upload-closed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment: play-internal
+
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@v7
+
+      - name: Derive and validate the app version
+        id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          if [ "$EVENT_NAME" = "push" ]; then
+            version_name="${TAG_NAME#v}"
+            package_version="$(node scripts/version.mjs name)"
+            test "$version_name" = "$package_version"
+          else
+            version_name="$(node scripts/version.mjs name)"
+          fi
+          version_code="$(node scripts/version.mjs code "$version_name")"
+          {
+            printf 'name=%s\n' "$version_name"
+            printf 'code=%s\n' "$version_code"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Require explicit testing confirmation
+        env:
+          CONFIRMATION: ${{ github.event_name == 'push' && 'UPLOAD_CLOSED' || inputs.confirmation }}
+          OPERATION: ${{ github.event_name == 'push' && 'upload-closed' || inputs.operation }}
+        run: |
+          if [ "$OPERATION" = "upload-internal" ]; then
+            test "$CONFIRMATION" = "UPLOAD_INTERNAL"
+          else
+            test "$CONFIRMATION" = "UPLOAD_CLOSED"
+          fi
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Install Android SDK 36
+        run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify source and Play metadata
+        run: |
+          npm run format:check
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run play:test
+          npm run play:check
+          npm audit --omit=dev --audit-level=high
+
+      - name: Restore Firebase and upload signing material
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+          UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+          UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+        run: |
+          test -n "$GOOGLE_SERVICES_JSON_BASE64"
+          test -n "$UPLOAD_KEYSTORE_BASE64"
+          printf '%s' "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > "$RUNNER_TEMP/google-services.json"
+          printf '%s' "$UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+          cp "$RUNNER_TEMP/google-services.json" android/app/google-services.json
+          {
+            printf 'storeFile=%s\n' "$RUNNER_TEMP/upload.jks"
+            printf 'storePassword=%s\n' "$UPLOAD_STORE_PASSWORD"
+            printf 'keyAlias=%s\n' "$UPLOAD_KEY_ALIAS"
+            printf 'keyPassword=%s\n' "$UPLOAD_KEY_PASSWORD"
+          } > "$RUNNER_TEMP/upload.properties"
+          chmod 600 "$RUNNER_TEMP/upload.jks" "$RUNNER_TEMP/upload.properties"
+
+      - name: Verify upload certificate
+        env:
+          UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          EXPECTED_CERT_SHA256: ${{ secrets.ANDROID_UPLOAD_CERT_SHA256 }}
+        run: |
+          actual="$(
+            keytool -list -v \
+              -keystore "$RUNNER_TEMP/upload.jks" \
+              -storepass "$UPLOAD_STORE_PASSWORD" \
+              -alias "$UPLOAD_KEY_ALIAS" |
+              sed -n 's/.*SHA256: //p' |
+              head -n 1 |
+              tr -d '[:space:]:'
+          )"
+          expected="$(printf '%s' "$EXPECTED_CERT_SHA256" | tr -d '[:space:]:' | tr '[:lower:]' '[:upper:]')"
+          actual="$(printf '%s' "$actual" | tr '[:lower:]' '[:upper:]')"
+          test -n "$actual"
+          test "$actual" = "$expected"
+
+      - name: Build signed release bundle
+        env:
+          KEYSTORE_PROPERTIES_FILE: ${{ runner.temp }}/upload.properties
+          APP_VERSION_NAME: ${{ steps.version.outputs.name }}
+          APP_VERSION_CODE: ${{ steps.version.outputs.code }}
+          VITE_APP_VERSION: ${{ steps.version.outputs.name }}
+        run: |
+          npm run build
+          npx cap sync android
+          cd android
+          ./gradlew --no-daemon lint test bundleRelease
+
+      - name: Record bundle hash
+        run: |
+          sha256sum android/app/build/outputs/bundle/release/app-release.aab |
+            tee "$RUNNER_TEMP/app-release.aab.sha256"
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.PLAY_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/androidpublisher
+
+      - name: Upload to the selected testing track
+        env:
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+          PLAY_PACKAGE_NAME: ${{ vars.PLAY_PACKAGE_NAME }}
+          PLAY_INTERNAL_CONFIRMATION: ${{ github.event_name == 'push' && 'UPLOAD_CLOSED' || inputs.confirmation }}
+          PLAY_CLOSED_CONFIRMATION: ${{ github.event_name == 'push' && 'UPLOAD_CLOSED' || inputs.confirmation }}
+          OPERATION: ${{ github.event_name == 'push' && 'upload-closed' || inputs.operation }}
+        run: |
+          short_sha="${GITHUB_SHA::7}"
+          node scripts/play-publisher.mjs "$OPERATION" \
+            --aab android/app/build/outputs/bundle/release/app-release.aab \
+            --release-name "Pirámide de Bird ${{ steps.version.outputs.name }} (${short_sha})" \
+            --commit
+
+      - name: Retain signed bundle evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: play-${{ steps.version.outputs.name }}-${{ github.sha }}
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            ${{ runner.temp }}/app-release.aab.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+  sync-testers:
+    if: inputs.operation == 'sync-testers'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: play-internal
+
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@v7
+
+      - name: Require explicit tester confirmation
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: test "$CONFIRMATION" = "SYNC_TESTERS"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.PLAY_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/androidpublisher
+
+      - name: Synchronize tester Google Groups
+        env:
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+          PLAY_PACKAGE_NAME: ${{ vars.PLAY_PACKAGE_NAME }}
+          PLAY_TESTERS_CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          node scripts/play-publisher.mjs sync-testers \
+            --groups "${{ inputs.tester_groups }}" \
+            --commit
+
+  sync-listing:
+    if: inputs.operation == 'sync-listing'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: play-production
+
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@v7
+
+      - name: Require explicit listing confirmation
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: test "$CONFIRMATION" = "SYNC_LISTING"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Validate listing locally
+        run: node scripts/play-publisher.mjs check
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.PLAY_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/androidpublisher
+
+      - name: Synchronize Spanish listing and images
+        env:
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+          PLAY_PACKAGE_NAME: ${{ vars.PLAY_PACKAGE_NAME }}
+          PLAY_LISTING_CONFIRMATION: ${{ inputs.confirmation }}
+        run: node scripts/play-publisher.mjs sync-listing --commit
+
+  promote-production:
+    if: inputs.operation == 'promote-production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: play-production
+
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@v7
+
+      - name: Require exact production confirmation
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+          VERSION_CODE: ${{ inputs.version_code }}
+        run: |
+          test -n "$VERSION_CODE"
+          test "$CONFIRMATION" = "PROMOTE_VERSION_${VERSION_CODE}"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.PLAY_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/androidpublisher
+
+      - name: Promote the tested version
+        env:
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+          PLAY_PACKAGE_NAME: ${{ vars.PLAY_PACKAGE_NAME }}
+          PLAY_PRODUCTION_CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          node scripts/play-publisher.mjs promote-production \
+            --version-code "${{ inputs.version_code }}" \
+            --fraction "${{ inputs.rollout_fraction }}" \
+            --commit

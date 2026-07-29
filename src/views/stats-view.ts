@@ -96,7 +96,7 @@ export class StatsView extends LitElement {
 
               <section class="stats-section learning-stats" aria-labelledby="learning-stats-title">
                 <p class="eyebrow">Aprendizaje preventivo</p>
-                <h2 id="learning-stats-title">Tus respuestas sobre peligros</h2>
+                <h2 id="learning-stats-title">Tus respuestas preventivas</h2>
                 <div class="learning-stats-grid">
                   <article>
                     <span>Preguntas respondidas</span>

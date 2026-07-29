@@ -1,6 +1,6 @@
 {
   "name": "piramide-bird-simulador",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "license": "SEE LICENSE IN LICENSE",
@@ -23,6 +23,10 @@
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots",
     "capture:store-listing": "npm run build && node scripts/capture-store-listing.mjs",
+    "play:check": "node scripts/play-publisher.mjs check",
+    "play:test": "node --test scripts/play-publisher.node-test.mjs",
+    "version:name": "node scripts/version.mjs name",
+    "version:code": "node scripts/version.mjs code",
     "typecheck": "tsc -b --pretty false",
     "lint": "eslint . --max-warnings 0",
     "format:check": "prettier --check .",
